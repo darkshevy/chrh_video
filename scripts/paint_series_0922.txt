@@ -1,0 +1,47 @@
+PAINT & PRIMER SERIES — 2026-09-22
+Source: "At Car Hauler Repair Houston.txt" (general script), paraphrased per video.
+All footage = the red trailer only (boss rule 1), except video 6 (general overview — VO speaks about the whole shop).
+Voice: Alistair Kingsley, ElevenLabs v3, 1x. Save VO as voiceover/<key>.mp3.
+
+========================================================================
+1) key: fullrefinish   — title "FULL REFINISH" / "STRIP · PRIME · PAINT"   — music: Hollywood waves
+========================================================================
+When an older car hauler needs more than a touch-up, Car Hauler Repair Houston takes the finish all the way back to bare metal. The trailer is stripped and sandblasted, removing old coatings and rust from the entire frame until only clean gray steel is left. That fresh steel is treated for corrosion and sealed with an industrial epoxy primer, the layer that holds everything that comes after it. Then the trailer is professionally painted with a durable industrial top coat, and a non-skid surface is added where it's needed. We don't hide problems under a quick coat of paint. We remove them, protect the steel, and send the trailer back to work. Bring your hauler to Car Hauler Repair Houston.
+
+Footage order: пескоструй2/3 (blasting, dust) -> пескоструй (nozzle, rust) -> покраска 0–15 (gray) -> 14-49-39 (spraying on gray) -> покраска 16–25 (brown primer) -> IMG_0331 (red) -> 19-07-11 (non-skid roller) -> drone 0020.
+
+========================================================================
+2) key: primer   — title "PRIMER" / "THE COAT YOU DON'T SEE"   — music: Fields of space
+========================================================================
+Primer is the coat most people never notice, and it's one of the most important steps in any trailer restoration. On this car hauler, the frame was sandblasted down to bare gray steel first, because primer can only bond properly to a clean surface. Our team then sprayed the structure with a brown industrial epoxy primer, section by section, sealing the fresh metal before moisture and rust had a chance to come back. Every beam, post and deck support gets covered before any color goes on. Only after the primer is down does the red top coat follow. Skip this step, and even the best paint won't last. Ask Car Hauler Repair Houston about sandblasting and primer work.
+
+Footage order: пескоструй2 (blasting) -> 14-58-29 mid / 14-59-44 0–3 (gray) -> 14-49-39 2–6 (worker spraying gray frame) -> покраска 16–25 (brown primer) -> покраска2 0–7 (red) -> drone.
+
+========================================================================
+3) key: topcoat   — title "TOP COAT" / "THE FINISH"   — music: Kama Sutra
+========================================================================
+This is the moment a restoration finally becomes visible. After sandblasting and primer, this car hauler received its red top coat at Car Hauler Repair Houston, laid over every beam, post and deck section of the frame. We finish trailers with durable industrial or polyurethane coatings, made to stand up to heavy loads and daily work. A good top coat does more than make a trailer look new again. It protects the steel underneath and helps keep corrosion from coming back. From the upper decks down to the lower frame, the whole structure now carries one clean, even finish. If your hauler is ready for a fresh start, we can take it from bare steel to final coat.
+
+Footage: red only — IMG_0331, 14-49-08 (sunset), 14-58-40, 19-06-53, drone 0023 (along the decks), drone 0020 (fly-through).
+
+========================================================================
+4) key: nonskid   — title "NON-SKID" / "THE FINAL DETAIL"   — music: Another Day
+========================================================================
+The red paint is done, but this car hauler isn't finished yet. The next step is non-skid. First, our team masks off the freshly painted steel with tape, leaving open only the strips that will get the new surface. Then the non-skid coating is rolled on by hand, one section at a time, along the rails and edges of the trailer. The tape keeps every line clean, so the texture goes exactly where it belongs and the new paint stays untouched. The result is a sharp red finish with a textured surface built right into it. Small details like this are what separate a simple paint job from a real restoration. See more of our work on our page.
+
+Footage (all NEW 09-22 clips): 19-07-16 (tape on red frame) -> 19-07-22 (taped rails) -> 19-07-05 3–5 (roller) -> 19-07-11 (roller close-up) -> 19-07-08 (fresh texture) -> 19-07-02 -> "sneak peek" (black decks) -> "Fresh paint NO-SKID" / 19-06-53 (finished).
+
+========================================================================
+5) key: fromabove   — title "FROM ABOVE" / "RESTORED & READY"   — music: Symphony one
+========================================================================
+From the air, you can see the full scope of a complete restoration. This car hauler was sandblasted, primed and repainted at Car Hauler Repair Houston, and every deck and beam now shares the same fresh red finish. Projects like this are handled from start to finish under one roof, from bare steel preparation and corrosion protection all the way to the final coat of paint. Our goal is never to cover problems with a temporary patch. We restore the structure, protect it against corrosion, and return the equipment to reliable working condition. Whether your trailer needs a single repair or a complete rebuild, our shop is equipped to handle the entire project. Car Hauler Repair Houston, Houston, Texas.
+
+Footage: drone DJI_2026092017xx (0018–0026, red trailer) + 1–2 ground shots of red finish. No stabilization on drone.
+
+========================================================================
+6) key: overview   — title "ONE SHOP" / "EVERYTHING UNDER ONE ROOF"   — music: Hyde and seek
+   (general, mixed projects allowed — VO speaks about the service, not one trailer)
+========================================================================
+At Car Hauler Repair Houston, we work only on car haulers, from small repairs to complete rebuilds. We repair cracked frame rails, crossmembers, side beams and kingpin areas, and straighten frames that have lost their geometry. Our fabrication department works in steel, aluminum and stainless steel, building brackets, ramps and replacement sections. We replace decking, repair hydraulic systems from cylinders and hoses to pumps and PTO units, and handle wiring, lights, brakes and running gear. For full restorations, trailers are sandblasted, primed and painted. We work on Cottrell, Sun Country, Sun Valley, Wally-Mo, Boydstun, Miller and more, and we're a Cottrell Certified Warranty Repair Center. Everything your trailer needs, under one roof.
+
+Footage: Miller hinges (0A2F/1D59) -> welding 19-03-53 0–4 -> aluminum deck 19-04-49 -> Drone Directions decks -> hydraulics 14-50-11 -> lights 14-49-30 -> sandblast -> red finish -> yard drone.

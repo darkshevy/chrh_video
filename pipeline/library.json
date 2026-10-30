@@ -1,0 +1,3414 @@
+{
+  "_about": "Clip library for the automatic editor. 'categories': topic labels + script keywords. 'clips': one record per footage file — enabled (use in edits), cats (topics), dull (seconds never to use), manual (tagged by hand; hand-tagged clips also teach the auto-tagger), reason (why disabled). New files are tagged by autotag.py.",
+  "categories": {
+    "wide": {
+      "label": "Wide: shop / trailer in the shop",
+      "keywords": [
+        "shop",
+        "bay",
+        "bays",
+        "deck",
+        "decks",
+        "decking",
+        "carrier",
+        "carriers",
+        "trailer",
+        "trailers",
+        "hauler",
+        "haulers",
+        "rig",
+        "rigs",
+        "multi",
+        "inside",
+        "full",
+        "length",
+        "platform",
+        "load",
+        "loaded",
+        "loading",
+        "unit",
+        "units",
+        "fleet",
+        "cottrell",
+        "authorized",
+        "warranty",
+        "finished",
+        "restoration",
+        "rebuild",
+        "result",
+        "ready"
+      ]
+    },
+    "close": {
+      "label": "Close-up: welds, beams, gussets",
+      "keywords": [
+        "steel",
+        "beam",
+        "beams",
+        "joint",
+        "joints",
+        "structure",
+        "structural",
+        "mainframe",
+        "frame",
+        "quality",
+        "right",
+        "backed",
+        "covered",
+        "coverage",
+        "done",
+        "work",
+        "workmanship",
+        "price",
+        "writing",
+        "exact"
+      ]
+    },
+    "weld": {
+      "label": "Welding",
+      "keywords": [
+        "weld",
+        "welds",
+        "welded",
+        "welding",
+        "crack",
+        "cracked",
+        "bracket",
+        "brackets",
+        "gusset",
+        "gussets",
+        "plate",
+        "plates",
+        "fabricate",
+        "fabrication",
+        "reinforce",
+        "repair",
+        "repairs",
+        "fix",
+        "fixed",
+        "broken"
+      ]
+    },
+    "hyd": {
+      "label": "Hydraulics",
+      "keywords": [
+        "hydraulic",
+        "hydraulics",
+        "cylinder",
+        "cylinders",
+        "hose",
+        "hoses",
+        "line",
+        "lines",
+        "fitting",
+        "fittings",
+        "pump",
+        "pumps",
+        "pto",
+        "ptos",
+        "valve",
+        "valves",
+        "leak",
+        "leaks",
+        "leaking",
+        "pressure",
+        "fluid",
+        "creep",
+        "drops",
+        "sticks",
+        "crimped",
+        "motor",
+        "motors"
+      ]
+    },
+    "alu": {
+      "label": "Aluminum, ramps",
+      "keywords": [
+        "aluminum",
+        "ramp",
+        "ramps",
+        "section",
+        "sections",
+        "stainless",
+        "walkway",
+        "walkways",
+        "trim"
+      ]
+    },
+    "hub": {
+      "label": "Running gear: hubs, wheels",
+      "keywords": [
+        "brake",
+        "brakes",
+        "hub",
+        "hubs",
+        "bearing",
+        "bearings",
+        "seal",
+        "seals",
+        "wheel",
+        "wheels",
+        "tire",
+        "tires",
+        "suspension",
+        "axle",
+        "axles",
+        "spring",
+        "springs",
+        "shocks",
+        "drums",
+        "gear",
+        "scale",
+        "air"
+      ]
+    },
+    "rust": {
+      "label": "Rust, damage",
+      "keywords": [
+        "rust",
+        "rusted",
+        "corrosion",
+        "rotted",
+        "damaged",
+        "damage",
+        "worn",
+        "failing",
+        "failed",
+        "failure",
+        "failures",
+        "quit",
+        "quits",
+        "patch",
+        "patched",
+        "temporary",
+        "stopgap",
+        "problem",
+        "problems",
+        "wrong",
+        "compartment",
+        "compartments",
+        "box"
+      ]
+    },
+    "grind": {
+      "label": "Grinder, cutting",
+      "keywords": [
+        "cut",
+        "grind",
+        "grinder",
+        "strip",
+        "stripped",
+        "clean",
+        "cleaning",
+        "remove",
+        "modified"
+      ]
+    },
+    "work": {
+      "label": "People at work",
+      "keywords": [
+        "team",
+        "tech",
+        "techs",
+        "technician",
+        "technicians",
+        "mechanic",
+        "eugene",
+        "director",
+        "diagnosis",
+        "diagnoses",
+        "inspected",
+        "inspection",
+        "specialize",
+        "master",
+        "senior",
+        "customers",
+        "driver",
+        "drivers",
+        "owner",
+        "owners",
+        "people",
+        "talk"
+      ]
+    },
+    "yard": {
+      "label": "Yard and building outside",
+      "keywords": [
+        "yard",
+        "houston",
+        "freeway",
+        "gulf",
+        "interchange",
+        "auction",
+        "gate",
+        "overnight",
+        "outside",
+        "road",
+        "highway",
+        "drive",
+        "location",
+        "southeast",
+        "call",
+        "text",
+        "phone",
+        "number",
+        "screen",
+        "contact",
+        "come",
+        "bring",
+        "visit",
+        "open"
+      ]
+    },
+    "blast": {
+      "label": "Sandblasting (close, bare gray steel)",
+      "keywords": [
+        "blast",
+        "blasting",
+        "blasted",
+        "sandblast",
+        "sandblasting",
+        "sandblasted",
+        "bare",
+        "surface"
+      ]
+    }
+  },
+  "people": [
+    "сварка.",
+    "14-50-04",
+    "14-49-30",
+    "15-01-24",
+    "19-04-40",
+    "Storage Compartment",
+    "14-49-39",
+    "покраска.",
+    "пескоструй",
+    "19-07-",
+    "19-04-15",
+    "19-03-53",
+    "1D59",
+    "14-59-44"
+  ],
+  "tracks": [
+    "Thunder",
+    "Hollywood waves",
+    "Kama Sutra",
+    "Fields of space",
+    "Another Day",
+    "Symphony one",
+    "Hyde and seek"
+  ],
+  "logos": {
+    "cottrell": {
+      "file": "assets/cottrell_logo.png",
+      "word": "cottrell",
+      "width": 420
+    }
+  },
+  "clips": {
+    "Car Hauler Storage Compartment Repair 2.mp4": {
+      "enabled": true,
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "Car Hauler Storage Compartment Repair.mp4": {
+      "enabled": true,
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-21_14-49-08.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_14-58-29.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_14-58-40.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-04-15.mp4": {
+      "enabled": true,
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-22_19-04-40.mp4": {
+      "enabled": true,
+      "cats": [
+        "work"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "DJI_20260920170925_0018_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171021_0019_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171058_0020_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171133_0021_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171217_0022_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171321_0023_D (2).mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171321_0023_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171343_0024_D.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "DJI_20260920171423_0025_D.mp4": {
+      "enabled": true,
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          19.0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": ""
+    },
+    "DJI_20260920171458_0026_D.mp4": {
+      "enabled": true,
+      "cats": [
+        "yard"
+      ],
+      "dull": [
+        [
+          12.0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-21_14-48-45.mp4": {
+      "enabled": true,
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-21_14-48-57.mp4": {
+      "enabled": true,
+      "cats": [
+        "hub"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-21_14-59-44.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_15-01-24.mp4": {
+      "enabled": true,
+      "cats": [
+        "grind"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "зеркальная поверхность.mp4": {
+      "enabled": true,
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-22_19-04-49.mp4": {
+      "enabled": true,
+      "cats": [
+        "close",
+        "alu"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "5 car decking front to rear through the frame.mp4": {
+      "enabled": true,
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          24.0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": ""
+    },
+    "5 car decking installed.mp4": {
+      "enabled": true,
+      "cats": [
+        "wide"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "5 car decking rear to back.mp4": {
+      "enabled": true,
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          17.0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": ""
+    },
+    "5 car decking rear to the belly.mp4": {
+      "enabled": true,
+      "cats": [
+        "wide",
+        "hyd"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "shop east to west and south.mp4": {
+      "enabled": true,
+      "cats": [
+        "yard"
+      ],
+      "dull": [
+        [
+          19.0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": ""
+    },
+    "yard footage.mp4": {
+      "enabled": true,
+      "cats": [
+        "yard"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "пескоструй.mp4": {
+      "enabled": true,
+      "cats": [
+        "blast"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "пескоструй3.mp4": {
+      "enabled": true,
+      "cats": [
+        "blast"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "Fresh paint, next step NO-SKID.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "IMG_0331.MOV": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_14-49-39.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_14-50-11.mp4": {
+      "enabled": true,
+      "cats": [
+        "hyd",
+        "hub"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-22_19-06-53.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-02.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-05.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-08.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-11.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-16.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-22_19-07-22.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "покраска.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "покраска2.mp4": {
+      "enabled": false,
+      "cats": [],
+      "dull": [],
+      "manual": true,
+      "reason": "outdoor painting"
+    },
+    "video_2026-09-21_14-48-40.mp4": {
+      "enabled": true,
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-21_14-50-04.mp4": {
+      "enabled": true,
+      "cats": [
+        "close",
+        "weld",
+        "work"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "video_2026-09-22_19-03-53.mp4": {
+      "enabled": true,
+      "cats": [
+        "alu"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "сварка.mp4": {
+      "enabled": true,
+      "cats": [
+        "close",
+        "weld",
+        "grind",
+        "work"
+      ],
+      "dull": [],
+      "manual": true,
+      "reason": ""
+    },
+    "0A2FB686-BECC-445B-9808-02D78275A277.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.85
+      }
+    },
+    "0C4ADDF4-BBF0-4058-B67A-2EC6642FC70A.MP4": {
+      "cats": [
+        "close",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.56,
+        "hub": 0.22
+      }
+    },
+    "1D597824-C830-4341-A7FC-C589D86E5019.MP4": {
+      "cats": [
+        "close",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.75,
+        "grind": 0.25
+      }
+    },
+    "23BED07B-2D42-4F59-B6D0-48B951A1859B.MOV": {
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.4,
+        "weld": 0.2
+      }
+    },
+    "2E5A3B80-1B92-4EED-B731-86313DD25492.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "30504AA8-EE48-4565-84A3-2E22A39496DF.MP4": {
+      "cats": [
+        "close",
+        "wide",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.5,
+        "wide": 0.25,
+        "hub": 0.25
+      }
+    },
+    "415B4C4F-16A3-46AC-A06D-5BB147E70BA8.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.88
+      }
+    },
+    "612CB628-BC04-48FE-B6D7-9EC53436F8A3.MP4": {
+      "cats": [
+        "close",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.43,
+        "hub": 0.43
+      }
+    },
+    "6553484E-7570-44A9-84AC-AB42AE75CFA1.MOV": {
+      "cats": [
+        "close",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.5,
+        "hub": 0.25
+      }
+    },
+    "70801946-C829-4830-911E-78FE7F2AC057.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.83
+      }
+    },
+    "7ED4D83E-010F-4346-AB4E-BA7D10D06A03.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.83
+      }
+    },
+    "89A7D49A-030B-4079-ABB6-E5A9ECD3B115.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.92
+      }
+    },
+    "8F1A0FDD-E1A6-4EF6-B70E-F2135E666918.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.67
+      }
+    },
+    "A755FB64-FA24-4487-BABE-6B05361240BA.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.83
+      }
+    },
+    "B4C68863-C518-4DA3-B7AC-3A1CD250754B.MP4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "BD5E617C-BDC3-48FE-8570-D35B5F718FE8.MOV": {
+      "cats": [
+        "close",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "clip shorter than 2 s",
+      "manual": false,
+      "share": {
+        "close": 0.5,
+        "hub": 0.5
+      }
+    },
+    "D3909D5D-A855-4335-ABE1-061B6EE7145F.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "D8679930-05D6-4BA7-A12A-9329FD3312E2.MP4": {
+      "cats": [
+        "close",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.58,
+        "grind": 0.25
+      }
+    },
+    "video_2026-09-21_14-49-30.mp4": {
+      "cats": [
+        "grind",
+        "work"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.6,
+        "work": 0.4
+      }
+    },
+    "IMG_0083.MOV": {
+      "cats": [
+        "close",
+        "alu"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.54,
+        "alu": 0.46
+      }
+    },
+    "video_2026-09-21_14-48-17.mp4": {
+      "cats": [
+        "close",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.75,
+        "rust": 0.25
+      }
+    },
+    "video_2026-09-21_14-48-20.mp4": {
+      "cats": [
+        "alu",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.67,
+        "close": 0.22
+      }
+    },
+    "video_2026-09-21_14-48-24.mp4": {
+      "cats": [
+        "rust",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "rust": 0.67,
+        "close": 0.33
+      }
+    },
+    "video_2026-09-21_14-48-26.mp4": {
+      "cats": [
+        "alu",
+        "close",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.4,
+        "close": 0.2,
+        "rust": 0.2
+      }
+    },
+    "video_2026-09-21_14-49-46.mp4": {
+      "cats": [
+        "alu"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "outdoor painting",
+      "manual": false,
+      "share": {
+        "alu": 1.0
+      }
+    },
+    "5 car decking above the tandem.mp4": {
+      "enabled": false,
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          0,
+          99
+        ]
+      ],
+      "manual": true,
+      "reason": "disabled by hand"
+    },
+    "пескоструй2.mp4": {
+      "cats": [
+        "blast"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "outdoor painting",
+      "manual": false,
+      "share": {
+        "blast": 1.0
+      }
+    },
+    "Just a quick sneak peek of the none skid application in progress..mp4": {
+      "cats": [],
+      "dull": [],
+      "enabled": false,
+      "reason": "outdoor painting",
+      "manual": false,
+      "share": {}
+    },
+    "01A0B1B4-3BDD-4E40-90E9-A6B59C6B3A9F.MOV": {
+      "cats": [
+        "hub",
+        "close"
+      ],
+      "dull": [
+        [
+          0.8,
+          1.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hub": 0.75,
+        "close": 0.25
+      }
+    },
+    "0657D049-A51F-4D0C-B8A4-FE5BF5C5FBF3.MOV": {
+      "cats": [
+        "blast",
+        "work"
+      ],
+      "dull": [
+        [
+          0.0,
+          0.8
+        ],
+        [
+          1.8,
+          2.8
+        ],
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "weld": 0.83
+      }
+    },
+    "0C0DE0F7-EF30-4842-BB39-DCC3FB395558.MOV": {
+      "cats": [
+        "grind",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.8,
+        "weld": 0.2
+      }
+    },
+    "1273657B-328D-4CBE-AAA2-82A9C6823D8E.MOV": {
+      "cats": [
+        "weld",
+        "close",
+        "alu"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.37,
+        "close": 0.26,
+        "alu": 0.26
+      }
+    },
+    "183DB933-6C95-49A6-AE38-F0B26809814F.MOV": {
+      "cats": [
+        "alu",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.62,
+        "grind": 0.25
+      }
+    },
+    "1B8B1007-06D8-4CE7-AFD7-B019AD3683C2.MOV": {
+      "cats": [
+        "yard"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {}
+    },
+    "209C6DFD-FCF7-452B-90C5-F800BD4F30F4.MOV": {
+      "cats": [
+        "close",
+        "alu",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.38,
+        "alu": 0.38,
+        "weld": 0.25
+      }
+    },
+    "263A58BB-6F67-41D2-80A3-09B226EDFCF6.MP4": {
+      "cats": [
+        "yard",
+        "wide"
+      ],
+      "dull": [
+        [
+          80.0,
+          999
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "yard": 0.43,
+        "wide": 0.26
+      }
+    },
+    "291B5DDF-9EDB-40E0-A6F4-75095648A943.MOV": {
+      "cats": [
+        "yard",
+        "work"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "work": 0.75,
+        "rust": 0.25
+      }
+    },
+    "2962AFBA-458C-491A-A2C0-CD9E6F24244E.MP4": {
+      "cats": [
+        "yard"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "yard": 1.0
+      }
+    },
+    "3156E6FE-8576-4A66-B347-FE5EBA650EC1.MOV": {
+      "cats": [
+        "weld",
+        "hub"
+      ],
+      "dull": [
+        [
+          3.8,
+          7.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.78,
+        "hub": 0.22
+      }
+    },
+    "3195FEE0-6DED-4DEB-944E-B9CC3D2861B4.MOV": {
+      "cats": [
+        "work",
+        "wide"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "weld": 0.64
+      }
+    },
+    "374FA497-55D1-4F65-85AB-6D88CCAC528E.MOV": {
+      "cats": [
+        "wide",
+        "weld",
+        "hub"
+      ],
+      "dull": [
+        [
+          1.8,
+          2.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.4,
+        "weld": 0.2,
+        "hub": 0.2
+      }
+    },
+    "44E59789-8921-49A5-A2DD-30AE6E527592.MOV": {
+      "cats": [
+        "alu",
+        "grind",
+        "work"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "grind": 0.39,
+        "weld": 0.22,
+        "alu": 0.22
+      }
+    },
+    "5187A701-B627-412D-8C5E-052E0545E88B.MOV": {
+      "cats": [
+        "hub",
+        "work"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "58BF428D-D313-482E-BCB4-690833B05EFB.MOV": {
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.44,
+        "weld": 0.33
+      }
+    },
+    "5BE403D8-9F86-4D43-929E-B0279736D59A.MOV": {
+      "cats": [
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.64,
+        "hyd": 0.23
+      }
+    },
+    "5CC5620F-884C-4031-9DA0-E012DF4B4E3B.MP4": {
+      "cats": [
+        "wide",
+        "work"
+      ],
+      "dull": [
+        [
+          6.8,
+          8.8
+        ],
+        [
+          50.8,
+          54.8
+        ],
+        [
+          56.8,
+          57.8
+        ],
+        [
+          81.8,
+          88.8
+        ],
+        [
+          107.8,
+          108.8
+        ],
+        [
+          113.8,
+          117.8
+        ],
+        [
+          122.8,
+          128.8
+        ],
+        [
+          143.8,
+          144.8
+        ],
+        [
+          158.8,
+          163.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 0.63,
+        "yard": 0.25
+      }
+    },
+    "5DF8A9D3-D195-48CC-AE60-06B4C4E9FD7C.MOV": {
+      "cats": [
+        "wide",
+        "rust"
+      ],
+      "dull": [
+        [
+          0.0,
+          0.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.33,
+        "rust": 0.25
+      }
+    },
+    "5E41B519-1351-4AF6-B0A3-6815B124018F.MOV": {
+      "cats": [],
+      "dull": [
+        [
+          0.0,
+          1.8
+        ]
+      ],
+      "enabled": false,
+      "reason": "mostly empty frames",
+      "manual": false,
+      "share": {}
+    },
+    "611FFD19-577A-407E-B0BE-5122C1F89378.MOV": {
+      "cats": [
+        "wide"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 1.0
+      }
+    },
+    "66833442-9F0F-4BDB-AF1B-27D5F4E35B35.MOV": {
+      "cats": [
+        "alu",
+        "wide"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.6,
+        "wide": 0.4
+      }
+    },
+    "6843C8F9-F116-42D1-B315-CD630D54EDAD.MOV": {
+      "cats": [
+        "wide",
+        "rust"
+      ],
+      "dull": [
+        [
+          8.8,
+          10.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.45,
+        "rust": 0.36
+      }
+    },
+    "69224C6E-F8C0-42C8-A711-EB2CCD5E9B55.MOV": {
+      "cats": [
+        "close",
+        "weld",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.32,
+        "weld": 0.26,
+        "grind": 0.21
+      }
+    },
+    "71FF3E2A-9AEC-44A2-BB72-D7C59ED08D85.MOV": {
+      "cats": [
+        "weld",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.33,
+        "grind": 0.33
+      }
+    },
+    "727A0C04-4B91-44C3-BE1C-D70828CC2D0D.MOV": {
+      "cats": [
+        "work",
+        "weld"
+      ],
+      "dull": [
+        [
+          38.8,
+          39.8
+        ]
+      ],
+      "enabled": false,
+      "reason": "someone else's edit with captions",
+      "manual": true,
+      "share": {
+        "hub": 0.34
+      }
+    },
+    "7E35F351-69B9-4DEB-95E8-58D7EB5AAE93.MOV": {
+      "cats": [
+        "close",
+        "wide"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.57,
+        "wide": 0.43
+      }
+    },
+    "82E5227F-6104-498B-A884-B8192487AAC3.MOV": {
+      "cats": [
+        "weld",
+        "wide"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.8,
+        "wide": 0.2
+      }
+    },
+    "83739E5E-4C6E-44A2-8D8F-627D05DBFFDE.MP4": {
+      "cats": [
+        "wide",
+        "alu"
+      ],
+      "dull": [
+        [
+          41.5,
+          99
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 0.43,
+        "alu": 0.33
+      }
+    },
+    "8F8E2143-83AD-4C30-9E7C-A2C9FE4360D5.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "90F4BFE6-24E1-4B27-8EB4-A606375EFC71.MOV": {
+      "cats": [
+        "close",
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.5,
+        "hub": 0.33
+      }
+    },
+    "94F9B6FE-C2E8-4CDC-860B-C4683F902D8E.MOV": {
+      "cats": [
+        "hub"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hub": 1.0
+      }
+    },
+    "9CC7B076-F595-4ABC-AD00-EDFC731C64B6.MOV": {
+      "cats": [
+        "hub",
+        "alu"
+      ],
+      "dull": [
+        [
+          12.8,
+          13.8
+        ],
+        [
+          21.8,
+          22.8
+        ],
+        [
+          25.8,
+          26.8
+        ],
+        [
+          27.8,
+          29.8
+        ]
+      ],
+      "enabled": false,
+      "reason": "someone else's edit with captions",
+      "manual": true,
+      "share": {
+        "hub": 0.33,
+        "alu": 0.29
+      }
+    },
+    "9DFE4536-EEE4-42E1-88EF-108F92B0D826.MOV": {
+      "cats": [
+        "hub",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hub": 0.67,
+        "close": 0.33
+      }
+    },
+    "A25EE086-4AF8-4EA5-AC41-95D8CB72DA3F.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.88
+      }
+    },
+    "A51D2327-C740-45AC-8F49-A85ED62A915A.MOV": {
+      "cats": [
+        "wide",
+        "work",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 0.75
+      }
+    },
+    "A80979A8-53F8-4F18-914A-10F88C5A31A9.MOV": {
+      "cats": [
+        "close",
+        "grind",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.38,
+        "grind": 0.38,
+        "rust": 0.25
+      }
+    },
+    "A9F40D45-0C11-4F4D-B51A-39C8CF25E90C.MOV": {
+      "cats": [
+        "hub",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "someone else's edit with captions",
+      "manual": true,
+      "share": {
+        "hub": 0.31,
+        "rust": 0.23
+      }
+    },
+    "B575ABC2-06DA-41D7-81C3-6D07936E1965.MOV": {
+      "cats": [
+        "alu",
+        "close"
+      ],
+      "dull": [
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.6,
+        "close": 0.3
+      }
+    },
+    "B8150EB6-F8C2-4D79-A7F9-15C340105C8B.MOV": {
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.46,
+        "weld": 0.31
+      }
+    },
+    "BDDBDC0F-15DB-4523-BC71-EFAC35CB0628.MOV": {
+      "cats": [
+        "yard"
+      ],
+      "dull": [
+        [
+          1.8,
+          3.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "grind": 1.0
+      }
+    },
+    "BDE992D8-A1E1-498A-ACF3-D20EE4046A01.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.83
+      }
+    },
+    "C4948B98-E92A-4240-A28D-119671427988.MOV": {
+      "cats": [
+        "weld",
+        "close",
+        "alu"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.43,
+        "close": 0.29,
+        "alu": 0.29
+      }
+    },
+    "C77BF277-DBE5-448C-989F-07DCD2D666FE.MP4": {
+      "cats": [
+        "alu",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.78,
+        "close": 0.22
+      }
+    },
+    "CE39A1E0-D1B7-4ED3-A701-B50FFD1E26B7.MOV": {
+      "cats": [
+        "alu"
+      ],
+      "dull": [
+        [
+          3.8,
+          4.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 1.0
+      }
+    },
+    "D2DF919F-616D-4CDB-84E9-F7965A10C9F8.MOV": {
+      "cats": [
+        "blast",
+        "work"
+      ],
+      "dull": [
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "grind": 0.44,
+        "blast": 0.22
+      }
+    },
+    "DAC3ADE8-708A-4DB4-9EE1-CCF6FCC80F24.MOV": {
+      "cats": [
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.62
+      }
+    },
+    "DCCEBF2F-177F-4B85-B08F-F4EACA3E2E38.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "clip shorter than 2 s",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "DF9D1C76-842A-4461-9F3C-B844494576EF.MOV": {
+      "cats": [
+        "close",
+        "yard"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.6,
+        "yard": 0.4
+      }
+    },
+    "E0CB486B-44B7-4F28-B162-497A8435F06F.MOV": {
+      "cats": [
+        "grind",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "grind": 0.56,
+        "weld": 0.28
+      }
+    },
+    "E1C7415D-58DD-4026-812E-106E4211C62B.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.86
+      }
+    },
+    "EC868C20-6B35-4D01-8C77-5AA252C0BF82.MP4": {
+      "cats": [
+        "wide",
+        "yard"
+      ],
+      "dull": [
+        [
+          20.8,
+          21.8
+        ],
+        [
+          24.8,
+          26.8
+        ],
+        [
+          27.8,
+          37.8
+        ],
+        [
+          38.8,
+          39.8
+        ],
+        [
+          53.8,
+          55.8
+        ],
+        [
+          73.8,
+          74.8
+        ],
+        [
+          121.8,
+          122.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.47,
+        "yard": 0.41
+      }
+    },
+    "EDB274C3-44DD-469E-A1B8-09C13CDFFB5C.MOV": {
+      "cats": [
+        "hub"
+      ],
+      "dull": [
+        [
+          9.8,
+          10.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hub": 0.7
+      }
+    },
+    "F0EA9E67-C94E-4BDA-80D5-C1DB291D4D1A.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.62
+      }
+    },
+    "F8E62FB3-80F1-4D56-AC26-4971BC699A1F.MOV": {
+      "cats": [
+        "grind",
+        "wide",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.4,
+        "wide": 0.2,
+        "close": 0.2
+      }
+    },
+    "F95F4B04-D872-4A8B-826A-A2DD43E0F846.MOV": {
+      "cats": [
+        "hyd",
+        "weld",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.33,
+        "weld": 0.22,
+        "grind": 0.22
+      }
+    },
+    "trailerrepair1.mp4": {
+      "cats": [
+        "close",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.47,
+        "rust": 0.35
+      },
+      "desc": "Walkaround of a car hauler trailer's rear extension ramp (lift-up ramp section) showing its perforated steel deck, worn edges and the hinge/latch end, filmed from the rear with the trailer's tail lights and Florida plate visible.",
+      "kw": [
+        "car hauler ramp",
+        "extension ramp",
+        "perforated steel deck",
+        "hinge end",
+        "rust",
+        "trailer walkaround",
+        "houston shop"
+      ],
+      "stage": "damage",
+      "subject": "extension ramp",
+      "desc_sig": "36600745|1793115279",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.5,
+          "shows": "close-up of extension ramp end with perforated deck and hinge clip, surface rust and dirty worn steel visible",
+          "stage": "damage"
+        },
+        {
+          "from": 3.5,
+          "to": 6.0,
+          "shows": "close-up of ramp end, bright bare steel lip and worn wooden-looking stop block at the hinge, rust on deck",
+          "stage": "damage"
+        },
+        {
+          "from": 6.0,
+          "to": 9.5,
+          "shows": "ramp end and underside of ramp near concrete floor, tail lights of trailer in background, rust on edges",
+          "stage": "damage"
+        },
+        {
+          "from": 9.5,
+          "to": 12.0,
+          "shows": "wide view of trailer rear with ramp stowed, Florida plate and red reflective bumper visible, ramp deck seen from above",
+          "stage": "other"
+        },
+        {
+          "from": 12.0,
+          "to": 16.8,
+          "shows": "wide then close-up of ramp deck and end lip with hinge latch, rust on deck and dirty steel, yard background",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair10.mp4": {
+      "cats": [
+        "close",
+        "rust"
+      ],
+      "dull": [
+        [
+          9.8,
+          10.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.57,
+        "rust": 0.29
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Hand-held close-ups of a red car-carrier ramp or support beam and a welded steel plate joint, moving from the weld to the beam's chipped paint and cracked tape, then the upper deck frame against a blue sky and the truck body.",
+      "kw": [
+        "car carrier",
+        "red beam",
+        "weld joint",
+        "chipped paint",
+        "cracked tape",
+        "upper deck",
+        "trailer repair",
+        "houston"
+      ],
+      "stage": "damage",
+      "subject": "red support beam",
+      "desc_sig": "29186176|1793115411",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.5,
+          "shows": "close-up of welded steel plate joint, weld bead visible, red paint on upright plate, wide-angle yard background",
+          "stage": "weld"
+        },
+        {
+          "from": 3.5,
+          "to": 5.6,
+          "shows": "close-up of red upright beam meeting bottom bracket, chipped and flaking red paint, bracket and weld seam at base",
+          "stage": "damage"
+        },
+        {
+          "from": 5.6,
+          "to": 9.7,
+          "shows": "close-up of red beam held against truck body and fender, flaking paint and peeling reflective tape with cracks",
+          "stage": "damage"
+        },
+        {
+          "from": 9.7,
+          "to": 11.0,
+          "shows": "wide shot up at red upper deck frame with perforated decking, chain and blue sky, beam in foreground",
+          "stage": "other"
+        },
+        {
+          "from": 11.0,
+          "to": 13.4,
+          "shows": "red beam with cracked, peeling white tape held against truck exhaust and fender, close-up",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair11.mp4": {
+      "cats": [
+        "wide",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 0.5,
+        "close": 0.33
+      },
+      "desc": "Wide walkaround of a car hauler trailer frame in a Houston shop showing the bare steel deck with perforated ramps and an upper deck structure, with the camera moving along the trailer.",
+      "kw": [
+        "car hauler",
+        "trailer frame",
+        "perforated ramp",
+        "upper deck",
+        "steel fabrication",
+        "houston shop"
+      ],
+      "stage": "fit",
+      "subject": "upper deck support",
+      "desc_sig": "13791865|1793115390",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "wide view of bare steel trailer frame with perforated ramps and upper deck rails, worker in background near welder",
+          "stage": "fit"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "close-up angled view of upper deck rails and ramp structure from below, clean bare steel",
+          "stage": "fit"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "side wide shot of deck frame and perforated ramps running toward the shop door",
+          "stage": "fit"
+        },
+        {
+          "from": 3.9,
+          "to": 5.1,
+          "shows": "close-up of perforated ramp sections and deck rails on the trailer bed, grinder or tool resting on steel",
+          "stage": "fit"
+        },
+        {
+          "from": 5.1,
+          "to": 6.2,
+          "shows": "wide shot of the trailer frame and ramps with the shop interior and a worker at left",
+          "stage": "fit"
+        }
+      ]
+    },
+    "trailerrepair12.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.82
+      },
+      "desc": "A walkaround of a car hauler trailer deck in a Houston shop showing rows of perforated steel ramps and deck plates on a frame, with the camera panning along the rails.",
+      "kw": [
+        "car hauler deck",
+        "perforated ramp plate",
+        "trailer frame",
+        "deck plates",
+        "houston shop",
+        "car carrier repair"
+      ],
+      "stage": "other",
+      "subject": "perforated deck plates",
+      "desc_sig": "23863959|1793037437",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "wide view of deck plates along trailer frame, close-up of perforated steel ramps, shop floor visible",
+          "stage": "other"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "angled view of ramp sections on rails, a few plates with rusted hinge pins",
+          "stage": "other"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "close-up of ramp plates and rails, some rust visible on pins and frame",
+          "stage": "other"
+        },
+        {
+          "from": 3.9,
+          "to": 6.3,
+          "shows": "close-up of several perforated deck plates on frame, bright welded seams on some plates",
+          "stage": "other"
+        },
+        {
+          "from": 6.3,
+          "to": 7.5,
+          "shows": "single ramp plate on frame with rusted pins, dark rubbery seam between plates",
+          "stage": "damage"
+        },
+        {
+          "from": 7.5,
+          "to": 10.9,
+          "shows": "wide and close views of deck plates and frame rails, rusted hardware and clean perforated plates",
+          "stage": "other"
+        }
+      ]
+    },
+    "trailerrepair13.mp4": {
+      "cats": [
+        "close",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.43,
+        "rust": 0.29
+      },
+      "desc": "Close and wide views of a car hauler deck with perforated steel plates, welded seams and bolted brackets, with a boot stepping onto the plate partway through.",
+      "kw": [
+        "car hauler deck",
+        "perforated deck plate",
+        "weld seam",
+        "carrier trailer repair",
+        "houston",
+        "steel bracket",
+        "bolted plate"
+      ],
+      "stage": "weld",
+      "subject": "deck plate",
+      "desc_sig": "15373790|1793113522",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "close-up of perforated deck plates with weld repair strips and bolts, rusted bracket across top",
+          "stage": "weld"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "boot stepping onto deck plate beside rusted bracket, welded seam strips and bolts visible",
+          "stage": "other"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "wide view of deck plates with bright weld beads running down the centre seam, rusted frame edge",
+          "stage": "weld"
+        },
+        {
+          "from": 3.9,
+          "to": 5.1,
+          "shows": "angled wide view of two plate sections with welded centre seams and bolts along the edge",
+          "stage": "weld"
+        },
+        {
+          "from": 5.1,
+          "to": 6.3,
+          "shows": "angled view of plates with weld seam and rusty steel crossmember between sections",
+          "stage": "weld"
+        }
+      ]
+    },
+    "trailerrepair2.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [
+        [
+          3.8,
+          5.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.71
+      },
+      "desc": "Walkaround of a car hauler trailer's hydraulic-free folding ramp extension, showing its perforated steel deck, rusted edge, and latch hooks from close-up to wider views of the trailer rear.",
+      "kw": [
+        "car hauler",
+        "ramp extension",
+        "perforated deck",
+        "trailer latch",
+        "rusted edge",
+        "florida trailer"
+      ],
+      "stage": "damage",
+      "subject": "ramp extension",
+      "desc_sig": "20577855|1793115427",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "close-up of ramp end with latch hooks and perforated deck, rust on edge bar",
+          "stage": "damage"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "close-up of ramp tip, hook and pin, perforated steel deck",
+          "stage": "damage"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "close-up of ramp end latch with worn steel flange, rusted lip",
+          "stage": "damage"
+        },
+        {
+          "from": 3.9,
+          "to": 5.1,
+          "shows": "wide view of ramp underside and hinge, rusted crossmember, trailer tag behind",
+          "stage": "damage"
+        },
+        {
+          "from": 5.1,
+          "to": 6.3,
+          "shows": "blurry wide shot of concrete floor and trailer rear with tag and red reflector",
+          "stage": "other"
+        },
+        {
+          "from": 6.3,
+          "to": 7.5,
+          "shows": "wide view of ramp deck and rusted crossmember, reflector at top left",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair3.mp4": {
+      "cats": [
+        "rust",
+        "hub"
+      ],
+      "dull": [
+        [
+          4.8,
+          5.8
+        ],
+        [
+          6.8,
+          7.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "rust": 0.71,
+        "hub": 0.29
+      },
+      "desc": "Handheld walkaround under a car hauler trailer frame showing rusted, cracked coating on the steel rail, then a pan across a concrete wall and ramp before returning to the damaged rail.",
+      "kw": [
+        "car hauler frame",
+        "rust",
+        "cracked coating",
+        "trailer underside",
+        "frame rail damage",
+        "concrete ramp",
+        "houston repair"
+      ],
+      "stage": "damage",
+      "subject": "frame rail rust",
+      "desc_sig": "20835823|1793115426",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 4.6,
+          "shows": "close-up of trailer frame rail with rust and cracked coating flaking off, camera moving",
+          "stage": "damage"
+        },
+        {
+          "from": 4.6,
+          "to": 7.6,
+          "shows": "wide shots of concrete wall and ramp edge with outdoor glimpse, no clear steel damage visible",
+          "stage": "other"
+        },
+        {
+          "from": 7.6,
+          "to": 9.5,
+          "shows": "close-up of rusted frame rail with cracked coating and rust-stained gap, damage visible",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair4.mp4": {
+      "cats": [
+        "rust",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "rust": 0.8,
+        "close": 0.2
+      },
+      "desc": "Close-up walkaround of a car hauler trailer's frame crossmember bracket showing heavy rust and a cracked, corroded section around a bolt-on pivot clip, with a hand pointing at the damaged area.",
+      "kw": [
+        "car hauler frame",
+        "rust damage",
+        "crossmember bracket",
+        "corroded clip",
+        "trailer inspection",
+        "houston repair"
+      ],
+      "stage": "damage",
+      "subject": "frame crossmember bracket",
+      "desc_sig": "20767788|1793115425",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "close-up of frame bracket and pivot clip with rust, hand pointing at corroded section",
+          "stage": "damage"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "close-up of clip with rusted flaking edges, fingers touching the corroded area",
+          "stage": "damage"
+        },
+        {
+          "from": 2.7,
+          "to": 5.1,
+          "shows": "close-up of rusted frame clip and bolt hole, cracked rust on the bracket edge",
+          "stage": "damage"
+        },
+        {
+          "from": 5.1,
+          "to": 7.5,
+          "shows": "frame clip with rust and pitted metal, slanted ramp steel below, wide view of tire side",
+          "stage": "damage"
+        },
+        {
+          "from": 7.5,
+          "to": 9.6,
+          "shows": "low angle of rusted clip above the ramp beam, cracked and corroded steel edge visible",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair5.mp4": {
+      "cats": [
+        "rust",
+        "close"
+      ],
+      "dull": [
+        [
+          5.8,
+          6.8
+        ],
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "rust": 0.56,
+        "close": 0.22
+      },
+      "desc": "Close-up walkaround of a car hauler trailer's underside frame rail showing a long cracked and flaking coating with rust exposed along a seam, then the camera moves to a clean, dark painted section of the rail near the end of the clip.",
+      "kw": [
+        "car hauler frame",
+        "cracked coating",
+        "frame rail crack",
+        "rust seam",
+        "trailer underside",
+        "houston trailer repair"
+      ],
+      "stage": "damage",
+      "subject": "frame rail crack",
+      "desc_sig": "23464661|1793115423",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 6.3,
+          "shows": "close-up of frame rail with cracked, flaking coating and rust exposed along a seam, cables and hose visible to the right",
+          "stage": "damage"
+        },
+        {
+          "from": 6.3,
+          "to": 7.5,
+          "shows": "blurred pan across pale painted frame surface with a rusted crack edge at right",
+          "stage": "damage"
+        },
+        {
+          "from": 7.5,
+          "to": 8.7,
+          "shows": "wide angle of dark clean painted frame section with a fresh-looking edge, bright light at upper left",
+          "stage": "done"
+        },
+        {
+          "from": 8.7,
+          "to": 10.6,
+          "shows": "close-up of pale painted frame with a faint seam, then cracked coating and rust returns at right edge near cables",
+          "stage": "damage"
+        }
+      ]
+    },
+    "trailerrepair6.mp4": {
+      "cats": [
+        "close",
+        "rust",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.6,
+        "rust": 0.2,
+        "grind": 0.2
+      },
+      "desc": "Close-up footage of a red car hauler frame leg with a black bracket, showing a cut-out section being repaired with a new grey steel plate welded into place.",
+      "kw": [
+        "car hauler frame repair",
+        "car carrier trailer",
+        "steel plate weld",
+        "cut out frame section",
+        "red frame leg",
+        "black gusset bracket",
+        "trailer repair houston"
+      ],
+      "stage": "weld",
+      "subject": "frame leg repair",
+      "desc_sig": "12827558|1793115408",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.1,
+          "shows": "close-up of red frame leg with new plate and fresh blue weld bead along the seam, damaged area not yet cut away",
+          "stage": "weld"
+        },
+        {
+          "from": 2.1,
+          "to": 4.5,
+          "shows": "close-up of red upright with cut-out section, bare grey steel plate sleeve welded in and weld bead visible at the joint",
+          "stage": "weld"
+        },
+        {
+          "from": 4.5,
+          "to": 5.8,
+          "shows": "close-up of grey replacement plate sleeve against black bracket at base of red frame leg, rough cut edges still visible",
+          "stage": "weld"
+        }
+      ]
+    },
+    "trailerrepair7.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.83
+      },
+      "desc": "Close-up walkaround of a car hauler trailer frame rail and gusset, showing fresh silver weld beads joining new steel plates and brackets, with rust-stained edges around the seams.",
+      "kw": [
+        "car hauler trailer",
+        "frame rail repair",
+        "weld bead",
+        "gusset weld",
+        "trailer frame",
+        "houston repair shop"
+      ],
+      "stage": "weld",
+      "subject": "frame rail weld",
+      "desc_sig": "26901489|1793115422",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "close-up of vertical frame plate with fresh silver weld bead along seam, rust on edges, exhaust above",
+          "stage": "weld"
+        },
+        {
+          "from": 1.5,
+          "to": 2.8,
+          "shows": "closer view of frame rail plate edge with two weld beads, rust staining, wide underside behind",
+          "stage": "weld"
+        },
+        {
+          "from": 2.8,
+          "to": 6.5,
+          "shows": "close-up of angled gusset joint with fresh weld beads meeting bracket corner, clean silver steel",
+          "stage": "weld"
+        },
+        {
+          "from": 6.5,
+          "to": 8.9,
+          "shows": "close-up of lower angled bracket end with weld bead and bracket edge, rust around joint",
+          "stage": "weld"
+        },
+        {
+          "from": 8.9,
+          "to": 11.4,
+          "shows": "vertical frame plate seam with weld beads, wider view showing road surface below",
+          "stage": "weld"
+        }
+      ]
+    },
+    "trailerrepair8.mp4": {
+      "cats": [
+        "hub",
+        "yard",
+        "close"
+      ],
+      "dull": [
+        [
+          4.8,
+          5.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "hub": 0.4,
+        "yard": 0.4,
+        "close": 0.2
+      },
+      "desc": "Camera moves along the underside of a car hauler trailer frame, showing freshly applied glossy black coating on the rails and cross-member joints, with the steel surfaces around it still bare grey.",
+      "kw": [
+        "car hauler frame",
+        "trailer underside",
+        "black frame coating",
+        "wet undercoating",
+        "rail coating",
+        "car carrier repair houston"
+      ],
+      "stage": "finish",
+      "subject": "frame rail coating",
+      "desc_sig": "24389209|1793115417",
+      "sharp": 1,
+      "motion": 9999,
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 4.0,
+          "shows": "wide view of trailer underside, air lines and exhaust, black coating on frame rail, fresh and glossy",
+          "stage": "finish"
+        },
+        {
+          "from": 4.0,
+          "to": 11.2,
+          "shows": "close-up of frame rail and cross-member junction, wet glossy black coating applied along the seams, grey bare steel beside it",
+          "stage": "finish"
+        }
+      ]
+    },
+    "trailerrepair9.mp4": {
+      "cats": [
+        "close",
+        "alu"
+      ],
+      "dull": [
+        [
+          6.8,
+          7.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.8,
+        "alu": 0.2
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Close-up walkaround of a freshly red-painted steel brace on a car hauler trailer, showing its welded base plate and weld seams against the trailer's stainless steel step and frame.",
+      "kw": [
+        "car hauler",
+        "red steel brace",
+        "weld bead",
+        "trailer frame",
+        "painted bracket",
+        "base plate",
+        "houston repair"
+      ],
+      "stage": "finish",
+      "subject": "red steel brace",
+      "desc_sig": "20158123|1793115414",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "close-up of red painted brace beside stainless step and base plate, clean fresh paint, no visible damage",
+          "stage": "finish"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "close-up of fresh weld bead joining brace to base plate, bead visible at the base",
+          "stage": "weld"
+        },
+        {
+          "from": 3.9,
+          "to": 6.3,
+          "shows": "red brace against trailer frame and stainless step, painted surface, weld line faintly visible",
+          "stage": "finish"
+        },
+        {
+          "from": 6.3,
+          "to": 7.5,
+          "shows": "low angle of red brace with weld seam at joint over base plate, rope on ground",
+          "stage": "weld"
+        },
+        {
+          "from": 7.5,
+          "to": 9.1,
+          "shows": "red brace base and welded plate on ground, painted weld joint, no visible rust",
+          "stage": "finish"
+        }
+      ]
+    },
+    "framerepair1.MOV": {
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "rust": 1.0
+      }
+    },
+    "framerepair2.MOV": {
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "rust": 1.0
+      }
+    },
+    "framerepair3.MOV": {
+      "cats": [
+        "close",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.56,
+        "grind": 0.44
+      }
+    },
+    "framerepair4.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "framerepair5.MOV": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "framerepair6.MOV": {
+      "cats": [
+        "close",
+        "alu"
+      ],
+      "dull": [
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.44,
+        "alu": 0.44
+      }
+    },
+    "rampwidth1.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "hyd": 0.67,
+        "close": 0.2
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Across these frames inside a shop, a car hauler trailer's steel ramp with a perforated grip-plate surface is shown from several close-up and mid-range angles, with chalk measurements and the word \"wider\" written on it, chains and straps hanging nearby, and a Miller welder idle in one frame, though no cutting, welding, or painting is in progress.",
+      "kw": [
+        "car hauler ramp",
+        "trailer ramp chalk marks",
+        "ramp grip plate",
+        "car carrier repair houston",
+        "trailer ramp measurement",
+        "car hauler ramp shop",
+        "ramp chain and strap"
+      ],
+      "stage": "other",
+      "subject": "car hauler ramp",
+      "desc_sig": "23810148|1792507933"
+    },
+    "rampwidth2.mp4": {
+      "cats": [
+        "weld",
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "weld": 0.44,
+        "close": 0.33,
+        "hyd": 0.22
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Wide shot inside the shop of a car hauler ramp end, with a new steel plate bearing chalk marks reading \"173/8\" and \"3.25\" and a Miller welder in the foreground; in the other frames the worker in an orange shirt is at the ramp end with a chalk arrow marked \"Wider\", and close-ups show the perforated deck plate and a tied-off rope.",
+      "kw": [
+        "car hauler ramp",
+        "car carrier ramp repair",
+        "ramp widening",
+        "chalk measurements steel plate",
+        "houston trailer repair shop",
+        "perforated deck plate",
+        "miller welder"
+      ],
+      "stage": "fit",
+      "subject": "car hauler ramp",
+      "desc_sig": "14208631|1792507923"
+    },
+    "rampwidth3.mp4": {
+      "cats": [
+        "close",
+        "hyd",
+        "alu"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "close": 0.5,
+        "hyd": 0.25,
+        "alu": 0.25
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Close-up and wide shots of a black steel car hauler ramp with raised diamond-plate cleats and a chain-driven extension section, shown outdoors against a cinder block shop wall and in a sunny yard with a parked reefer trailer behind it.",
+      "kw": [
+        "car hauler ramp",
+        "extension ramp",
+        "chain drive ramp",
+        "car carrier trailer",
+        "diamond plate ramp",
+        "houston trailer repair",
+        "ramp close-up"
+      ],
+      "stage": "done",
+      "subject": "extension ramp",
+      "desc_sig": "12254915|1792507920"
+    },
+    "rampwidth4.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "hyd": 0.42,
+        "close": 0.33
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Across the clip, close-up and wide shots inside a shop show a car hauler's perforated steel extension ramp, first sitting next to a chain-and-grinder setup on the deck, then as a black, freshly fitted ramp on the trailer against a cinder block wall, with a welder and gas cylinder nearby.",
+      "kw": [
+        "car hauler ramp",
+        "extension ramp",
+        "perforated steel plate",
+        "car carrier trailer repair",
+        "houston trailer shop",
+        "ramp fabrication",
+        "trailer deck ramp"
+      ],
+      "stage": "fit",
+      "subject": "extension ramp",
+      "desc_sig": "19182629|1792507932"
+    },
+    "rampwidth5.mp4": {
+      "cats": [
+        "wide",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": true,
+      "share": {
+        "wide": 0.56,
+        "hyd": 0.22
+      },
+      "sharp": 1,
+      "motion": 9999,
+      "desc": "Short clip inside a metal-roofed shop showing the underside of a car hauler trailer: a dark crossmember with a winch/gear assembly and a spray can near the chassis, a gray crossmember partly lifted on a chain hoist, and a diamond-plate extension ramp with an olive-painted edge resting against a cinder block wall.",
+      "kw": [
+        "car hauler trailer",
+        "car carrier crossmember",
+        "trailer underside",
+        "extension ramp",
+        "trailer repair houston",
+        "crossmember painting",
+        "spray paint trailer chassis"
+      ],
+      "stage": "finish",
+      "subject": "trailer deck crossmember",
+      "desc_sig": "13533242|1792507911"
+    },
+    "springlock1.mp4": {
+      "cats": [
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "rust": 0.71
+      },
+      "desc": "Handheld footage of the rear deck and bumper of a rusty car hauler trailer, with a D-ring, latch bracket and debris on the ground, showing the worn condition before the spring lock repair.",
+      "kw": [
+        "car hauler trailer",
+        "rear deck",
+        "spring lock",
+        "d-ring",
+        "rust",
+        "trailer bumper"
+      ],
+      "stage": "damage",
+      "subject": "rear deck bumper",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.9,
+          "shows": "wide view of rear bumper and deck with rusty steel, strap and Texas plate, debris on ground, no welding visible",
+          "stage": "damage"
+        },
+        {
+          "from": 3.9,
+          "to": 5.1,
+          "shows": "low close-up of bumper and lower deck with weathered latch brackets and dirt",
+          "stage": "damage"
+        },
+        {
+          "from": 5.1,
+          "to": 7.0,
+          "shows": "side angle close-up of spring lock bracket, D-ring and red tail light, worn and rusted steel",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "15352477|1793369312",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock2.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.5,
+        "close": 0.33
+      },
+      "desc": "Close-up and wide views of a car hauler deck rail with a broken spring lock housing, rust and burnt-looking edges, a steel ring hook, and a worker's gloved hand with an abrasive pad near the end.",
+      "kw": [
+        "car hauler",
+        "spring lock",
+        "deck rail",
+        "broken lock housing",
+        "trailer repair",
+        "houston"
+      ],
+      "stage": "damage",
+      "subject": "spring lock housing",
+      "segments": [
+        {
+          "from": 0.3,
+          "to": 2.0,
+          "shows": "close-up of spring lock housing, ragged burnt and rusted edges, steel ring hook, damage visible",
+          "stage": "damage"
+        },
+        {
+          "from": 2.0,
+          "to": 3.5,
+          "shows": "closer angle on lock plate and bolt with bright metal fitted to the rail, rough weld area visible",
+          "stage": "fit"
+        },
+        {
+          "from": 3.5,
+          "to": 4.5,
+          "shows": "gloved hand holding abrasive pad over the deck rail, lock bracket close-up, metal being prepped",
+          "stage": "strip"
+        },
+        {
+          "from": 4.5,
+          "to": 6.3,
+          "shows": "wide view of deck rail and lock bracket with license plate and red reflector, bracket still rough",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "14011028|1793369327",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock3.mp4": {
+      "cats": [
+        "hyd",
+        "close",
+        "rust"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.38,
+        "close": 0.23,
+        "rust": 0.23
+      },
+      "desc": "Camera circles a car hauler trailer's deck-end spring lock and ramp bracket, showing the worn galvanized steel, the pin and clip, and the rear trailer tag, with the ground and green deck mat in view.",
+      "kw": [
+        "car hauler",
+        "spring lock",
+        "ramp bracket",
+        "trailer deck",
+        "galvanized steel",
+        "pin clip",
+        "houston trailer repair"
+      ],
+      "stage": "damage",
+      "subject": "spring lock bracket",
+      "segments": [
+        {
+          "from": 0.3,
+          "to": 4.2,
+          "shows": "close-up of spring lock bracket and pin clip on deck end, scraped and weathered steel with weld marks",
+          "stage": "damage"
+        },
+        {
+          "from": 4.2,
+          "to": 5.4,
+          "shows": "side angle of ramp bracket and lower plate, galvanized deck with worn spots",
+          "stage": "damage"
+        },
+        {
+          "from": 5.4,
+          "to": 8.0,
+          "shows": "wide view of stacked deck plates and lower bracket from the rear, tag visible at edge",
+          "stage": "other"
+        },
+        {
+          "from": 8.0,
+          "to": 9.3,
+          "shows": "side view of ramp channel and lower plate near trailer rail, scuffed galvanized finish",
+          "stage": "damage"
+        },
+        {
+          "from": 9.3,
+          "to": 11.9,
+          "shows": "close-up of rear lock bracket and plate with paint loss and worn edges, trailer tag 589 visible",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "28013538|1793369363",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock4.mp4": {
+      "cats": [
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.33,
+        "hyd": 0.33
+      },
+      "desc": "Close-up walkaround of a car hauler's rear bracket and spring lock, showing the broken old lock, then clamping and chiselling away the damaged steel on the ramp crossbar.",
+      "kw": [
+        "car hauler",
+        "spring lock",
+        "rear bracket",
+        "broken lock",
+        "chisel removal",
+        "bar clamp",
+        "trailer ramp",
+        "houston shop"
+      ],
+      "stage": "strip",
+      "subject": "spring lock bracket",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.6,
+          "shows": "close-up of rear bumper bracket and old spring lock, rusted and broken, no work yet",
+          "stage": "damage"
+        },
+        {
+          "from": 2.6,
+          "to": 3.8,
+          "shows": "bar clamp on ramp crossbar at the lock bracket, rusty plate still in place",
+          "stage": "fit"
+        },
+        {
+          "from": 3.8,
+          "to": 5.7,
+          "shows": "chisel and cut scrap plate on ground, lock bracket edges chipped and ground, residue at weld area",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "12619876|1793369343",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock5.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      },
+      "desc": "Close-up footage of a car hauler deck bracket held by a steel clamp on a rubber floor mat, moving from the clamped bracket to the broken, rusted lower edge with a bolt and cut steel.",
+      "kw": [
+        "car hauler",
+        "spring lock bracket",
+        "deck clamp",
+        "broken steel",
+        "rust",
+        "trailer repair houston"
+      ],
+      "stage": "fit",
+      "subject": "spring lock bracket",
+      "segments": [
+        {
+          "from": 0.3,
+          "to": 1.5,
+          "shows": "close-up of bracket held by steel clamp, rusted grey steel, wood block inside bracket, mat below",
+          "stage": "fit"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "wider view of clamp on deck edge and bracket with slots, rust and grey residue visible",
+          "stage": "fit"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "side of deck bracket with slots and white residue, clamp on deck, rusted lower edge",
+          "stage": "fit"
+        },
+        {
+          "from": 3.9,
+          "to": 5.7,
+          "shows": "angled close-up of broken lower bracket with bolt, cut and rough edges, rust visible",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "12660184|1793369337",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock6.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.75
+      },
+      "desc": "Close-up walkaround of a car hauler trailer's deck rail and rear bracket area, showing welded brackets, bolts and white weld-spatter residue on the steel, with a Texas token trailer plate visible.",
+      "kw": [
+        "car hauler trailer",
+        "deck rail bracket",
+        "spring lock weld",
+        "trailer frame",
+        "bolt bracket",
+        "weld spatter",
+        "houston trailer repair"
+      ],
+      "stage": "weld",
+      "subject": "deck rail bracket",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "close-up of deck frame corner bracket with scorched weld remnants and bolt, wide holed deck plate above",
+          "stage": "weld"
+        },
+        {
+          "from": 2.7,
+          "to": 5.1,
+          "shows": "close-up of slotted deck rail end with welded bracket and bolt on the side",
+          "stage": "weld"
+        },
+        {
+          "from": 5.1,
+          "to": 8.7,
+          "shows": "close-up of rail end with white weld filler and spatter on the bracket, ramp plate beside it, Texas plate in view",
+          "stage": "weld"
+        },
+        {
+          "from": 8.7,
+          "to": 11.1,
+          "shows": "close-up of lower bracket with slotted plate and white weld marks, then rail end at angle",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "25674089|1793369391",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    },
+    "springlock7.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.89
+      },
+      "desc": "Close-up walkaround of a galvanized car hauler deck section and its lock end, with a strap across the perforated deck plate and debris-covered ground below.",
+      "kw": [
+        "car hauler",
+        "deck plate",
+        "spring lock",
+        "trailer frame",
+        "galvanized rail",
+        "houston trailer repair"
+      ],
+      "stage": "other",
+      "subject": "deck rail section",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "wide close-up of perforated deck plate end and lock bracket on rail, strap across, no visible weld",
+          "stage": "other"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "close-up of rail end with lock bracket and bolt hole, debris on ground",
+          "stage": "other"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "close-up of lock end of deck rail with slotted holes and grimy galvanized steel",
+          "stage": "other"
+        },
+        {
+          "from": 3.9,
+          "to": 6.3,
+          "shows": "side view of rail with slotted holes and a flat steel ramp plate beneath, tag plate visible",
+          "stage": "other"
+        },
+        {
+          "from": 6.3,
+          "to": 7.5,
+          "shows": "close-up of rail end over ramp plate with slots, license plate visible at top",
+          "stage": "other"
+        },
+        {
+          "from": 7.5,
+          "to": 9.0,
+          "shows": "low side view of rail with slots and flat ramp plate with bolt hole on dirt ground",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "19725772|1793369407",
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+    }
+  }
+}

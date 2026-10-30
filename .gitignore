@@ -1,0 +1,60 @@
+# What stays out of the repo.
+#
+# The rule: code and settings go in, media and anything rebuildable stays out. Footage alone is several GB and
+# GitHub refuses a file over 100 MB, so pushing it would fail halfway and leave a broken repo.
+
+# source footage and everything made from it
+footage/
+output/
+voiceover/
+work/
+music/
+sheets/
+
+# David's packaged GUI: hundreds of MB of bundled Python, and it is not what we run
+app/
+*.[eE][xX][eE]
+*.dll
+CHRH Video/
+CHRH Video*/
+
+# Video, audio and images anywhere. The patterns are case-insensitive on purpose: a phone writes .MOV, a
+# drone .MP4, an export .Mp4, and git matches patterns case-sensitively even on Windows.
+*.[mM][pP]4
+*.[mM][oO][vV]
+*.[mM][kK][vV]
+*.[aA][vV][iI]
+*.[mM][pP]3
+*.[wW][aA][vV]
+*.[mM]4[aAvV]
+*.[jJ][pP][gG]
+*.[jJ][pP][eE][gG]
+*.[pP][nN][gG]
+*.[gG][iI][fF]
+*.[wW][eE][bB][pP]
+
+# model files: the CLIP onnx weights are big and downloadable again
+*.onnx
+*.bin
+*.pt
+
+# python leftovers
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# keys never belong in a repo; they live in environment variables
+.env
+*.key
+secrets*
+
+# windows
+Thumbs.db
+desktop.ini
+API Keys.txt
+*Keys*.txt
+*.zip
+API Keys.txt
+*Keys*.txt
+*.zip

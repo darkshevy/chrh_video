@@ -1,0 +1,92 @@
+10 TOPICS — 2026-09-23
+Paraphrased from the general script ("At Car Hauler Repair Houston.txt"). No invented specs.
+FOOTAGE RULE FOR THIS BATCH: only clips/time ranges NOT used in the 09-22 videos (decks, miller, sandblast,
+fullrefinish, primer, topcoat, nonskid, fromabove, overview). Ranges below are verified free.
+Save VO as voiceover/<key>.mp3. Target 40-42 s VO.
+
+========================================================================
+1) key: hydraulics — "HYDRAULICS" / "CYLINDERS, LINES & PUMPS" — music: Kama Sutra
+========================================================================
+Almost every moving part on a car hauler runs on hydraulics, and when the system starts to fail, loading turns into a fight. At Car Hauler Repair Houston we repair and replace hydraulic cylinders, hoses, fittings, valves, pumps, electric motors, reservoirs and PTO systems. A cylinder that still has good steel can be rebuilt with new seals and components, and the ones that are past saving get replaced. We trace leaks back to the actual source, check the lines and the mounting points, and test the deck through its full travel before the trailer leaves. Hydraulic problems rarely fix themselves, and they get expensive when a deck drops or sticks. Hydraulics acting up? Bring the trailer to Car Hauler Repair Houston.
+
+Footage (all unused ranges): 14-50-11 0–6 (cylinders, coil lines, black trailer) -> 14-50-11 10.8–19.3 (rams under deck)
+-> 19-03-53 5.5–7.5 (cylinder on the floor) -> 14-50-11 12.7–15 (mounting points). General VO = mixed trailers OK.
+
+========================================================================
+2) key: storage — "STORAGE COMPARTMENTS" / "REBUILT FROM THE FRAME UP" — music: Another Day
+========================================================================
+Storage compartments live in the worst spot on the trailer, right behind the wheels, where water, dirt and road spray hit them every single mile. On this hauler the compartment floor and its supports were eaten through, the doors no longer sat straight, and the box had stopped protecting anything stored inside. Our team stripped it back, cut out the rotted steel, and rebuilt the structure so the compartment sits square and closes properly again. It is a small part of a big trailer, and it is exactly the kind of repair people put off until the day their tools and chains are lying on the ground. Need a compartment rebuilt? Talk to Car Hauler Repair Houston.
+
+Footage (all unused clips): "Car Hauler Storage Compartment Repair.mp4" 0.5–7 (open box, corroded floor)
+-> "…Repair 2.mp4" 1–8 (rotted rail, damaged door edge) -> 19-04-40 0.5–9 (worker rebuilding the compartment)
+-> "…Repair 2.mp4" 20–28 (rebuilt rail, box closed). ONE trailer = rule 1 OK.
+
+========================================================================
+3) key: corrosion — "CORROSION" / "CUT IT OUT, BUILD IT BACK" — music: Fields of space
+========================================================================
+Rust does not stop on its own. It works into seams, under skins and along the bottom rails, and by the time it shows on the outside, the steel underneath is usually thinner than it looks. At Car Hauler Repair Houston we cut out fatigued and damaged steel, fabricate replacement sections, and weld them back into the structure so the trailer carries load the way it was built to. Panels, rails, posts and skins all get treated the same way: remove what has failed, replace it with new material, and protect the repair against corrosion. Patching over rust only hides it for a season. Fighting rust on your trailer? Car Hauler Repair Houston can take care of it.
+
+Footage (all unused): 15-01-24 0.2–4.5 (grinder, sparks, rusted rail) -> "зеркальная поверхность" 0.3–4 (rusted beam over deck)
+-> "зеркальная поверхность" 4.2–8.5 (torn skin, mirror panel) -> 19-04-15 4–13 (white enclosed trailer, rear post).
+General VO = mixed trailers OK.
+
+========================================================================
+4) key: welding — "STRUCTURAL WELDING" / "WHERE THE LOAD GOES" — music: Thunder
+========================================================================
+Every load a car hauler carries ends up in its welds. At Car Hauler Repair Houston we repair cracked and damaged frame rails, crossmembers, side beams and lower frames, and we reinforce high-stress areas with properly fitted structural plates, gussets and additional supports. Each repair starts with cleaning the steel and fitting the new piece tight, because a weld is only as good as what sits underneath it. We weld on the trailer and on the bench, wherever the repair is best done, and the finished joints go back into service carrying the same load as the original structure. Welds are not the place to save money. Got a cracked frame or a broken bracket? Call Car Hauler Repair Houston.
+
+Footage (all unused ranges): 14-48-45 0.1–4.6 (gusset clamped and welded on primed frame) -> "сварка.mp4" 0.5–5
+(welding under the trailer) -> 14-50-04 5.5–9.5 (arc, sparks) -> 14-48-40 6–12 (finished welds, light box).
+General VO = mixed trailers OK.
+
+========================================================================
+5) key: aluminum — "ALUMINUM WORK" / "RAMPS, DECKS, SECTIONS" — music: Hollywood waves
+========================================================================
+Aluminum is a different animal than steel, and it shows up all over a modern car hauler: ramps, deck sections, walkways and trim. Our fabrication department at Car Hauler Repair Houston works in steel, aluminum and stainless, so a damaged aluminum ramp does not mean waiting on a factory part that may not exist anymore. We build new sections in the shop, weld them to fit the trailer they belong on, and finish the edges so nothing catches a tire or a boot. Same trailer, same mounting points, new part. Running aluminum decks or ramps that have seen better days? Car Hauler Repair Houston builds them to fit.
+
+Footage (all unused ranges): 19-04-49 0.5–9 (aluminum perforated section on the bench) -> 19-03-53 3.8–5 (welding it)
+-> 19-04-49 14–18 (finished section) -> 14-48-20 2.6–5.2 and 14-48-26 1.6–5 (aluminum decks on the trailer).
+General VO = mixed trailers OK.
+
+========================================================================
+6) key: shoptour — "INSIDE THE SHOP" / "EVERYTHING IN ONE PLACE" — music: Symphony one
+========================================================================
+This is where the work happens. Car Hauler Repair Houston is a shop built around one kind of equipment: car haulers. Inside, there is room to pull a trailer all the way in, lift the decks and work the frame from end to end, with the welding bays, the fabrication benches and the parts a rebuild needs in the same building. Outside, the yard holds the trailers waiting their turn and the ones that are already finished. Working under one roof is not about convenience, it is about control: the same team sees the trailer from the first cut to the last coat of paint. Come see the shop, or send us your trailer.
+
+Footage (all unused): drone 0025 0.5–14 (fly through the shop, trailer on the floor) -> 0026 4–8 (bays, decks)
+-> "shop east to west and south" 0–11 (aerial over the shop) -> "yard footage" 7.5–12.9 (yard, finished trailers).
+General VO. Drone = no stabilization.
+
+========================================================================
+7) key: insideframe — "UNDER THE DECKS" / "A 5-CAR FROM THE INSIDE" — music: Hyde and seek
+========================================================================
+From the outside a five-car hauler looks like one big machine. From the inside it is a stack of decks, posts and tracks that all have to line up, or nothing loads the way it should. This trailer went through our shop for decking work, and the drone shows the part an owner rarely sees: the run under the upper decks, the frame tunnel from the rear to the belly, and the clearance above the tandem. Every one of those surfaces takes weight, vibration and wear on every single trip. Building decks that fit this structure is the whole job. Want work like this on your hauler? Car Hauler Repair Houston builds and installs decks in house.
+
+Footage (all unused ranges, one trailer = rule 1 OK): "5 car decking rear to back" 0.5–8 (whole clip unused)
+-> "5 car decking rear to the belly" 0.5–12 -> "5 car decking front to rear through the frame" 11–20
+-> "5 car decking above the tandem" 7–14.
+
+========================================================================
+8) key: rungear — "RUNNING GEAR" / "HUBS, SPRINGS, BRAKES, TIRES" — music: Kama Sutra
+========================================================================
+A car hauler can have a perfect frame and still be unsafe if the running gear underneath it is worn out. At Car Hauler Repair Houston we service suspension and running gear: shocks, brake chambers, drums, shoes, hubs, bearings, seals, wheels and tires. We pull hubs to check bearings and seals, look at the springs and mounts for cracks and movement, and replace what is out of service instead of sending it down the road for one more load. This is the part of the trailer that touches the highway, and it is the part inspectors look at first. Due for suspension or brake work? Car Hauler Repair Houston handles running gear along with everything else.
+
+Footage (all unused ranges): 14-48-57 0.3–8.5 (hub and spindle, blocked axle) -> 14-50-11 0.5–5 (springs, suspension)
+-> 14-59-44 3.5–8 (tandem and wheels) -> 14-59-44 9–13.5 (wheels, rear). General VO = mixed trailers OK.
+
+========================================================================
+9) key: whyblast — "WHY BLASTING" / "THE SURFACE DECIDES" — music: Another Day
+========================================================================
+People ask why we blast a trailer instead of just painting over it. This is why. Old coatings and rust hold moisture against the steel, so anything sprayed on top starts failing from underneath on day one. Blasting takes the frame back to clean bare metal, which is the only surface a primer can really bond to, and it also shows us the truth about the steel: where it is solid and where it needs repair before any coating goes on. It is slow, it is dirty, and it is the reason the finish still looks right years later. Thinking about paint for your hauler? Start the conversation with Car Hauler Repair Houston.
+
+Footage (red trailer only, all unused ranges): "пескоструй.mp4" 7–12 (blasted deck, rust line) -> "пескоструй.mp4" 13–18
+-> "пескоструй3" 3.5–8 (worker blasting) -> 14-58-29 2–8 (bare gray frame) -> "покраска.mp4" 26–33 (primed/painted result).
+
+========================================================================
+10) key: warranty — "COTTRELL CERTIFIED" / "WARRANTY WORK IN HOUSTON" — music: Thunder
+========================================================================
+If you run a Cottrell, this one matters. Houston Car Hauler is a Cottrell Certified Warranty Repair Center, which means approved warranty and service work gets done here in Houston instead of being shipped somewhere else. We also work on Sun Country, Sun Valley, Wally-Mo, Boydstun, Miller, LOHR systems, stinger units and enclosed car haulers, from a single hydraulic hose to a complete frame reconstruction. Same shop, same team, whether the job is covered by warranty or not. Our goal is always the same: find the real damage, rebuild the structure properly, and put the equipment back to work. Cottrell owner in Texas? Car Hauler Repair Houston is your certified warranty shop.
+
+Footage (all unused ranges): drone 0025 14–24 (shop interior) -> 0A2F 0.5–8 (Miller hinge work)
+-> 1D59 3.6–8 (new hinge plates) -> B4C6 2–8 (beam end) -> "shop east to west and south" 14–22 (aerial).
+General VO = mixed trailers OK.

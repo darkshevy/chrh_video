@@ -1,0 +1,11 @@
+# Runtime (Python 3.12, Windows). ffmpeg full build is separate: winget install Gyan.FFmpeg
+pocketsphinx==5.1.1
+onnxruntime==1.30.0
+opencv-python==5.0.0.93
+numpy==2.5.2
+# build the .exe
+pyinstaller==6.22.3
+# dev only: regenerate CLIP prompt embeddings (autotag.build_prompts), render the logo SVG, music beat grids
+tokenizers
+resvg_py
+librosa

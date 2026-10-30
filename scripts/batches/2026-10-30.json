@@ -1,0 +1,70 @@
+{
+ "videos": {
+  "springlock": {
+   "title": "SPRING LOCK FIX",
+   "sub": "CLEANED UP, FITTED, WELDED",
+   "track": "Thunder",
+   "text": "Is your spring lock rusted and broken? This one was. We chiseled out the broken pieces and ground the edges clean. So what goes in its place? A new lock, clamped to the rail and fitted. Then we welded it in. Old lock gone, new one welded on. Bring it by the shop.",
+   "hook": 21,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "springlock1.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     7,
+     "springlock4.mp4",
+     0.25,
+     0.7,
+     null
+    ],
+    [
+     15,
+     "springlock3.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     21,
+     "springlock3.mp4",
+     9.25,
+     1.0,
+     null
+    ],
+    [
+     27,
+     "springlock7.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     36,
+     "springlock6.mp4",
+     0.0,
+     0.7,
+     null
+    ],
+    [
+     41,
+     "springlock6.mp4",
+     5.0,
+     1.0,
+     null
+    ],
+    [
+     48,
+     "springlock3.mp4",
+     3.75,
+     0.7,
+     null
+    ]
+   ]
+  }
+ }
+}

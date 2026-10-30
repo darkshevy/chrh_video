@@ -1,0 +1,57 @@
+10 VIDEOS — 2026-09-24   (9 topical + 1 Cottrell)
+Facts ONLY from carhaulerrepairhouston.com and Cottrell's Limited Warranty (see CLAUDE.md "Verified facts").
+Every script: hook in the first line + a second hook near the middle (marked [HOOK 2] — do NOT read the marker).
+Numbers are written as words on purpose (the voice reads them reliably, subtitles stay in sync).
+The phone number is not spoken — it is on screen the whole time ("the number on screen").
+Save VO as voiceover/<key>.mp3. Voice: Alistair Kingsley, v3, 1x.
+
+========================================================================
+1) key: deckdown — "DECK DOWN?" / "IF IT'S ON A CARRIER, WE FIX IT" — music: Thunder
+========================================================================
+Deck won't move? Line just blew and there's fluid on the pavement? The clock doesn't care, and neither does dispatch. At Car Hauler Repair Houston, car carriers are the only thing we work on. Burst lines and weeping fittings. Pumps and PTOs that spin but build nothing. Decks that creep halfway and quit, and cylinders that leak down overnight. [HOOK 2] Here's the part that saves your week: hoses are crimped right here and welding is done on site, so most of these failures turn the same day instead of waiting on a supplier. Cracked ramps, broken brackets, air leaks, brakes locked up on the scale. If it's on a car carrier, we fix it in this bay. Call the number on screen.
+
+========================================================================
+2) key: sameday — "SAME DAY" / "ONE DAY HERE. A WEEK THERE." — music: Hollywood waves
+========================================================================
+Same failure. One day here, a week at the dealer. So what's the difference? At Car Hauler Repair Houston, four things line up. One: diagnosis starts on the phone, so we know what's coming before you pull in. Two: senior master techs who specialize in car carriers, not general trucks. Three: parts on hand, because hydraulic line and fittings are stocked, custom hoses are crimped in-house, and welding happens right here. [HOOK 2] And the fourth one surprises people. It's the price, fixed in writing before a wrench turns. Line all four up, in bays built for full-length multi-deck rigs, and most common carrier failures roll out the same day. Down right now? Call before you drive over.
+
+========================================================================
+3) key: pricing — "$0 TO LOOK" / "PRICE BEFORE THE WRENCH" — music: Kama Sutra
+========================================================================
+How much does it cost just to find out what's wrong? Here, nothing. At Car Hauler Repair Houston you get a rough number on the phone, then an exact price in writing once the rig is inspected in the bay. Don't like the number? Take your keys and drive out owing zero. No diagnostic fee, no shop time, no inspection charge. Approve it, and we start right away, and nothing outside that price gets touched. [HOOK 2] And if we find something else halfway through? Work stops, you get a phone call, and you decide. No surprises on the invoice, and no number that moves after you agreed to it. You're already down. You should at least know the price. Call the number on screen.
+
+========================================================================
+4) key: callfirst — "60 SECONDS" / "CALL BEFORE YOU DRIVE" — music: Fields of space
+========================================================================
+Sixty seconds on the phone can save your whole afternoon. When you call Car Hauler Repair Houston, you're not talking to a call center. Eugene, the shop director, picks up, asks what you're pulling and what quit, and diagnoses while you talk. He'll tell you straight whether to limp it in or get a tow, and whether there's a bay for you today. [HOOK 2] Want to cut that call in half? Have this ready: the brand and roughly how old it is, what quit, what it's doing, loaded or empty, and where the rig is right now. If Eugene is under a rig, send a text, and you'll hear back within fifteen minutes during shop hours. One call, and you know exactly where you stand.
+
+========================================================================
+5) key: loaded — "STILL LOADED?" / "CARS ON THE DECK" — music: Another Day
+========================================================================
+Your deck quits with cars still on it. Now what? The first thing most drivers ask us is whether we can take a rig loaded, and often the answer is yes. It depends on the failure and where the technician needs access, so tell us how many units you're carrying and where they sit, and we'll confirm on the call before you drive over. [HOOK 2] Why does that matter so much? Because unloading on the side of the road just to get a repair is a day you'll never get back. Our bays at Car Hauler Repair Houston are built for full-length multi-deck carriers, and if the job runs long, your rig sits securely behind our gate overnight instead of on an open shoulder. Loaded and down? Call us first.
+
+========================================================================
+6) key: bays — "FOUR BAYS" / "BUILT FOR MULTI-DECK RIGS" — music: Symphony one
+========================================================================
+Most truck shops were built for trucks. Ours was built for car carriers. Car Hauler Repair Houston runs four full-service bays sized for full-length multi-deck rigs, so your trailer comes all the way inside instead of waiting in a yard. We're in southeast Houston, off the Gulf Freeway, about a mile and a half from the I forty-five and six ten interchange, and just minutes from America's Auto Auction. [HOOK 2] What does that mean for you? No more hunting for a shop that can actually fit your rig. Four bays, first come, first served, Monday through Saturday, seven in the morning to six at night. Call or text before you roll in, and we'll tell you if a bay is open.
+
+========================================================================
+7) key: reviews — "FIVE STARS" / "WHAT DRIVERS SAY" — music: Hyde and seek
+========================================================================
+Five stars from twenty-five Google reviews, and they keep saying the same things. One carrier owner had the rear arms replaced and all the welding handled, and called the quality top-notch and the pricing more than fair. Another had a rear deck repaired and noticed that everything lined up and operated correctly, because the job was done right instead of patched. [HOOK 2] So what do customers mention most? Clear estimates, and reports that explain what's being done and why, so they feel confident leaving their truck with us. One driver was in and out within a couple of hours after a single phone call. Read all twenty-five reviews on Google, then call Car Hauler Repair Houston.
+
+========================================================================
+8) key: fleet — "RUNNING A FLEET?" / "CALL BEFORE IT BREAKS" — music: Thunder
+========================================================================
+Running a fleet, not just one truck? Then the best time to call us is before a unit goes down. Fleet managers who have already talked to Eugene at Car Hauler Repair Houston get a faster read when a carrier breaks, because we already know the equipment. The pricing policy is the same for one rig or twenty: an exact price in writing, and nothing extra without your approval. [HOOK 2] Here's what fleet owners like most: we take the cards your drivers already carry, Comchek, EFS and T-Chek, plus cash and every major card. Most common failures turn the same day, and if a job runs long, the rig stays secure behind our gate overnight. Keep your fleet loading. Call before you're broken.
+
+========================================================================
+9) key: warranty6 — "6-MONTH WARRANTY" / "ON LABOR & WORKMANSHIP" — music: Hollywood waves
+========================================================================
+What happens if a repair doesn't hold? At Car Hauler Repair Houston, completed repairs come with a six-month warranty on labor and workmanship. If something we did doesn't hold, bring it back, and we make it right. Cottrell warranty repairs are a separate story, because they carry Cottrell's own coverage. [HOOK 2] And here's the honest part: sometimes a rig just needs to get home. Anything we flag as a temporary or limp-it-home fix is called out up front, before you pay, so you always know which repairs are covered and which ones are a stopgap. No fine print discovered later. Just a straight answer, a price in writing, and work that's backed. Call the number on screen.
+
+========================================================================
+10) key: cottrell — "COTTRELL AUTHORIZED" / "KEEP YOUR FACTORY WARRANTY" — music: Kama Sutra
+    (Cottrell logo on screen — see pipeline notes)
+========================================================================
+Own a Cottrell? Where you repair it can decide whether your warranty survives. Cottrell's limited warranty does not apply if the trailer is modified or repaired by anyone other than Cottrell or its authorized representatives. Car Hauler Repair Houston is a Cottrell authorized warranty repair center, right here in Houston. [HOOK 2] So how does it work? Cottrell approves the claim and issues a work order before any repair starts, and the covered work is done in our bay, without the dealer's week-long queue. On new units, the coverage itself comes from Cottrell: thirty-six months on the mainframe structure, wear items excluded, and twelve months on Cottrell-made hydraulic cylinders. Keep your warranty intact. Bring your Cottrell to Car Hauler Repair Houston.
