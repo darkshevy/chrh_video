@@ -175,7 +175,11 @@ def render(k,budget=160,tag="_v2"):
         stab=not (f.startswith("DJI") or "DroneDirections" in src(f))  # boss rule 3: no stab on drone
         pre=",".join(vf+["vidstabdetect=shakiness=6:accuracy=15:stepsize=6:result="+trf])
         if stab: subprocess.run(["ffmpeg","-y","-v","error","-ss",str(s['tin']),"-t",f"{d*s['sp']+0.3:.3f}","-i",src(f),"-vf",pre,"-f","null","-"],check=True,cwd=WORK)
-        if stab: vf.append(f"vidstabtransform=input={trf}:smoothing=14:optzoom=1:zoomspeed=0.2:interpol=bicubic")
+        # optzoom=1 zooms in until no border shows, with no ceiling: on a shaky handheld stretch that was 20-30%,
+        # the "too close, cut off at the edge" shots. Capping the correction (4% of the width, ~3 degrees) caps
+        # the zoom; a little shake left in beats the subject cropped out.
+        if stab: vf.append(f"vidstabtransform=input={trf}:smoothing=14:optzoom=1:zoomspeed=0.2:interpol=bicubic"
+                           f":maxshift={max(8, int(0.04 * min(dims(f))))}:maxangle=0.05")
         vf+=(fit_filters() if fit_mode(f) else
              [f"scale={W}:{H}:flags=lanczos:force_original_aspect_ratio=increase",
               f"crop=1080:1920:'min(max(iw*{cx}-540,0),iw-1080)':'min(max(ih*{cy}-960,0),ih-1920)'"])
