@@ -44,7 +44,9 @@ Rules, in order of importance:
 1. The picture must match the words spoken at that moment. If the words name damage, show damage; if they name
    a weld, show the weld; if they name paint, show paint. This is the whole point.
 2. Real work order. Damage comes before cutting, cutting before welding, welding before paint, paint before the
-   finished result. Never show a finished part before the work that produced it.
+   finished result. Never show a finished part before the work that produced it. The stage in square
+   brackets was judged by comparing all clips of the job side by side: a [done] or [weld] segment must not
+   go under words about the broken part, the rust or the damage, however well its description matches.
 3. Do not jump back and forth: once the video has moved past a stage, stay there, unless the words themselves
    go back to it.
 4. Spread the material out. Do not leave good segments unused while repeating one, and avoid using the same

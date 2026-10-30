@@ -16,6 +16,12 @@
 #   python pipeline\describe.py rampwidth           only clips whose name starts with that
 #   python pipeline\describe.py --force rampwidth   describe them again, overwriting
 #   python pipeline\describe.py --show rampwidth    print what is stored, call nothing
+#   --single                                        one clip at a time even for a project (the old way)
+#
+# With a project prefix the whole project is described in ONE request (see describe_project): every clip of a
+# job shows the same part, and only side by side can a model tell the broken old lock from the new one welded
+# in its place. Clip by clip, a fresh part on an old rusty trailer kept coming back as "worn, rusted, damage"
+# and the finished lock ended up under the words about the rust.
 #
 # Usually you do not run this yourself: plan_ai.py describes whatever it needs. A clip is described once and
 # cached by file size and date, so a re-shot clip under the same name is described again, an untouched one never.
@@ -25,7 +31,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import autoplan, build
 
-MODEL = "claude-haiku-5-5"
+MODEL = "claude-haiku-5-5"            # clip by clip: the library-wide catch-up, many clips, cheap
+PROJECT_MODEL = "claude-sonnet-5-5"   # a whole project at once: one call, worth the stronger model
+PROJECT_MAX = 15                      # above this the frames per clip get too few to read; fall back
+PROJECT_FRAMES = 90                   # images in one request (the API takes 100)
 MAXFRAMES = 10             # a frame roughly every second or two, whichever gives fewer
 MINSTEP = 1.2
 MAXPX = 768
@@ -58,17 +67,18 @@ segments: split the clip where what is on screen actually changes — a new angl
 _shown = False
 
 
-def frames(path):
+def frames(path, maxframes=None):
     """[(seconds, base64 jpeg)] — up to MAXFRAMES, evenly spaced, never closer than MINSTEP apart."""
+    maxframes = maxframes or MAXFRAMES
     import cv2
     cap = cv2.VideoCapture(path)
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
     total = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0
     dur = total / fps if total else 0
     if dur <= 0: cap.release(); return [], 0.0
-    step = max(MINSTEP, dur / MAXFRAMES)
+    step = max(MINSTEP, dur / maxframes)
     out, t = [], min(0.3, dur / 20)
-    while t < dur - 0.1 and len(out) < MAXFRAMES:
+    while t < dur - 0.1 and len(out) < maxframes:
         cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000)
         ok, f = cap.read()
         if ok:
@@ -168,15 +178,7 @@ def describe(names, L, api_key, log=print, force=False, note=""):
             if not shots:
                 log(f"  {i}/{len(todo)} {n}: could not read frames"); continue
             r = ask(shots, dur, api_key, log=log, note=note)
-            segs = clean_segments(r.get("segments"), dur)
-            C[n]["desc"] = str(r.get("desc", ""))[:400]
-            C[n]["kw"] = [str(k).lower() for k in r.get("kw", [])][:8]
-            C[n]["stage"] = str(r.get("stage", "other")).lower()
-            C[n]["subject"] = str(r.get("subject", ""))[:60]
-            C[n]["segments"] = segs or [{"from": 0.0, "to": round(dur, 1),
-                                         "shows": C[n]["desc"], "stage": C[n]["stage"]}]
-            C[n]["desc_sig"] = sig(build.src(n))
-            C[n]["desc_note"] = note
+            store(C, n, r, dur, note, "clip")
             done += 1
             log(f"  {i}/{len(todo)} {n}: {len(C[n]['segments'])} segment(s)")
             for s in C[n]["segments"]:
@@ -184,6 +186,122 @@ def describe(names, L, api_key, log=print, force=False, note=""):
             if done % 10 == 0: autoplan.save_lib(L)      # checkpoint: a crash never loses the batch
         except Exception as e:
             log(f"  {i}/{len(todo)} {n}: FAILED {e}")
+    autoplan.save_lib(L)
+    return done
+
+
+PROJECT_PROMPT = """All the clips above are from ONE repair job on ONE trailer, filmed on a phone. They are shown in
+file-name order, which is not necessarily the order the work was done in.
+
+Before labelling anything, compare the clips with each other. The same part (and the area around it) appears
+in several clips: in some it is the old broken part, in some it is being cut, ground, fitted or welded, in some
+it is the new part finished in place. Work out what the broken part looked like and what the finished part
+looks like, and only then label every stretch by what is ACTUALLY in it.
+
+Traps that matter:
+- The trailer around the repair is old: dull galvanized, scuffed, rusty, dirty. That does NOT make a stretch
+  "damage". Judge the part itself.
+- A complete new part in place — intact, clean or bright steel, fresh weld beads around it, a new pin, ring or
+  latch — is "done" (or "weld" when the welding itself is visible), even if the steel beside it is weathered.
+- "damage" is only the old part before the work: broken, torn, burnt, rusted through, missing pieces.
+- Grey or white residue, spatter and ground metal are signs of welding/grinding, not of damage.
+
+Reply with JSON only, no other text:
+{"story": "two sentences: what the job was and in what order it went, judged across the clips",
+ "clips": {"<file name>": {"desc": "...", "kw": ["..."], "subject": "...", "stage": "...",
+                           "segments": [{"from": 0.0, "to": 3.5, "shows": "...", "stage": "..."}]}}}
+Every clip must appear under its exact file name. The fields inside follow the same rules as below.
+
+""" + PROMPT.split("Reply with JSON only, no other text:", 1)[1].split("\n", 3)[3]
+
+
+def ask_project(clips, key, log=print, note=""):
+    """clips = [(name, shots, dur)] -> {"story": ..., "clips": {name: {...}}} in one request."""
+    content = []
+    for i, (n, shots, dur) in enumerate(clips, 1):
+        content.append({"type": "text", "text": f"=== CLIP {i} of {len(clips)}: {n} ({dur:.1f} s)"})
+        for t, b in shots:
+            content.append({"type": "text", "text": f"{n} at {t}s"})
+            content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b}})
+    ctx = (f"WHAT THE SHOP SAYS THIS JOB IS: {note}\nUse it to name the parts and to tell the stages apart. "
+           f"Do not describe anything you cannot see in the frames.\n\n" if note else "")
+    content.append({"type": "text", "text": ctx + PROJECT_PROMPT})
+    body = json.dumps({"model": PROJECT_MODEL, "max_tokens": 16000,
+                       "messages": [{"role": "user", "content": content}]}).encode()
+    req = urllib.request.Request(URL, data=body, headers={
+        "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=600) as r:
+                data = json.load(r)
+            u = data.get("usage", {})
+            log(f"   (described by {data.get('model')}, {u.get('input_tokens')} in / {u.get('output_tokens')} out)")
+            if data.get("stop_reason") == "max_tokens":
+                raise RuntimeError("the reply was cut off")
+            txt = "".join(p.get("text", "") for p in data.get("content", []))
+            a, b = txt.find("{"), txt.rfind("}")
+            if a < 0 or b < 0: raise ValueError(f"no JSON in reply: {txt[:300]!r}")
+            return json.loads(txt[a:b + 1])
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode(errors="replace")[:300]
+            if e.code in (429, 500, 502, 503, 529) and attempt < 2:
+                time.sleep(5 * (attempt + 1)); continue
+            raise RuntimeError(f"HTTP {e.code}: {msg}")
+        except RuntimeError:
+            raise
+        except Exception:
+            if attempt < 2: time.sleep(3 * (attempt + 1)); continue
+            raise
+    raise RuntimeError("gave up after retries")
+
+
+def store(C, n, r, dur, note, mode):
+    """Write one clip's description into the library record."""
+    segs = clean_segments(r.get("segments"), dur)
+    C[n]["desc"] = str(r.get("desc", ""))[:400]
+    C[n]["kw"] = [str(k).lower() for k in r.get("kw", [])][:8]
+    C[n]["stage"] = str(r.get("stage", "other")).lower()
+    C[n]["subject"] = str(r.get("subject", ""))[:60]
+    C[n]["segments"] = segs or [{"from": 0.0, "to": round(dur, 1),
+                                 "shows": C[n]["desc"], "stage": C[n]["stage"]}]
+    C[n]["desc_sig"] = sig(build.src(n))
+    C[n]["desc_note"] = note
+    C[n]["desc_mode"] = mode
+
+
+def describe_project(names, L, api_key, log=print, force=False, note=""):
+    """Describe all clips of one project in a single request. Returns how many were described, or None when
+    the project is too big for one request (the caller then goes clip by clip).
+
+    All-or-nothing on purpose: the labels only mean something relative to each other, so if one clip changed or
+    was never described this way, the whole project is looked at again."""
+    C = L["clips"]
+    names = [n for n in names if n in C and n in build.FILES]
+    if not names: return 0
+    if len(names) > PROJECT_MAX: return None
+    stale = [n for n in names if needs_description(C[n], n, note) or C[n].get("desc_mode") != "project"]
+    if not force and not stale: return 0
+    per = max(4, min(MAXFRAMES, PROJECT_FRAMES // len(names)))
+    log(f"describing the project together: {len(names)} clip(s), up to {per} frames each, with {PROJECT_MODEL}…")
+    clips = []
+    for n in names:
+        shots, dur = frames(build.src(n), per)
+        if shots: clips.append((n, shots, dur))
+        else: log(f"  {n}: could not read frames")
+    if not clips: return 0
+    r = ask_project(clips, api_key, log=log, note=note)
+    got = r.get("clips") or {}
+    if r.get("story"): log(f"\n  {r['story']}\n")
+    done = 0
+    for n, _, dur in clips:
+        rec = got.get(n) or next((v for k, v in got.items() if k.lower() == n.lower()), None)
+        if not isinstance(rec, dict):
+            log(f"  {n}: missing from the reply"); continue
+        store(C, n, rec, dur, note, "project")
+        done += 1
+        log(f"  {n}: {len(C[n]['segments'])} segment(s)")
+        for s in C[n]["segments"]:
+            log(f"      {s['from']:5.1f}-{s['to']:<5.1f} [{s['stage']}] {s['shows']}")
     autoplan.save_lib(L)
     return done
 
@@ -215,7 +333,12 @@ def main():
     if "--note" in sys.argv:
         i = sys.argv.index("--note")
         if i + 1 < len(sys.argv): note = sys.argv[i + 1]
-    n = describe(names, L, key, force="--force" in flags, note=note)
+    n = None
+    if prefix and "--single" not in flags:
+        n = describe_project(names, L, key, force="--force" in flags, note=note)
+        if n is None: print(f"{len(names)} clips is too many for one look; describing them one by one")
+    if n is None:
+        n = describe(names, L, key, force="--force" in flags, note=note)
     print(f"\ndescribed {n} clip(s); library.json saved")
 
 
