@@ -135,13 +135,23 @@ def place(key, slots, cuts, order, cands):
         c = order[i]
         got, how = None, ""
 
-        if c:   # keep the search inside the assigned stretch by forbidding everything outside it
-            forbid = collections.defaultdict(list)
-            for f, r in base.items(): forbid[f] += r
-            forbid[c["clip"]] += [(0.0, c["a"]), (c["b"], 1e9)]
-            got = (picker.best([c["clip"]], need, forbid, batch_used, 700, own_count=oc)
-                   or picker.best([c["clip"]], need, forbid, batch_used, 600, own_count=oc))
-            if got is None:   # the stretch is too short for this cut: stay in the clip, leave the stretch
+        if c:
+            # Keep the search inside the assigned stretch by forbidding everything outside it. If the stretch is
+            # too short, widen it step by step before letting go of it: the seconds right next to the described
+            # stretch almost always show the same thing, while "anywhere in the clip" on an 8 s clip happily
+            # lands on the unrelated side view at the far end.
+            # Real speed is tried at every width before slow motion: otherwise a stretch a little too short is
+            # "solved" by slowing the shot to 0.7x, which looks worse than borrowing a neighbouring second.
+            for slow, grow in [(False, g) for g in (0.0, 1.5, 3.0)] + [(True, g) for g in (0.0, 1.5, 3.0)]:
+                forbid = collections.defaultdict(list)
+                for f, r in base.items(): forbid[f] += r
+                forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)]
+                got = (picker.best([c["clip"]], need, forbid, batch_used, 700, allow_slow=slow, own_count=oc)
+                       or picker.best([c["clip"]], need, forbid, batch_used, 600, allow_slow=slow, own_count=oc))
+                if got:
+                    if grow: how = f"  (segment widened by {grow:g}s)"
+                    break
+            if got is None:   # even the widened stretch is too short: stay in the clip, leave the stretch
                 got = (picker.best([c["clip"]], need, base, batch_used, 700, own_count=oc)
                        or picker.best([c["clip"]], need, base, batch_used, 600, own_count=oc))
                 if got: how = "  (outside the segment)"
@@ -157,7 +167,9 @@ def place(key, slots, cuts, order, cands):
         if got is None:
             rep.append(f"  cut {i} ({need:.1f}s) NO CANDIDATE")
             problems.append((i, "no usable window anywhere")); continue
-        if how: problems.append((i, how.strip(" ()")))
+        # A widened segment is still the assigned picture, only a second or two off its edge — reported, but
+        # not worth a correction round. Everything else under `how` is a substitute.
+        if how and "widened" not in how: problems.append((i, how.strip(" ()")))
         f, t, sp, ms, reused = got
         own[f].append((t, t + need * sp + 0.3)); batch_used[f].append((t, t + need * sp + 0.3))
         zz = z if z is not None else ((1.0, 0.5, 0.5) if picker.is_drone(f) and "decking" not in f else None)
