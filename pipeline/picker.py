@@ -116,9 +116,18 @@ def ok_window(m, s, th, mlim):
 def overlap(a, b, rngs, tol=0.1):
     return any(x < b - tol and y > a + tol for x, y in rngs)
 
+# With the gate off, the worst seconds of a clip still have to lose: a whip pan or the phone being raised is
+# smeared, and vidstab answers a big shake by zooming far in, which is where the "too close, cut off at the
+# edge" shots came from. So a window is junk when it is far softer than the rest of ITS clip (relative, because
+# a messenger copy and a phone original score on different scales) or shakes far past the limit. Junk is used
+# only when nothing else fits the cut.
+JUNK_SHARP = 0.45     # below this share of the clip's median sharpness
+JUNK_MOTION = 1.8     # above this multiple of the motion limit
+
+
 def best(pool, need, forbid, soft_used, th=700, allow_slow=True, own_count=None):
     """-> (file, tin, speed, minsharp, reused) or None"""
-    cands = []
+    cands, junk = [], []
     seen = set()
     # The pool is ordered by topic fit and cut at MAX_POOL for speed. Clips that no video has used yet sit
     # wherever their tags put them, which on a long pool can be past the cut — so they would never be seen.
@@ -138,6 +147,8 @@ def best(pool, need, forbid, soft_used, th=700, allow_slow=True, own_count=None)
         uses = min(len(soft_used.get(f, [])), USE_TIERS) if USE_TIERS else 0
         th_f = sharp_floor(f, th)          # a clip may declare its own, lower, sharpness floor
         banned = forbid.get(f, []) + dull(f)
+        sh = sorted(s for (_, _, s) in w); med = sh[len(sh) // 2]
+        is_junk = lambda m, s: s < JUNK_SHARP * med or m > JUNK_MOTION * mlim
         for sp in ((1.0, 0.8, 0.7) if allow_slow else (1.0,)):
             src = need * sp + 0.3
             t = 0.0
@@ -157,10 +168,11 @@ def best(pool, need, forbid, soft_used, th=700, allow_slow=True, own_count=None)
                         #       fewest reuses > sharpest.
                         # The coarse step is what replaced the hard gate: a clearly sharper window wins, but
                         # small differences don't override freshness and topic fit. Keep rank[7] == reused below.
-                        cands.append(((oc, reused > 0, lb, sp != 1.0, -int(ms / 300), uses, rank_in_pool,
-                                       reused, -ms),
-                                      f, round(t, 2), sp, ms))
+                        (junk if any(is_junk(m, s) for m, s in inside) else cands).append(
+                            ((oc, reused > 0, lb, sp != 1.0, -int(ms / 300), uses, rank_in_pool, reused, -ms),
+                             f, round(t, 2), sp, ms))
                 t += 0.25
+    cands = cands or junk
     if not cands: return None
     cands.sort()
     rank, f, t, sp, ms = cands[0]

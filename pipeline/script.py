@@ -43,6 +43,10 @@ RULES = """Each script:
 - NO DIGITS ANYWHERE. Write numbers as words: "six-month", "seventeen and three sixteenths", "two thousand one".
 - Never invent prices, measurements, causes, specs or promises. Use only the facts given below and what the
   footage descriptions actually show.
+- What the shop said about the job outranks the footage descriptions: those are a camera's guesses. Name a
+  process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never explain
+  a colour ("turned orange from the heat"): discoloured steel is usually just rust.
+- Do not enlarge the work: if a description says one end or a section, never say "the whole ramp".
 
 Output format, exactly this and nothing else, one block per script:
 

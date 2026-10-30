@@ -33,6 +33,7 @@ import autoplan, build
 
 MODEL = "claude-haiku-5-5"            # clip by clip: the library-wide catch-up, many clips, cheap
 PROJECT_MODEL = "claude-sonnet-5-5"   # a whole project at once: one call, worth the stronger model
+DESC_VERSION = 2                      # bump when the prompt changes in a way old descriptions should not keep
 PROJECT_MAX = 15                      # above this the frames per clip get too few to read; fall back
 PROJECT_FRAMES = 90                   # images in one request (the API takes 100)
 MAXFRAMES = 10             # a frame roughly every second or two, whichever gives fewer
@@ -62,7 +63,12 @@ segments: split the clip where what is on screen actually changes — a new angl
          matters more than anything else here.
   stage: damage, strip, weld, fit, finish, done or other — damage = the fault before work, strip =
          cutting/grinding/removal, weld = welding, fit = new steel being fitted, finish = paint or coating,
-         done = the finished result, other = anything else (yard, walkaround, people)."""
+         done = the finished result, other = anything else (yard, walkaround, people).
+
+Describe what is visible, not what might have caused it. Orange or brown on steel is rust unless you see it
+being heated; a dark or shiny surface is not paint unless you see it being painted or the shop says so. Name a
+process (painting, priming, heating, coating) only when it is visibly happening or the shop's note names it.
+Say how much of the part a thing covers ("one end", "a short section"), never "the whole" unless it is."""
 
 _shown = False
 
@@ -301,6 +307,7 @@ def store(C, n, r, dur, note, mode):
     C[n]["desc_note"] = note
     C[n]["desc_mode"] = mode
     C[n]["desc_at"] = int(time.time())     # a script older than this was written from other descriptions
+    C[n]["desc_v"] = DESC_VERSION
 
 
 def describe_project(names, L, api_key, log=print, force=False, note="", prefix=""):
@@ -315,7 +322,7 @@ def describe_project(names, L, api_key, log=print, force=False, note="", prefix=
     if len(names) > PROJECT_MAX: return None
     # no desc_at: described before the story was kept for the script — once more, to get it
     stale = [n for n in names if needs_description(C[n], n, note) or C[n].get("desc_mode") != "project"
-             or not C[n].get("desc_at")]
+             or C[n].get("desc_v") != DESC_VERSION]
     if not force and not stale: return 0
     per = max(4, min(MAXFRAMES, PROJECT_FRAMES // len(names)))
     log(f"describing the project together: {len(names)} clip(s), up to {per} frames each, with {PROJECT_MODEL}…")
