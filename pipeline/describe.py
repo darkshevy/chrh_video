@@ -226,33 +226,66 @@ def ask_project(clips, key, log=print, note=""):
     ctx = (f"WHAT THE SHOP SAYS THIS JOB IS: {note}\nUse it to name the parts and to tell the stages apart. "
            f"Do not describe anything you cannot see in the frames.\n\n" if note else "")
     content.append({"type": "text", "text": ctx + PROJECT_PROMPT})
-    body = json.dumps({"model": PROJECT_MODEL, "max_tokens": 16000,
+    # Streamed, not one blocking request: with ~60 images the answer takes a minute or two, and a connection
+    # that sits silent that long can be dropped on the way without either end noticing — the old version then
+    # waited out a 10-minute timeout, three times. A stream keeps data moving, shows progress, and a gap of
+    # STALL seconds with nothing arriving is treated as a dead connection and retried at once.
+    body = json.dumps({"model": PROJECT_MODEL, "max_tokens": 16000, "stream": True,
                        "messages": [{"role": "user", "content": content}]}).encode()
     req = urllib.request.Request(URL, data=body, headers={
         "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
+    log(f"   sending {len(body) / 2**20:.1f} MB ({sum(len(s) for _, s, _ in clips)} frames)…")
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(req, timeout=600) as r:
-                data = json.load(r)
-            u = data.get("usage", {})
-            log(f"   (described by {data.get('model')}, {u.get('input_tokens')} in / {u.get('output_tokens')} out)")
-            if data.get("stop_reason") == "max_tokens":
-                raise RuntimeError("the reply was cut off")
-            txt = "".join(p.get("text", "") for p in data.get("content", []))
+            txt, stop, usage, model = stream(req, log)
+            log(f"   (described by {model}, {usage.get('input_tokens')} in / {usage.get('output_tokens')} out)")
+            if stop == "max_tokens": raise RuntimeError("the reply was cut off")
             a, b = txt.find("{"), txt.rfind("}")
             if a < 0 or b < 0: raise ValueError(f"no JSON in reply: {txt[:300]!r}")
             return json.loads(txt[a:b + 1])
         except urllib.error.HTTPError as e:
             msg = e.read().decode(errors="replace")[:300]
             if e.code in (429, 500, 502, 503, 529) and attempt < 2:
-                time.sleep(5 * (attempt + 1)); continue
+                log(f"   server busy (HTTP {e.code}), trying again…"); time.sleep(5 * (attempt + 1)); continue
             raise RuntimeError(f"HTTP {e.code}: {msg}")
         except RuntimeError:
             raise
-        except Exception:
-            if attempt < 2: time.sleep(3 * (attempt + 1)); continue
+        except Exception as e:
+            if attempt < 2:
+                log(f"   connection lost ({type(e).__name__}: {str(e)[:80]}), trying again…")
+                time.sleep(3 * (attempt + 1)); continue
             raise
     raise RuntimeError("gave up after retries")
+
+
+STALL = 90      # seconds without a single byte: the connection is dead
+
+
+def stream(req, log):
+    """Read a streamed Messages reply. -> (text, stop_reason, usage, model). Prints a progress line."""
+    txt, stop, usage, model = [], None, {}, ""
+    got, last = 0, time.time()
+    with urllib.request.urlopen(req, timeout=STALL) as r:
+        for raw in r:
+            line = raw.decode("utf-8", "replace").strip()
+            if not line.startswith("data:"): continue
+            try: ev = json.loads(line[5:])
+            except ValueError: continue
+            kind = ev.get("type")
+            if kind == "message_start":
+                m = ev.get("message", {}); model = m.get("model", ""); usage.update(m.get("usage", {}))
+                log("   the model is looking at the frames…")
+            elif kind == "content_block_delta" and ev.get("delta", {}).get("type") == "text_delta":
+                txt.append(ev["delta"]["text"]); got += len(ev["delta"]["text"])
+                if time.time() - last > 5:
+                    sys.stdout.write(f"\r   writing… {got} characters"); sys.stdout.flush(); last = time.time()
+            elif kind == "message_delta":
+                stop = ev.get("delta", {}).get("stop_reason") or stop
+                usage.update(ev.get("usage", {}))
+            elif kind == "error":
+                raise RuntimeError(f"API error: {ev.get('error', {}).get('message', ev)}")
+    if got: sys.stdout.write(f"\r   writing… {got} characters, done\n"); sys.stdout.flush()
+    return "".join(txt), stop, usage, model
 
 
 def store(C, n, r, dur, note, mode):
