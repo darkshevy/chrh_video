@@ -3855,10 +3855,355 @@
       "desc_mode": "project",
       "desc_at": 1793380740,
       "desc_v": 2
+    },
+    "sleevereplacement1.mp4": {
+      "cats": [
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.58,
+        "hyd": 0.42
+      },
+      "desc": "Looking up from under the trailer at the old perforated post and sleeve, panning down to the cylinder and the rusty, worn end of the old sleeve with its latch hook.",
+      "kw": [
+        "old sleeve",
+        "damaged",
+        "rust",
+        "spring lock",
+        "cylinder",
+        "latch hook",
+        "underside",
+        "trailer"
+      ],
+      "stage": "damage",
+      "subject": "old sleeve assembly",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 5.1,
+          "shows": "Wide upward view of a perforated post with a coiled line and a clamp collar at the lower joint, camera moving",
+          "stage": "other"
+        },
+        {
+          "from": 5.1,
+          "to": 11.6,
+          "shows": "Close-up of the old square sleeve end beside the hydraulic cylinder, with rusty, worn steel at the end and a bent latch hook below",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "17990285|1793382280",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement2.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.93
+      },
+      "desc": "Close-up pan across the old sleeve end, cylinder and latch hook, showing rusty, scuffed steel and a worn hook bracket.",
+      "kw": [
+        "old sleeve",
+        "rust",
+        "latch hook",
+        "cylinder",
+        "spring coil",
+        "worn",
+        "close-up",
+        "damage"
+      ],
+      "stage": "damage",
+      "subject": "old sleeve end",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 6.1,
+          "shows": "Close-up of the latch hook bracket and the end of the old sleeve with rust and scuffed steel under the coiled line",
+          "stage": "damage"
+        },
+        {
+          "from": 6.1,
+          "to": 9.1,
+          "shows": "Side view of two square tubes angled up with the cylinder on top, dull scratched steel",
+          "stage": "damage"
+        },
+        {
+          "from": 9.1,
+          "to": 14.6,
+          "shows": "Close-up of the rusty sleeve end with a rough cut edge and the hook bracket, then the perforated post above it",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "22543391|1793382289",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement3.mp4": {
+      "cats": [
+        "hyd",
+        "close",
+        "alu"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.4,
+        "close": 0.2,
+        "alu": 0.2
+      },
+      "desc": "Walkaround of the trailer side showing a bare ground hole in the red side bracket where the cylinder pin sat, then panning to a perforated post.",
+      "kw": [
+        "bracket hole",
+        "ground metal",
+        "hydraulic hose",
+        "trailer frame",
+        "removed",
+        "pivot",
+        "walkaround",
+        "perforated post"
+      ],
+      "stage": "strip",
+      "subject": "cylinder mount bracket",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.6,
+          "shows": "Red trailer side frame with a bare ground hole in the lower triangular bracket and hydraulic hoses hanging, cylinder not in place",
+          "stage": "strip"
+        },
+        {
+          "from": 2.6,
+          "to": 4.8,
+          "shows": "Camera panning along the red trailer rail to a perforated post in front of the deck",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "7548624|1793382358",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement4.mp4": {
+      "cats": [
+        "close",
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.71,
+        "grind": 0.29
+      },
+      "desc": "A rusty perforated square post is held upright on the shop floor and tilted against the trailer, with a cable running along it.",
+      "kw": [
+        "perforated post",
+        "removed part",
+        "square tube",
+        "shop floor",
+        "rust",
+        "holes",
+        "trailer",
+        "cable"
+      ],
+      "stage": "strip",
+      "subject": "perforated post",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "Perforated square post standing on the concrete floor, brown and rusty, with a flat bar lying beside it",
+          "stage": "strip"
+        },
+        {
+          "from": 1.5,
+          "to": 5.1,
+          "shows": "The post tilted against the trailer frame with a cable alongside, deck plates behind it",
+          "stage": "strip"
+        },
+        {
+          "from": 5.1,
+          "to": 6.6,
+          "shows": "The post lowered back to the floor beside the red frame",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "10303443|1793382352",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement5.mp4": {
+      "cats": [
+        "alu",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.57,
+        "close": 0.29
+      },
+      "desc": "A new square steel tube on a perforated welding table, with a red clevis plate clamped on and a fresh weld bead along its edge.",
+      "kw": [
+        "new tube",
+        "welding table",
+        "fresh weld bead",
+        "red plate",
+        "clamp",
+        "fabrication",
+        "square tube",
+        "bench"
+      ],
+      "stage": "weld",
+      "subject": "new sleeve tube",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "End of a bare steel square tube with a round hole through it, held over a blue tarp, with a red plate on the floor beyond",
+          "stage": "fit"
+        },
+        {
+          "from": 2.7,
+          "to": 6.6,
+          "shows": "Bare steel tube on the welding table with a red plate clamped along it and a fresh silvery weld bead along the seam",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "11638515|1793382322",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement6.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.67
+      },
+      "desc": "The new tube with its red clevis bracket sits on the trailer beside the cylinder mount, with a welded ring around the bracket hole.",
+      "kw": [
+        "new sleeve",
+        "clevis bracket",
+        "fitted",
+        "weld ring",
+        "square tube",
+        "trailer frame",
+        "alignment",
+        "cylinder mount"
+      ],
+      "stage": "fit",
+      "subject": "new sleeve tube",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "Close-up of the new bare tube with a red clevis bracket, and the bracket hole on the trailer now with a bright fresh weld ring around it",
+          "stage": "fit"
+        },
+        {
+          "from": 2.7,
+          "to": 6.1,
+          "shows": "Wider view of the new tubes lying in the frame with the clevis bracket and a larger square tube end, a person in red coveralls behind",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "9656007|1793382295",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
+    },
+    "sleevereplacement7.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.46,
+        "close": 0.31
+      },
+      "desc": "The new grey sleeve and cylinder are installed in the trailer, with a red clevis pinned at the lower end and the coiled spring lock near the top, shown in a pan along the trailer.",
+      "kw": [
+        "new sleeve",
+        "cylinder",
+        "clevis pin",
+        "spring lock",
+        "coil",
+        "finished",
+        "installed",
+        "trailer"
+      ],
+      "stage": "done",
+      "subject": "new sleeve and spring lock",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.9,
+          "shows": "Red clevis bracket on the trailer bracket pinned to the cylinder, with a new grey tube beside it and a paint can on a blue tarp",
+          "stage": "done"
+        },
+        {
+          "from": 2.9,
+          "to": 6.7,
+          "shows": "The new grey sleeve running up alongside the cylinder, with clean steel and a welded seam on the upper end",
+          "stage": "done"
+        },
+        {
+          "from": 6.7,
+          "to": 9.3,
+          "shows": "The coiled spring lock above the sleeve, attached at the upper end, with tools lying on the deck below",
+          "stage": "done"
+        },
+        {
+          "from": 9.3,
+          "to": 12.8,
+          "shows": "Wide pan across the red trailer rail with the cylinder and the new sleeve in place",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "19867242|1793382300",
+      "desc_note": "Job: sleeve and spring lock replacement. Before: the old sleeve was damaged. Work: removed the damaged sleeve and spring lock assembly, then installed and secured the new components. After: new sleeve and spring lock in place, properly fitted, aligned and locking. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793382574,
+      "desc_v": 2
     }
   },
   "stories": {
     "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order.",
-    "rampwidening": "A loading ramp that was too narrow for the tires was widened by fitting square-tube side extensions, which were then welded on, as the shop describes it. Judged by the visible condition, the order looks like: ramp with chalk width marks (clips 1-2), extension on with fresh weld heat marks (clips 3-5), then grey and black finished-looking ramp (clips 6-7)."
+    "rampwidening": "A loading ramp that was too narrow for the tires was widened by fitting square-tube side extensions, which were then welded on, as the shop describes it. Judged by the visible condition, the order looks like: ramp with chalk width marks (clips 1-2), extension on with fresh weld heat marks (clips 3-5), then grey and black finished-looking ramp (clips 6-7).",
+    "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve."
   }
 }
