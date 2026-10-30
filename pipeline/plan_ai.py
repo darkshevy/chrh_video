@@ -61,7 +61,9 @@ Every cut must appear exactly once, and every id must come from the list."""
 
 
 def ask(payload, key):
-    body = json.dumps({"model": MODEL, "max_tokens": 4000, "system": SYSTEM,
+    # 4000 was too tight: the correction round repeats the whole plan and the reply got cut off mid-JSON,
+    # which then failed to parse on every retry. The cap only limits, it costs nothing unless used.
+    body = json.dumps({"model": MODEL, "max_tokens": 16000, "system": SYSTEM,
                        "messages": [{"role": "user", "content": payload}]}).encode()
     req = urllib.request.Request(URL, data=body, headers={
         "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
@@ -70,6 +72,8 @@ def ask(payload, key):
             with urllib.request.urlopen(req, timeout=180) as r:
                 data = json.load(r)
             txt = "".join(p.get("text", "") for p in data.get("content", []))
+            if data.get("stop_reason") == "max_tokens":   # retrying the same request would be cut off again
+                raise RuntimeError(f"the reply was cut off at {data.get('usage', {}).get('output_tokens')} tokens")
             a, b = txt.find("{"), txt.rfind("}")
             if a < 0: raise ValueError(f"no JSON (stop={data.get('stop_reason')}): {txt[:300]!r}")
             u = data.get("usage", {})
@@ -79,6 +83,8 @@ def ask(payload, key):
             msg = e.read().decode(errors="replace")[:300]
             if e.code in (429, 500, 502, 503, 529) and attempt < 3: time.sleep(3 * (attempt + 1)); continue
             raise RuntimeError(f"HTTP {e.code}: {msg}")
+        except RuntimeError:
+            raise
         except Exception:
             if attempt < 3: time.sleep(2 * (attempt + 1)); continue
             raise
@@ -246,7 +252,8 @@ def make(key, cands, byid, apikey, dry, only):
                   "\n\nSeconds already spent per clip in that plan: " +
                   ", ".join(f"{k} x{v}" for k, v in sorted(spent.items())) +
                   "\n\nGive the WHOLE plan again, every cut, choosing differently for the cuts listed above. "
-                  "A segment whose longest run is shorter than a cut cannot take that cut.")
+                  "A segment whose longest run is shorter than a cut cannot take that cut. "
+                  "Reply with the JSON only, \"why\" in one or two sentences.")
         try:
             res2 = ask(repair, apikey)
             order2 = read_plan(res2)
