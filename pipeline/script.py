@@ -121,6 +121,29 @@ def facts():
 flags = [a for a in sys.argv[1:] if a.startswith("--")]
 
 
+def block_texts(t):
+    """-> [(key, text)] for every script in t."""
+    return [(m.group(1), re.sub(r"\s+", " ", m.group(2)).strip())     # keeps [HOOK 2], unlike clean_text
+            for m in re.finditer(r"^===\s*([A-Za-z][A-Za-z0-9_]*)[^\n]*\n(.+?)(?=\n===|\Z)", t, re.M | re.S)]
+
+
+def sentences(t):
+    return [x.strip().lower() for x in re.split(r"(?<=[.!?])\s+", t.replace("[HOOK 2]", "")) if x.strip()]
+
+
+def recent_scripts(n=8):
+    """The last n scripts written before, newest first — shown to the writer so a new one does not reuse the
+    same opening, hook and call to action (two scripts in a row had come back with "This one was." and
+    "Bring it by the shop." word for word)."""
+    out = []
+    for p in sorted(glob.glob(os.path.join(ROOT, "scripts", "topics_*.txt")), key=os.path.getmtime, reverse=True):
+        try: vids = autoplan.parse_batch(open(p, encoding="utf-8").read())
+        except Exception: continue
+        out += [v["text"] for v in reversed(vids) if v.get("text")]
+        if len(out) >= n: break
+    return out[:n]
+
+
 def opt(name, default=""):
     if name in sys.argv:
         i = sys.argv.index(name)
@@ -222,29 +245,6 @@ else:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage")
 
 
-def block_texts(t):
-    """-> [(key, text)] for every script in t."""
-    return [(m.group(1), re.sub(r"\s+", " ", m.group(2)).strip())     # keeps [HOOK 2], unlike clean_text
-            for m in re.finditer(r"^===\s*([A-Za-z][A-Za-z0-9_]*)[^\n]*\n(.+?)(?=\n===|\Z)", t, re.M | re.S)]
-
-
-def sentences(t):
-    return [x.strip().lower() for x in re.split(r"(?<=[.!?])\s+", t.replace("[HOOK 2]", "")) if x.strip()]
-
-
-def recent_scripts(n=8):
-    """The last n scripts written before, newest first — shown to the writer so a new one does not reuse the
-    same opening, hook and call to action (two scripts in a row had come back with "This one was." and
-    "Bring it by the shop." word for word)."""
-    out = []
-    for p in sorted(glob.glob(os.path.join(ROOT, "scripts", "topics_*.txt")), key=os.path.getmtime, reverse=True):
-        try: vids = autoplan.parse_batch(open(p, encoding="utf-8").read())
-        except Exception: continue
-        out += [v["text"] for v in reversed(vids) if v.get("text")]
-        if len(out) >= n: break
-    return out[:n]
-
-
 def blocks(t):
     """-> [(key, word count)] for every script in the reply."""
     out = []
@@ -268,7 +268,9 @@ if not txt: sys.exit("the reply had no script block")
 # to repeat itself. So check it and send it back rather than accepting whatever came out.
 # Checked in code and sent back rather than accepted: length (words decide how many cuts there are, and cuts
 # decide whether the footage has to repeat itself), and the rules a prompt alone kept losing.
-_recent_ends = {sentences(x)[-1] for x in RECENT if sentences(x)}
+# Only the last two: the stock calls to action ("call the number on screen") are fine across a week, just not
+# twice in a row; checked against all eight, every one of them was soon forbidden.
+_recent_ends = {sentences(x)[-1] for x in RECENT[:2] if sentences(x)}
 _recent_starts = {" ".join(sentences(x)[:2]) for x in RECENT if sentences(x)}
 
 
