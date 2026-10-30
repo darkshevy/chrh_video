@@ -1,12 +1,11 @@
 # Let Claude lay out the videos: which stretch of which clip goes under which words.
 #
 # This is the whole build in one command: it tags any new footage, describes whatever has no description yet,
-# plans the cuts, renders, and blurs the faces. Everything is cached, so a second run on the same clips calls
-# nothing extra.
+# plans the cuts and renders. Everything is cached, so a second run on the same clips calls nothing extra.
 #
-# The blur is the last step and it is not optional: the file it writes, output\CHRH_<Key>_blur.mp4, is the one
-# that gets published, and the summary at the end names it per video. A video whose blur pass fails is listed
-# as NOT CLEARED rather than counted as built.
+# Face blur is OFF by default. The detector keeps firing on rust, bolt heads and hub holes, so an automatic pass
+# smeared patches over every video while the clips themselves hold no faces. --blur turns it back on for a batch
+# that does show people; the menu's manual blur item (finish.py) works on a finished render either way.
 #
 # The plan works on SEGMENTS, not whole clips (see describe.py): a ten-second clip may hold the crack, then a
 # hand pointing at it, then a wide view. Assigning a whole file under "a crack running through the support"
@@ -18,7 +17,7 @@
 #   --only PREFIX     use only clips whose name starts with this (a single project's story)
 #   --dry             show the plans and the reasoning, render nothing
 #   --no-scan / --no-describe   skip those steps if you have already done them by hand
-#   --no-blur         render only, leave the faces (for a test you are not going to post)
+#   --blur            also run the face blur after the render (writes output\CHRH_<Key>_blur.mp4)
 #
 # A video whose voice-over is missing, or that fails for any other reason, is reported and skipped; the rest of
 # the batch still builds.
@@ -320,7 +319,7 @@ if not cands: sys.exit("no usable footage described — check the API key and th
 byid = {c["id"]: c for c in cands}
 
 keys = [v["key"] for v in vids]
-blur = "--no-blur" not in flags
+blur = "--blur" in flags
 print(f"\n=== {len(keys)} video(s) to build: {', '.join(keys)} ===")
 done, failed, unblurred = [], [], []
 for n, k in enumerate(keys, 1):
@@ -329,7 +328,7 @@ for n, k in enumerate(keys, 1):
         out = make(k, cands, byid, apikey, dry, only)
         if not out: continue
         if not blur:
-            unblurred.append((k, os.path.basename(out), "--no-blur")); continue
+            done.append((k, os.path.basename(out))); continue
         # The blur runs here rather than in make(), so a failure costs the publishable file and not the render.
         try:
             pub = finish.run(k, log=print, hint=out)
