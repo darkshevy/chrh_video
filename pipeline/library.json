@@ -3373,9 +3373,485 @@
       "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
       "desc_mode": "project",
       "desc_at": 1793377772
+    },
+    "20261014_135833.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.67,
+        "close": 0.33
+      }
+    },
+    "20261014_135918.mp4": {
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.56,
+        "weld": 0.44
+      }
+    },
+    "20261014_142406.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.55,
+        "close": 0.45
+      }
+    },
+    "20261014_162936.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.67
+      }
+    },
+    "20261014_162946.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.8,
+        "close": 0.2
+      }
+    },
+    "20261014_164415.mp4": {
+      "cats": [
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 1.0
+      }
+    },
+    "20261014_164524.mp4": {
+      "cats": [
+        "alu",
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.5,
+        "close": 0.25,
+        "hyd": 0.25
+      }
+    },
+    "rampwidening1.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.67,
+        "close": 0.33
+      },
+      "desc": "Walkaround of the ramp side extension marked in chalk 'wider 17 3/8', with deck seam welds visible and the ramp hinge chains and welder in the background.",
+      "kw": [
+        "ramp",
+        "extension",
+        "chalk marks",
+        "seam weld",
+        "perforated deck",
+        "hinge chains",
+        "measurement",
+        "trailer"
+      ],
+      "stage": "fit",
+      "subject": "ramp side extension",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.4,
+          "shows": "ramp edge seen from beside the trailer, bare grey steel plate with chalk numbers",
+          "stage": "fit"
+        },
+        {
+          "from": 3.4,
+          "to": 4.9,
+          "shows": "close-up of the grey edge lip with chalk 'wider 17 3/8' and an arrow",
+          "stage": "fit"
+        },
+        {
+          "from": 4.9,
+          "to": 7.9,
+          "shows": "ramp end, chain hinge and tie-down cable, Miller welder below",
+          "stage": "other"
+        },
+        {
+          "from": 7.9,
+          "to": 11.0,
+          "shows": "top-down view of the perforated deck with a weld seam where the new section joins, then close-up of the bead",
+          "stage": "weld"
+        },
+        {
+          "from": 11.0,
+          "to": 15.3,
+          "shows": "underside of the ramp with weld marks and the chalked lip from below",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "23810148|1793378905",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening2.mp4": {
+      "cats": [
+        "close",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.56,
+        "weld": 0.44
+      },
+      "desc": "The chalked edge lip on the widened ramp, with a worker beside it, the welder, and the perforated deck above.",
+      "kw": [
+        "ramp",
+        "chalk",
+        "17 3/8",
+        "welder",
+        "extension",
+        "worker",
+        "perforated deck",
+        "lip"
+      ],
+      "stage": "fit",
+      "subject": "ramp edge lip",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.9,
+          "shows": "close-up of the grey lip plate marked '17 3/8' with the Miller welder and gas bottle behind",
+          "stage": "fit"
+        },
+        {
+          "from": 3.9,
+          "to": 5.1,
+          "shows": "ramp end with a worker in an orange shirt standing behind it",
+          "stage": "other"
+        },
+        {
+          "from": 5.1,
+          "to": 9.1,
+          "shows": "perforated ramp deck and the new grey lip with a chalk arrow and the word 'wider'",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "14208631|1793379266",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening3.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.55,
+        "close": 0.45
+      },
+      "desc": "The widened ramp with its orange heat-tinted edge lip and a prop leg, seen from several sides with a grinder and a red tray on the trailer deck below.",
+      "kw": [
+        "ramp",
+        "welded lip",
+        "heat tint",
+        "grinder",
+        "prop",
+        "extension",
+        "perforated deck",
+        "trailer"
+      ],
+      "stage": "weld",
+      "subject": "widened ramp lip",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "ramp corner with an orange discoloured lip welded on, brick wall behind",
+          "stage": "weld"
+        },
+        {
+          "from": 2.7,
+          "to": 7.5,
+          "shows": "end-on and side views of the orange lip with its weld seam on the ramp deck, grinder and red tray below",
+          "stage": "weld"
+        },
+        {
+          "from": 7.5,
+          "to": 11.2,
+          "shows": "orange heat-stained lip face, then the corner view with weld at the lip end",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "17344335|1793378920",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening4.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.67
+      },
+      "desc": "Ramp with the orange welded lip, shown from the welder side, along the deck, from underneath, and by the wall.",
+      "kw": [
+        "ramp",
+        "lip",
+        "weld",
+        "welder",
+        "gas bottle",
+        "chains",
+        "underside",
+        "orange"
+      ],
+      "stage": "weld",
+      "subject": "widened ramp",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.5,
+          "shows": "orange lip of the ramp with the Miller welder and gas cylinder beside it",
+          "stage": "weld"
+        },
+        {
+          "from": 1.5,
+          "to": 2.7,
+          "shows": "perforated deck and the welded orange lip with a visible joint seam",
+          "stage": "weld"
+        },
+        {
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "underside of the ramp with hinge chains and trailer rails",
+          "stage": "other"
+        },
+        {
+          "from": 3.9,
+          "to": 6.2,
+          "shows": "ramp edge near the brick wall with the welded lip, heat tint on the plate",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "9617231|1793379213",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening5.mp4": {
+      "cats": [
+        "hyd",
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 0.8,
+        "close": 0.2
+      },
+      "desc": "The ramp and its rusty-orange welded lip seen from behind the trailer rails, with the underside and the hinge hardware.",
+      "kw": [
+        "ramp",
+        "lip",
+        "heat tint",
+        "rails",
+        "hinge",
+        "underside",
+        "weld",
+        "trailer"
+      ],
+      "stage": "weld",
+      "subject": "widened ramp lip",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.9,
+          "shows": "ramp end above the trailer rail, rough orange-brown lip tilted up",
+          "stage": "weld"
+        },
+        {
+          "from": 3.9,
+          "to": 6.3,
+          "shows": "lip face level with the ramp, brick wall and chains behind",
+          "stage": "weld"
+        },
+        {
+          "from": 6.3,
+          "to": 9.9,
+          "shows": "ramp from low angle with the orange lip, burn marks and spatter, tie strap hanging",
+          "stage": "weld"
+        },
+        {
+          "from": 9.9,
+          "to": 11.4,
+          "shows": "orange lip underside and side view over the fuel tank and battery",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "17595699|1793379229",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening6.mp4": {
+      "cats": [
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hyd": 1.0
+      },
+      "desc": "The ramp lip now covered in a dull grey-brown primer coat, viewed from beside the trailer.",
+      "kw": [
+        "ramp",
+        "primer",
+        "grey coating",
+        "lip",
+        "painted",
+        "trailer",
+        "fuel tank",
+        "spray can"
+      ],
+      "stage": "finish",
+      "subject": "widened ramp lip",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.9,
+          "shows": "ramp underside and grey coated tubing above the fuel tank, spray can in view",
+          "stage": "finish"
+        },
+        {
+          "from": 3.9,
+          "to": 6.3,
+          "shows": "close view of the coated dark grey lip face with small scuffs",
+          "stage": "finish"
+        },
+        {
+          "from": 6.3,
+          "to": 8.7,
+          "shows": "ramp by the wall with the olive-grey coated lip and perforated deck",
+          "stage": "finish"
+        }
+      ],
+      "desc_sig": "13533242|1793379232",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
+    },
+    "rampwidening7.mp4": {
+      "cats": [
+        "alu",
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "alu": 0.5,
+        "close": 0.25,
+        "hyd": 0.25
+      },
+      "desc": "The finished ramps painted gloss black, viewed from the shop doorway and outside the yard.",
+      "kw": [
+        "ramp",
+        "black paint",
+        "finished",
+        "widened",
+        "perforated deck",
+        "lip",
+        "yard",
+        "trailer"
+      ],
+      "stage": "done",
+      "subject": "finished ramp",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "two ramp sections folded with fresh black paint, chains and perforated deck",
+          "stage": "done"
+        },
+        {
+          "from": 2.7,
+          "to": 6.3,
+          "shows": "glossy black painted ramp with the new lip, held out in the yard",
+          "stage": "done"
+        },
+        {
+          "from": 6.3,
+          "to": 7.9,
+          "shows": "painted black ramp edge, then the ramps back against the wall",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "12254915|1793379237",
+      "desc_note": "Widening an existing loading ramp: the ramp was too narrow for the tires. We cut and fabricated extensions from 1.5 x 2.5 inch square tubing, fitted them along the ramp sides, then welded them on. Finished: wider ramp with fresh welds along the new tubing.",
+      "desc_mode": "project",
+      "desc_at": 1793379554
     }
   },
   "stories": {
-    "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order."
+    "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order.",
+    "rampwidening": "The trailer's loading ramp was too narrow for the tires, so a wider side section with a raised edge lip was fitted and marked in chalk ('wider 17 3/8'), then welded to the ramp deck. The orange heat-tinted welded lips were then coated in dull primer, and the ramp ended up painted gloss black. The clip order 1,2,3,4,5,6,7 follows this progression."
   }
 }

@@ -288,6 +288,100 @@
      null
     ]
    ]
+  },
+  "rampwiden": {
+   "title": "WIDER RAMP",
+   "sub": "NEW LIP, FRESH WELDS",
+   "track": "Thunder",
+   "text": "Ramp too narrow for your tires? We started with chalk on bare steel: wider, seventeen and three eighths. A new side section with a raised edge lip was fitted along the ramp. So how does it become part of the ramp? We welded it to the perforated deck. The lip turned orange from the heat. Next came a coat of dull primer. Then gloss black paint over the whole ramp. Now the tires have room. Bring it by the shop.",
+   "hook": 32,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "rampwidening2.mp4",
+     5.25,
+     1.0,
+     null
+    ],
+    [
+     6,
+     "rampwidening1.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     13,
+     "rampwidening2.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     18,
+     "rampwidening1.mp4",
+     11.25,
+     1.0,
+     null
+    ],
+    [
+     26,
+     "rampwidening2.mp4",
+     3.5,
+     0.7,
+     null
+    ],
+    [
+     32,
+     "rampwidening1.mp4",
+     8.0,
+     1.0,
+     null
+    ],
+    [
+     41,
+     "rampwidening3.mp4",
+     4.25,
+     1.0,
+     null
+    ],
+    [
+     48,
+     "rampwidening3.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     55,
+     "rampwidening6.mp4",
+     2.5,
+     1.0,
+     null
+    ],
+    [
+     62,
+     "rampwidening6.mp4",
+     0.0,
+     0.7,
+     null
+    ],
+    [
+     70,
+     "rampwidening7.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     75,
+     "rampwidening7.mp4",
+     2.0,
+     1.0,
+     null
+    ]
+   ]
   }
  }
 }
