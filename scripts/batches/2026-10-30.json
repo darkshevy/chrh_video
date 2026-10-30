@@ -65,6 +65,229 @@
      null
     ]
    ]
+  },
+  "newlock": {
+   "title": "SPRING LOCK REPAIR",
+   "sub": "BROKEN LOCK, NEW WELD",
+   "track": "Thunder",
+   "text": "Spring lock torn up on your car hauler? This one came in with burnt, torn steel around the bracket and the D-ring. Rust and pitting everywhere. First, we cleaned up the frame with a red pad. So what do you do with a lock this far gone? You take out what's broken. We chiseled the old remnants out of the jagged housing. Then we clamped a new steel plate to the frame rail and fitted the bracket, with a wood block in the lock opening. We ground the weld areas, bolted the bracket on, and welded it in. Smooth beads, a solid new lock. Got a broken spring lock? Bring it by the shop.",
+   "hook": 37,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "springlock6.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     8,
+     "springlock7.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     14,
+     "springlock6.mp4",
+     8.75,
+     1.0,
+     null
+    ],
+    [
+     22,
+     "springlock6.mp4",
+     3.5,
+     1.0,
+     null
+    ],
+    [
+     27,
+     "springlock7.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     37,
+     "springlock5.mp4",
+     2.5,
+     1.0,
+     null
+    ],
+    [
+     48,
+     "springlock5.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     53,
+     "springlock1.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     63,
+     "springlock4.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     70,
+     "springlock1.mp4",
+     4.0,
+     1.0,
+     null
+    ],
+    [
+     78,
+     "springlock3.mp4",
+     5.25,
+     1.0,
+     null
+    ],
+    [
+     86,
+     "springlock2.mp4",
+     4.25,
+     1.0,
+     null
+    ],
+    [
+     91,
+     "springlock2.mp4",
+     2.25,
+     1.0,
+     null
+    ],
+    [
+     95,
+     "springlock3.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     99,
+     "springlock4.mp4",
+     2.25,
+     1.0,
+     null
+    ],
+    [
+     105,
+     "springlock3.mp4",
+     8.0,
+     1.0,
+     null
+    ],
+    [
+     110,
+     "springlock3.mp4",
+     7.25,
+     1.0,
+     null
+    ]
+   ]
+  },
+  "slideout": {
+   "title": "SPRING LOCK FIX",
+   "sub": "NEW RING-PULL LOCK WELDED IN",
+   "track": "Thunder",
+   "text": "Is the spring lock on your slide-out ramp broken off under the beam? This one was. We ground away the broken lock and the old end stop. Want it fixed with real welds? First, the end stop went back on. Then we welded in a new stainless spring lock with a pull ring and pin. We pulled the slide-out all the way out and pushed it back in. The lock stayed on the beam. Bring it by the shop.",
+   "hook": 28,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "springlock6.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     8,
+     "springlock7.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     14,
+     "springlock6.mp4",
+     2.5,
+     1.0,
+     null
+    ],
+    [
+     17,
+     "springlock7.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     28,
+     "springlock4.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     34,
+     "springlock1.mp4",
+     0.75,
+     1.0,
+     null
+    ],
+    [
+     41,
+     "springlock1.mp4",
+     4.0,
+     1.0,
+     null
+    ],
+    [
+     49,
+     "springlock2.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     56,
+     "springlock3.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     64,
+     "springlock3.mp4",
+     8.0,
+     1.0,
+     null
+    ],
+    [
+     70,
+     "springlock2.mp4",
+     3.75,
+     1.0,
+     null
+    ],
+    [
+     76,
+     "springlock3.mp4",
+     2.0,
+     1.0,
+     null
+    ]
+   ]
   }
  }
 }

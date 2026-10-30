@@ -3046,39 +3046,37 @@
       "share": {
         "rust": 0.71
       },
-      "desc": "Handheld footage of the rear deck and bumper of a rusty car hauler trailer, with a D-ring, latch bracket and debris on the ground, showing the worn condition before the spring lock repair.",
+      "desc": "Wide view of the trailer rear, then a pan round to the side showing the new ring-pull spring lock welded under the beam end.",
       "kw": [
-        "car hauler trailer",
-        "rear deck",
         "spring lock",
-        "d-ring",
-        "rust",
-        "trailer bumper"
+        "new latch",
+        "pull ring",
+        "welded bracket",
+        "trailer rear",
+        "slide-out",
+        "car hauler",
+        "finished"
       ],
-      "stage": "damage",
-      "subject": "rear deck bumper",
+      "stage": "done",
+      "subject": "new spring lock",
       "segments": [
         {
           "from": 0.0,
           "to": 3.9,
-          "shows": "wide view of rear bumper and deck with rusty steel, strap and Texas plate, debris on ground, no welding visible",
-          "stage": "damage"
+          "shows": "wide view of trailer rear with welded end-stop box on the slide-out and Texas trailer plate; no damage visible",
+          "stage": "done"
         },
         {
           "from": 3.9,
-          "to": 5.1,
-          "shows": "low close-up of bumper and lower deck with weathered latch brackets and dirt",
-          "stage": "damage"
-        },
-        {
-          "from": 5.1,
           "to": 7.0,
-          "shows": "side angle close-up of spring lock bracket, D-ring and red tail light, worn and rusted steel",
-          "stage": "damage"
+          "shows": "camera moves round to the side: new stainless spring lock with pull ring and pin welded under the beam end, clean welds",
+          "stage": "done"
         }
       ],
       "desc_sig": "15352477|1793369312",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock2.mp4": {
       "cats": [
@@ -3093,45 +3091,37 @@
         "hyd": 0.5,
         "close": 0.33
       },
-      "desc": "Close-up and wide views of a car hauler deck rail with a broken spring lock housing, rust and burnt-looking edges, a steel ring hook, and a worker's gloved hand with an abrasive pad near the end.",
+      "desc": "Close-up of the new spring lock with ring, then a pan along the beam to the rear end stop and license plate.",
       "kw": [
-        "car hauler",
         "spring lock",
-        "deck rail",
-        "broken lock housing",
-        "trailer repair",
-        "houston"
+        "pull ring",
+        "lock housing",
+        "weld",
+        "slide beam",
+        "end stop",
+        "finished",
+        "close-up"
       ],
-      "stage": "damage",
-      "subject": "spring lock housing",
+      "stage": "done",
+      "subject": "new spring lock",
       "segments": [
         {
-          "from": 0.3,
-          "to": 2.0,
-          "shows": "close-up of spring lock housing, ragged burnt and rusted edges, steel ring hook, damage visible",
-          "stage": "damage"
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "close-up of the finished spring lock housing with pull ring and pin, fresh welds at the mounting point",
+          "stage": "done"
         },
         {
-          "from": 2.0,
-          "to": 3.5,
-          "shows": "closer angle on lock plate and bolt with bright metal fitted to the rail, rough weld area visible",
-          "stage": "fit"
-        },
-        {
-          "from": 3.5,
-          "to": 4.5,
-          "shows": "gloved hand holding abrasive pad over the deck rail, lock bracket close-up, metal being prepped",
-          "stage": "strip"
-        },
-        {
-          "from": 4.5,
+          "from": 2.7,
           "to": 6.3,
-          "shows": "wide view of deck rail and lock bracket with license plate and red reflector, bracket still rough",
-          "stage": "other"
+          "shows": "pan along the beam to the rear end-stop box and license plate; a gloved hand holds a rust-coloured piece at the top",
+          "stage": "done"
         }
       ],
       "desc_sig": "14011028|1793369327",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock3.mp4": {
       "cats": [
@@ -3148,52 +3138,43 @@
         "close": 0.23,
         "rust": 0.23
       },
-      "desc": "Camera circles a car hauler trailer's deck-end spring lock and ramp bracket, showing the worn galvanized steel, the pin and clip, and the rear trailer tag, with the ground and green deck mat in view.",
+      "desc": "The new spring lock is shown, then the slide-out extension is pulled out and pushed back in with the lock in place.",
       "kw": [
-        "car hauler",
         "spring lock",
-        "ramp bracket",
-        "trailer deck",
-        "galvanized steel",
-        "pin clip",
-        "houston trailer repair"
+        "slide-out",
+        "extension",
+        "pull ring",
+        "test",
+        "ramp",
+        "trailer",
+        "finished"
       ],
-      "stage": "damage",
-      "subject": "spring lock bracket",
+      "stage": "done",
+      "subject": "spring lock slide-out",
       "segments": [
         {
-          "from": 0.3,
-          "to": 4.2,
-          "shows": "close-up of spring lock bracket and pin clip on deck end, scraped and weathered steel with weld marks",
-          "stage": "damage"
+          "from": 0.0,
+          "to": 2.9,
+          "shows": "close-up of the new spring lock with pull ring under the beam as the slide-out starts to move",
+          "stage": "done"
         },
         {
-          "from": 4.2,
-          "to": 5.4,
-          "shows": "side angle of ramp bracket and lower plate, galvanized deck with worn spots",
-          "stage": "damage"
-        },
-        {
-          "from": 5.4,
+          "from": 2.9,
           "to": 8.0,
-          "shows": "wide view of stacked deck plates and lower bracket from the rear, tag visible at edge",
-          "stage": "other"
+          "shows": "slide-out extension pulled fully out, showing the ribbed ramp and the lower steel plate; lock stays on the beam",
+          "stage": "done"
         },
         {
           "from": 8.0,
-          "to": 9.3,
-          "shows": "side view of ramp channel and lower plate near trailer rail, scuffed galvanized finish",
-          "stage": "damage"
-        },
-        {
-          "from": 9.3,
-          "to": 11.9,
-          "shows": "close-up of rear lock bracket and plate with paint loss and worn edges, trailer tag 589 visible",
-          "stage": "damage"
+          "to": 12.9,
+          "shows": "slide-out pushed back in; rear end-stop box with welds and the trailer plate visible",
+          "stage": "done"
         }
       ],
       "desc_sig": "28013538|1793369363",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock4.mp4": {
       "cats": [
@@ -3208,41 +3189,43 @@
         "close": 0.33,
         "hyd": 0.33
       },
-      "desc": "Close-up walkaround of a car hauler's rear bracket and spring lock, showing the broken old lock, then clamping and chiselling away the damaged steel on the ramp crossbar.",
+      "desc": "Rear end-stop box on the slide-out with fresh welds, then a clamp holding the part and a chisel and cut plate on the ground, with the lock mounting area bare.",
       "kw": [
-        "car hauler",
-        "spring lock",
-        "rear bracket",
-        "broken lock",
-        "chisel removal",
-        "bar clamp",
-        "trailer ramp",
-        "houston shop"
+        "end stop",
+        "box",
+        "weld",
+        "clamp",
+        "chisel",
+        "cut plate",
+        "slide-out",
+        "lock mount"
       ],
-      "stage": "strip",
-      "subject": "spring lock bracket",
+      "stage": "weld",
+      "subject": "slide-out end stop",
       "segments": [
         {
           "from": 0.0,
-          "to": 2.6,
-          "shows": "close-up of rear bumper bracket and old spring lock, rusted and broken, no work yet",
-          "stage": "damage"
+          "to": 2.7,
+          "shows": "wide view of the rear end-stop box welded at the end of the slide-out, bright weld beads, open frame end beside it",
+          "stage": "weld"
         },
         {
-          "from": 2.6,
-          "to": 3.8,
-          "shows": "bar clamp on ramp crossbar at the lock bracket, rusty plate still in place",
-          "stage": "fit"
+          "from": 2.7,
+          "to": 3.9,
+          "shows": "stainless clamp and vise-grip holding the slide while the box sits at its end",
+          "stage": "weld"
         },
         {
-          "from": 3.8,
+          "from": 3.9,
           "to": 5.7,
-          "shows": "chisel and cut scrap plate on ground, lock bracket edges chipped and ground, residue at weld area",
-          "stage": "strip"
+          "shows": "close-up of the welded box and a bare lock mounting area on the beam; chisel and cut-off steel piece on the ground",
+          "stage": "weld"
         }
       ],
       "desc_sig": "12619876|1793369343",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock5.mp4": {
       "cats": [
@@ -3255,45 +3238,43 @@
       "share": {
         "close": 1.0
       },
-      "desc": "Close-up footage of a car hauler deck bracket held by a steel clamp on a rubber floor mat, moving from the clamped bracket to the broken, rusted lower edge with a bolt and cut steel.",
+      "desc": "Grinding and cleanup: the box at the slide end is cut or ground off, then the beam side shows a bare area where the old lock was.",
       "kw": [
-        "car hauler",
-        "spring lock bracket",
-        "deck clamp",
-        "broken steel",
-        "rust",
-        "trailer repair houston"
+        "grinding",
+        "cut off",
+        "old lock",
+        "remnant bracket",
+        "clamp",
+        "slide-out",
+        "cleanup",
+        "sparks"
       ],
-      "stage": "fit",
-      "subject": "spring lock bracket",
+      "stage": "strip",
+      "subject": "old lock area",
       "segments": [
         {
-          "from": 0.3,
+          "from": 0.0,
           "to": 1.5,
-          "shows": "close-up of bracket held by steel clamp, rusted grey steel, wood block inside bracket, mat below",
-          "stage": "fit"
+          "shows": "close-up of the slide-end box wrapped in tape or foil with a clamp, dark mat with burn marks and a cut-off disc on it",
+          "stage": "strip"
         },
         {
           "from": 1.5,
-          "to": 2.7,
-          "shows": "wider view of clamp on deck edge and bracket with slots, rust and grey residue visible",
-          "stage": "fit"
-        },
-        {
-          "from": 2.7,
           "to": 3.9,
-          "shows": "side of deck bracket with slots and white residue, clamp on deck, rusted lower edge",
-          "stage": "fit"
+          "shows": "slide-end box ground away and edges cleaned, cut-off disc on the mat",
+          "stage": "strip"
         },
         {
           "from": 3.9,
           "to": 5.7,
-          "shows": "angled close-up of broken lower bracket with bolt, cut and rough edges, rust visible",
-          "stage": "damage"
+          "shows": "beam side with a bare cut-out where the old lock was, a small bracket with bolt left, cut plate on the ground",
+          "stage": "strip"
         }
       ],
       "desc_sig": "12660184|1793369337",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock6.mp4": {
       "cats": [
@@ -3306,46 +3287,49 @@
       "share": {
         "close": 0.75
       },
-      "desc": "Close-up walkaround of a car hauler trailer's deck rail and rear bracket area, showing welded brackets, bolts and white weld-spatter residue on the steel, with a Texas token trailer plate visible.",
+      "desc": "Close-up of what is left of the old lock on the beam, then the slide-out pulled out with its end ground flat.",
       "kw": [
-        "car hauler trailer",
-        "deck rail bracket",
-        "spring lock weld",
-        "trailer frame",
-        "bolt bracket",
-        "weld spatter",
-        "houston trailer repair"
+        "old spring lock",
+        "broken bracket",
+        "remnant",
+        "bolt",
+        "slide-out",
+        "ground flat",
+        "beam end",
+        "cleanup"
       ],
-      "stage": "weld",
-      "subject": "deck rail bracket",
+      "stage": "strip",
+      "subject": "old lock remnant",
       "segments": [
         {
           "from": 0.0,
           "to": 2.7,
-          "shows": "close-up of deck frame corner bracket with scorched weld remnants and bolt, wide holed deck plate above",
-          "stage": "weld"
+          "shows": "close-up of the beam underside with a broken bracket and bolt left from the old lock, no latch or ring, wood chips below",
+          "stage": "damage"
         },
         {
           "from": 2.7,
           "to": 5.1,
-          "shows": "close-up of slotted deck rail end with welded bracket and bolt on the side",
-          "stage": "weld"
+          "shows": "slide-out pulled out; its end is ground flat with a scribed patch outline, flat bar on the ground",
+          "stage": "strip"
         },
         {
           "from": 5.1,
           "to": 8.7,
-          "shows": "close-up of rail end with white weld filler and spatter on the bracket, ramp plate beside it, Texas plate in view",
-          "stage": "weld"
+          "shows": "slide end with the stop box gone and a flat ground patch, trailer plate behind",
+          "stage": "strip"
         },
         {
           "from": 8.7,
-          "to": 11.1,
-          "shows": "close-up of lower bracket with slotted plate and white weld marks, then rail end at angle",
-          "stage": "weld"
+          "to": 11.7,
+          "shows": "slide end seen from the corner, then the beam with the leftover bracket and a loose bent tab",
+          "stage": "strip"
         }
       ],
       "desc_sig": "25674089|1793369391",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     },
     "springlock7.mp4": {
       "cats": [
@@ -3358,57 +3342,40 @@
       "share": {
         "close": 0.89
       },
-      "desc": "Close-up walkaround of a galvanized car hauler deck section and its lock end, with a strap across the perforated deck plate and debris-covered ground below.",
+      "desc": "Another view of the beam end with the old lock bracket stub and the slide-out end ground flat.",
       "kw": [
-        "car hauler",
-        "deck plate",
-        "spring lock",
-        "trailer frame",
-        "galvanized rail",
-        "houston trailer repair"
+        "old lock stub",
+        "bracket",
+        "bolt",
+        "slide-out",
+        "ground",
+        "flat bar",
+        "beam",
+        "cleanup"
       ],
-      "stage": "other",
-      "subject": "deck rail section",
+      "stage": "strip",
+      "subject": "old lock remnant",
       "segments": [
         {
           "from": 0.0,
-          "to": 1.5,
-          "shows": "wide close-up of perforated deck plate end and lock bracket on rail, strap across, no visible weld",
-          "stage": "other"
-        },
-        {
-          "from": 1.5,
           "to": 2.7,
-          "shows": "close-up of rail end with lock bracket and bolt hole, debris on ground",
-          "stage": "other"
+          "shows": "close-up of the beam underside with a bolted stub bracket and bent tab left from the old lock, no new lock yet",
+          "stage": "damage"
         },
         {
           "from": 2.7,
-          "to": 3.9,
-          "shows": "close-up of lock end of deck rail with slotted holes and grimy galvanized steel",
-          "stage": "other"
-        },
-        {
-          "from": 3.9,
-          "to": 6.3,
-          "shows": "side view of rail with slotted holes and a flat steel ramp plate beneath, tag plate visible",
-          "stage": "other"
-        },
-        {
-          "from": 6.3,
-          "to": 7.5,
-          "shows": "close-up of rail end over ramp plate with slots, license plate visible at top",
-          "stage": "other"
-        },
-        {
-          "from": 7.5,
           "to": 9.0,
-          "shows": "low side view of rail with slots and flat ramp plate with bolt hole on dirt ground",
-          "stage": "other"
+          "shows": "slide-out extended over a flat bar; its end is ground flat with white grinding residue and slots, no end-stop box",
+          "stage": "strip"
         }
       ],
       "desc_sig": "19725772|1793369407",
-      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one."
+      "desc_note": "we clean up the broken parts of the old spring lock and replace and weld a new one",
+      "desc_mode": "project",
+      "desc_at": 1793377772
     }
+  },
+  "stories": {
+    "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order."
   }
 }

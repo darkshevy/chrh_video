@@ -1,2 +1,11 @@
 === springlock | SPRING LOCK FIX | CLEANED UP, FITTED, WELDED | Thunder
 Is your spring lock rusted and broken? This one was. We chiseled out the broken pieces and ground the edges clean. [HOOK 2] So what goes in its place? A new lock, clamped to the rail and fitted. Then we welded it in. Old lock gone, new one welded on. Bring it by the shop.
+
+=== lockreplace | SPRING LOCK REPAIR | OLD LOCK OUT, NEW LOCK WELDED | Thunder
+Is your spring lock torn up and burnt? This one was. Broken pieces were still in place. We cleaned up the frame and chiseled out the old lock. [HOOK 2] So what goes in? A new steel plate, clamped, fitted, and welded. Now the frame end has a new bracket and smooth welds. Bring it by the shop.
+
+=== newlock | SPRING LOCK REPAIR | BROKEN LOCK, NEW WELD | Thunder
+Spring lock torn up on your car hauler? This one came in with burnt, torn steel around the bracket and the D-ring. Rust and pitting everywhere. First, we cleaned up the frame with a red pad. [HOOK 2] So what do you do with a lock this far gone? You take out what's broken. We chiseled the old remnants out of the jagged housing. Then we clamped a new steel plate to the frame rail and fitted the bracket, with a wood block in the lock opening. We ground the weld areas, bolted the bracket on, and welded it in. Smooth beads, a solid new lock. Got a broken spring lock? Bring it by the shop.
+
+=== slideout | SPRING LOCK FIX | NEW RING-PULL LOCK WELDED IN | Thunder
+Is the spring lock on your slide-out ramp broken off under the beam? This one was. We ground away the broken lock and the old end stop. [HOOK 2] Want it fixed with real welds? First, the end stop went back on. Then we welded in a new stainless spring lock with a pull ring and pin. We pulled the slide-out all the way out and pushed it back in. The lock stayed on the beam. Bring it by the shop.
