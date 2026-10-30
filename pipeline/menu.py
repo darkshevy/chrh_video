@@ -766,7 +766,9 @@ if not os.environ.get("ELEVENLABS_API_KEY", "").strip():
 
 st = {"path": path, "keys": keys_of(path), "only": [], "warn": warn,
       "work": work_size(), "cur": jload(CURRENT, {}), "view": None}
-st["mode"] = "b" if st["cur"].get("wizard") else "a"     # a project left half-way reopens where it was
+# Always start on the whole menu: reopening the half-done project on every launch got in the way. The project
+# is not forgotten — the right panel names its step, and Tab goes back to it.
+st["mode"] = "a"
 sel, live = 0, True
 if COLOUR: sys.stdout.write("\033[2J")
 
