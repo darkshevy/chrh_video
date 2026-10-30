@@ -57,9 +57,54 @@ Rules, in order of importance:
    without showing the same seconds again.
 6. The last cut carries the closing card and is the longest; give it a wide or finished shot long enough for it.
 
+How to work: for every cut FIRST decide what its words are about, then choose a segment of that stage.
+  about: damage, strip, fit, weld, finish or done when the words talk about that stage of the job;
+         other when they don't (a general hook, the brand, the call to action).
+  A cut whose words are about "damage" takes a [damage] segment, "weld" a [weld] segment, and so on.
+  An "other" cut takes a segment of the stage the story has already reached — never an earlier one; the
+  closing call to action takes a [done] segment when there is one.
+Your plan is checked against these stage tags, and cuts that break them are sent back to you.
+
 Reply with JSON only:
-{"plan": [{"cut": 0, "seg": "s3"}, ...], "why": "one or two sentences about the shape you chose"}
+{"plan": [{"cut": 0, "about": "damage", "seg": "s3"}, ...], "why": "one or two sentences about the shape"}
 Every cut must appear exactly once, and every id must come from the list."""
+
+# Work order of the stage tags describe.py writes. "other" has no place in it.
+ORDER = {"damage": 0, "strip": 1, "fit": 2, "weld": 3, "finish": 4, "done": 5}
+ALIAS = {"finished": "done", "result": "done", "after": "done", "before": "damage", "broken": "damage",
+         "welding": "weld", "cutting": "strip", "grinding": "strip", "removal": "strip", "fitting": "fit",
+         "paint": "finish", "painting": "finish", "coating": "finish", "general": "other", "cta": "other"}
+
+
+def norm_stage(x):
+    x = str(x or "other").strip().lower()
+    x = ALIAS.get(x, x)
+    return x if x in ORDER else "other"
+
+
+def stage_problems(about, order):
+    """[(cut, reason)] where the chosen segment's stage does not fit the words. This is checked in code
+    because a prompt alone was not enough: the model kept putting 'after' footage under 'before' words."""
+    out, reached = [], -1
+    for i, (ab, c) in enumerate(zip(about, order)):
+        if c is None: continue
+        st = c["stage"]
+        if ab in ORDER:
+            if st in ORDER and st != ab:
+                out.append((i, f"the words are about [{ab}] but the segment is [{st}]"))
+            reached = max(reached, ORDER[ab])
+        elif st in ORDER and reached >= 0 and ORDER[st] < reached:
+            back = [k for k, v in ORDER.items() if v == reached][0]
+            out.append((i, f"the story has reached [{back}] but the segment goes back to [{st}]"))
+    return out
+
+
+def target_stage(about, i):
+    """The stage cut i should show: what its words are about, or for 'other' words where the story is."""
+    if about[i] in ORDER: return about[i]
+    seen = [ORDER[a] for a in about[:i] if a in ORDER]
+    if not seen: return None
+    return [k for k, v in ORDER.items() if v == max(seen)][0]
 
 
 def ask(payload, key):
@@ -130,8 +175,22 @@ def segments_of(C, pool_names):
     return cands
 
 
-def place(key, slots, cuts, order, cands):
-    """Put a real window under every cut. The assigned segment wins; the rest is only a fallback."""
+def in_segment(c, need, base, batch_used, oc, grows):
+    """Best window inside segment c (widened by up to `grows`), real speed before slow motion."""
+    for slow, grow in [(False, g) for g in grows] + [(True, g) for g in grows]:
+        forbid = collections.defaultdict(list)
+        for f, r in base.items(): forbid[f] += r
+        forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)]
+        got = (picker.best([c["clip"]], need, forbid, batch_used, 700, allow_slow=slow, own_count=oc)
+               or picker.best([c["clip"]], need, forbid, batch_used, 600, allow_slow=slow, own_count=oc))
+        if got: return got, grow
+    return None, 0.0
+
+
+def place(key, slots, cuts, order, cands, want=None):
+    """Put a real window under every cut. The assigned segment wins; the rest is only a fallback.
+    want[i] is the stage cut i must show; fallbacks stay inside that stage before giving it up."""
+    want = want or [None] * len(slots)
     own = collections.defaultdict(list)
     batch_used = collections.defaultdict(list)
     P, rep, problems = [], [], []
@@ -150,19 +209,24 @@ def place(key, slots, cuts, order, cands):
             # lands on the unrelated side view at the far end.
             # Real speed is tried at every width before slow motion: otherwise a stretch a little too short is
             # "solved" by slowing the shot to 0.7x, which looks worse than borrowing a neighbouring second.
-            for slow, grow in [(False, g) for g in (0.0, 1.5, 3.0)] + [(True, g) for g in (0.0, 1.5, 3.0)]:
-                forbid = collections.defaultdict(list)
-                for f, r in base.items(): forbid[f] += r
-                forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)]
-                got = (picker.best([c["clip"]], need, forbid, batch_used, 700, allow_slow=slow, own_count=oc)
-                       or picker.best([c["clip"]], need, forbid, batch_used, 600, allow_slow=slow, own_count=oc))
+            got, grow = in_segment(c, need, base, batch_used, oc, (0.0, 1.5, 3.0))
+            if got and grow: how = f"  (segment widened by {grow:g}s)"
+        # Next: another segment of the SAME stage. The old fallback took whatever clip was least used anywhere,
+        # and late in a video the least used ones were the "before" clips — that is how the broken lock came
+        # back under the closing words. Least used and longest first.
+        st = want[i] or (c["stage"] if c else None)
+        if got is None and st:
+            used = collections.Counter(f for f, r in own.items() for _ in r)
+            same = sorted((x for x in cands if x["stage"] == st and x is not c),
+                          key=lambda x: (used[x["clip"]], -x["longest"]))
+            for x in same:
+                got, _ = in_segment(x, need, base, batch_used, oc, (0.0, 1.5))
                 if got:
-                    if grow: how = f"  (segment widened by {grow:g}s)"
-                    break
-            if got is None:   # even the widened stretch is too short: stay in the clip, leave the stretch
-                got = (picker.best([c["clip"]], need, base, batch_used, 700, own_count=oc)
-                       or picker.best([c["clip"]], need, base, batch_used, 600, own_count=oc))
-                if got: how = "  (outside the segment)"
+                    how = f"  (another [{st}] segment)"; break
+        if got is None and c:   # stay in the clip, leave the stretch
+            got = (picker.best([c["clip"]], need, base, batch_used, 700, own_count=oc)
+                   or picker.best([c["clip"]], need, base, batch_used, 600, own_count=oc))
+            if got: how = "  (outside the segment)"
         if got is None:
             rest = [x["clip"] for x in cands if not c or x["clip"] != c["clip"]]
             if rest:
@@ -177,13 +241,14 @@ def place(key, slots, cuts, order, cands):
             problems.append((i, "no usable window anywhere")); continue
         # A widened segment is still the assigned picture, only a second or two off its edge — reported, but
         # not worth a correction round. Everything else under `how` is a substitute.
-        if how and "widened" not in how: problems.append((i, how.strip(" ()")))
+        if how and "widened" not in how and "segment)" not in how: problems.append((i, how.strip(" ()")))
         f, t, sp, ms, reused = got
         own[f].append((t, t + need * sp + 0.3)); batch_used[f].append((t, t + need * sp + 0.3))
         zz = z if z is not None else ((1.0, 0.5, 0.5) if picker.is_drone(f) and "decking" not in f else None)
         if "decking" in f or "DJI" in f: zz = z or (1.0, 0.5, 0.5)
         P.append((w, f, t, sp, zz))
-        rep.append(f"  {i:2d} {need:4.1f}s {f[:30]:30s} @{t:5.2f} x{sp} sharp {ms:5.0f}{how}")
+        stg = next((x["stage"] for x in cands if x["clip"] == f and x["a"] - 0.5 <= t <= x["b"]), "?")
+        rep.append(f"  {i:2d} {need:4.1f}s [{(want[i] or '-'):6s}] {f[:26]:26s} @{t:5.2f} [{stg:6s}] x{sp}{how}")
     return P, rep, problems
 
 
@@ -208,13 +273,15 @@ def make(key, cands, byid, apikey, dry, only):
                "\n\nFOOTAGE SEGMENTS:\n" +
                "\n".join(f'  {c["id"]}  {c["clip"]} {c["a"]:.1f}-{c["b"]:.1f}s '
                          f'(usable {c["usable"]}s, longest run {c["longest"]}s) [{c["stage"]}]: {c["shows"]}'
-                         for c in cands))
+                         for c in sorted(cands, key=lambda c: (ORDER.get(c["stage"], 9), c["clip"], c["a"]))))
     print(f"{len(slots)} cuts, {len(cands)} segment(s) from {len(set(c['clip'] for c in cands))} clip(s)")
 
     def read_plan(res):
-        got = {}
+        got, ab = {}, {}
         for row in res.get("plan", []):
-            try: got[int(row["cut"])] = str(row.get("seg") or row.get("clip") or "")
+            try:
+                got[int(row["cut"])] = str(row.get("seg") or row.get("clip") or "")
+                ab[int(row["cut"])] = norm_stage(row.get("about"))
             except Exception: continue
         out = []
         for i in range(len(slots)):
@@ -222,29 +289,31 @@ def make(key, cands, byid, apikey, dry, only):
             if v in byid: out.append(byid[v]); continue
             hit = [c for c in cands if v and v.lower() in c["clip"].lower()]   # tolerate a clip name
             out.append(hit[0] if hit else None)
-        return out
+        return out, [ab.get(i, "other") for i in range(len(slots))]
 
     res = ask(payload, apikey)
-    order = read_plan(res)
+    order, about = read_plan(res)
     print("\n" + (res.get("why", "") or ""))
     blank = [i for i, c in enumerate(order) if c is None]
     if blank: print(f"note: nothing named for cut(s) {blank}; they will be filled from the rest")
 
     print()
     for i, c in enumerate(order):
-        tag = f'{c["clip"]} {c["a"]:.0f}-{c["b"]:.0f}s' if c else "(free choice)"
-        print(f"  cut {i:2d} {cuts[i+1]-cuts[i]:4.1f}s  {tag:34s} {texts[i][:52]}")
-        if c: print(f"{'':42s}   -> {c['shows'][:70]}")
+        tag = f'{c["clip"]} {c["a"]:.0f}-{c["b"]:.0f}s [{c["stage"]}]' if c else "(free choice)"
+        print(f"  cut {i:2d} {cuts[i+1]-cuts[i]:4.1f}s  about [{about[i]}]  {tag:38s} {texts[i][:44]}")
+        if c: print(f"{'':20s}-> {c['shows'][:80]}")
 
     if dry: return None
 
-    P, rep, problems = place(key, slots, cuts, order, cands)
+    want = [target_stage(about, i) for i in range(len(slots))]
+    P, rep, problems = place(key, slots, cuts, order, cands, want)
+    problems = sorted(problems + stage_problems(about, order))
 
-    # A cut that could not take its assigned segment is a wrong picture under those words — the thing this
-    # script exists to prevent. So instead of quietly substituting, hand the failures back and let the model
-    # choose again knowing what went wrong. One cheap extra call, and only when something did not fit.
+    # A cut that could not take its assigned segment, or took one of the wrong stage, is a wrong picture under
+    # those words — the thing this script exists to prevent. Hand the failures back once and let the model
+    # choose again knowing what went wrong.
     if problems:
-        print(f"\n{len(problems)} cut(s) did not take what was assigned; asking for a correction...")
+        print(f"\n{len(problems)} cut(s) need another look; asking for a correction...")
         for i, why in problems: print(f"   cut {i}: {why}")
         spent = collections.Counter(f for (_, f, _, _, _) in P)
         detail = "\n".join(
@@ -253,22 +322,53 @@ def make(key, cands, byid, apikey, dry, only):
         repair = (payload + "\n\nYOUR PREVIOUS PLAN DID NOT WORK FOR THESE CUTS:\n" + detail +
                   "\n\nSeconds already spent per clip in that plan: " +
                   ", ".join(f"{k} x{v}" for k, v in sorted(spent.items())) +
-                  "\n\nGive the WHOLE plan again, every cut, choosing differently for the cuts listed above. "
-                  "A segment whose longest run is shorter than a cut cannot take that cut. "
+                  "\n\nGive the WHOLE plan again, every cut, with \"about\" for each, choosing differently for "
+                  "the cuts listed above. A segment whose longest run is shorter than a cut cannot take that cut. "
                   "Reply with the JSON only, \"why\" in one or two sentences.")
         try:
             res2 = ask(repair, apikey)
-            order2 = read_plan(res2)
+            order2, about2 = read_plan(res2)
             order2 = [order2[i] or order[i] for i in range(len(slots))]
-            P2, rep2, prob2 = place(key, slots, cuts, order2, cands)
+            want2 = [target_stage(about2, i) for i in range(len(slots))]
+            P2, rep2, prob2 = place(key, slots, cuts, order2, cands, want2)
+            prob2 = sorted(prob2 + stage_problems(about2, order2))
             if len(prob2) < len(problems):
                 print(f"corrected: {len(problems)} problem cut(s) -> {len(prob2)}")
                 print("\n" + (res2.get("why", "") or ""))
-                P, rep, problems, order = P2, rep2, prob2, order2
+                P, rep, problems, order, about, want = P2, rep2, prob2, order2, about2, want2
             else:
                 print("the correction was no better; keeping the first plan")
         except Exception as e:
             print(f"could not get a correction ({e}); keeping the first plan")
+
+    # Whatever stage mismatch is still left, fix it here without asking: swap in the least used segment of the
+    # stage the words need. A plain rule, but it can't put the finished lock under the words about the rust.
+    left = stage_problems(about, order)
+    if left:
+        used = collections.Counter(c["id"] for c in order if c)
+        for i, why in left:
+            st = want[i]
+            pool = sorted((x for x in cands if x["stage"] == st),
+                          key=lambda x: (used[x["id"]], x["longest"] < cuts[i + 1] - cuts[i], -x["longest"]))
+            if pool:
+                print(f"   cut {i}: {why} -> {pool[0]['id']} {pool[0]['clip']} [{st}]")
+                used[pool[0]["id"]] += 1; order[i] = pool[0]
+        P, rep, problems = place(key, slots, cuts, order, cands, want)
+
+    # The whole decision, cut by cut, in one file next to the video: what was said, what stage it is about,
+    # what the segment was described as and where the shot really came from. Send this file when a cut is wrong.
+    try:
+        rp = os.path.join(finish.outdir(), f"CHRH_{key}_plan.txt")
+        with open(rp, "w", encoding="utf-8") as fh:
+            fh.write(f"{key}\n\n")
+            for i, c in enumerate(order):
+                fh.write(f"cut {i:2d}  {cuts[i]:5.1f}s  about [{about[i]}]  \"{texts[i]}\"\n")
+                if c: fh.write(f"         planned {c['id']} {c['clip']} {c['a']:.1f}-{c['b']:.1f}s [{c['stage']}] "
+                               f"{c['shows']}\n")
+            fh.write("\nplaced:\n" + "\n".join(rep) + "\n")
+        print(f"plan written to {os.path.relpath(rp, START)}")
+    except Exception as e:
+        print(f"could not write the plan file: {e}")
 
     print("\n".join(rep))
     if [r for r in rep if "NO CANDIDATE" in r]:

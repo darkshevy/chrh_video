@@ -300,9 +300,10 @@ def store(C, n, r, dur, note, mode):
     C[n]["desc_sig"] = sig(build.src(n))
     C[n]["desc_note"] = note
     C[n]["desc_mode"] = mode
+    C[n]["desc_at"] = int(time.time())     # a script older than this was written from other descriptions
 
 
-def describe_project(names, L, api_key, log=print, force=False, note=""):
+def describe_project(names, L, api_key, log=print, force=False, note="", prefix=""):
     """Describe all clips of one project in a single request. Returns how many were described, or None when
     the project is too big for one request (the caller then goes clip by clip).
 
@@ -312,7 +313,9 @@ def describe_project(names, L, api_key, log=print, force=False, note=""):
     names = [n for n in names if n in C and n in build.FILES]
     if not names: return 0
     if len(names) > PROJECT_MAX: return None
-    stale = [n for n in names if needs_description(C[n], n, note) or C[n].get("desc_mode") != "project"]
+    # no desc_at: described before the story was kept for the script — once more, to get it
+    stale = [n for n in names if needs_description(C[n], n, note) or C[n].get("desc_mode") != "project"
+             or not C[n].get("desc_at")]
     if not force and not stale: return 0
     per = max(4, min(MAXFRAMES, PROJECT_FRAMES // len(names)))
     log(f"describing the project together: {len(names)} clip(s), up to {per} frames each, with {PROJECT_MODEL}…")
@@ -324,7 +327,10 @@ def describe_project(names, L, api_key, log=print, force=False, note=""):
     if not clips: return 0
     r = ask_project(clips, api_key, log=log, note=note)
     got = r.get("clips") or {}
-    if r.get("story"): log(f"\n  {r['story']}\n")
+    if r.get("story"):
+        log(f"\n  {r['story']}\n")
+        # kept for script.py: the order of the job, judged across all clips, is the spine of the story
+        if prefix: L.setdefault("stories", {})[prefix] = str(r["story"])[:600]
     done = 0
     for n, _, dur in clips:
         rec = got.get(n) or next((v for k, v in got.items() if k.lower() == n.lower()), None)
@@ -368,7 +374,7 @@ def main():
         if i + 1 < len(sys.argv): note = sys.argv[i + 1]
     n = None
     if prefix and "--single" not in flags:
-        n = describe_project(names, L, key, force="--force" in flags, note=note)
+        n = describe_project(names, L, key, force="--force" in flags, note=note, prefix=prefix)
         if n is None: print(f"{len(names)} clips is too many for one look; describing them one by one")
     if n is None:
         n = describe(names, L, key, force="--force" in flags, note=note)

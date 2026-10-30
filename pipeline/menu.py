@@ -152,10 +152,11 @@ def projects():
     clips = jload(LIB, {}).get("clips", {})
     out = {}
     for n, r in clips.items():
-        g = out.setdefault(project_of(n), {"clips": 0, "on": 0, "described": 0})
+        g = out.setdefault(project_of(n), {"clips": 0, "on": 0, "described": 0, "desc_at": 0})
         g["clips"] += 1
         g["on"] += bool(r.get("enabled"))
         g["described"] += bool(r.get("enabled") and r.get("segments"))
+        g["desc_at"] = max(g["desc_at"], r.get("desc_at", 0) if r.get("enabled") else 0)
     return out
 
 
@@ -205,7 +206,9 @@ def progress(st):
     s1 = bool(g and g["on"] and g["described"] >= g["on"])
     script = cur.get("script", "")
     keys = [k for k in cur.get("keys", []) if script and k in keys_of(script)]
-    s2 = bool(keys)
+    # a script written before the clips were last described tells the old, wrong story: write it again
+    stale = bool(keys and g and cur.get("script_at", 0) < g.get("desc_at", 0))
+    s2 = bool(keys) and not stale
     d = finish.outdir()
     outs = {k: sum(finish.outputs(k, d), []) for k in keys}
     s3 = s2 and all(outs[k] for k in keys)
@@ -215,7 +218,8 @@ def progress(st):
 
     if not prefix: hint = "проект не выбран"
     elif not s1: hint = f"описано {g['described'] if g else 0} из {g['on'] if g else 0} клипов"
-    elif not s2: hint = "клипы описаны, скрипта ещё нет"
+    elif not s2: hint = ("клипы описаны заново — скрипт написан по старым описаниям, перепиши его" if stale
+                         else "клипы описаны, скрипта ещё нет")
     elif not s3:
         vo = [k for k in keys if os.path.exists(autoplan.vo_path(k))]
         hint = f"{', '.join(keys)}: " + ("озвучка есть, ролик не собран" if vo else "нет озвучки и ролика")
@@ -566,7 +570,7 @@ def step_write(st, secs=None):
     st["path"], st["keys"] = out, keys_of(out)
     st["only"] = new                                  # step 3 builds exactly what was just written
     cur["prefix"], cur["seconds"] = prefix, secs
-    if new: cur["script"], cur["keys"] = out, new    # the progress bar follows these through steps 3 and 4
+    if new: cur["script"], cur["keys"], cur["script_at"] = out, new, int(time.time())   # followed by steps 3-4
     jsave(CURRENT, cur)
     print(f"\n  {C.GR}скрипт в scripts\\{os.path.basename(out)}" +
           (f", ключ: {', '.join(new)}" if new else "") + f"{C.OFF}")

@@ -137,6 +137,16 @@ if not names:
     sys.exit(("no described clips" + (f" starting with '{only}'" if only else "")) +
              " — run `python pipeline\\describe.py` first")
 
+# Footage goes to the writer in the order of the work (by the stage judged when the project was described),
+# not in file-name order: a writer reading "finished lock" first and "broken lock" fourth tells the story in
+# that order, and then the planner has no right footage for the first sentences.
+STAGES = {"damage": 0, "strip": 1, "fit": 2, "weld": 3, "finish": 4, "done": 5}
+def _first_stage(n):
+    st = [STAGES.get(s.get("stage"), 9) for s in C[n].get("segments", [])]
+    return min(st) if st else 9
+names.sort(key=lambda n: (_first_stage(n), n))
+story = (L.get("stories") or {}).get(only, "") if only else ""
+
 lines, total = [], 0.0
 for n in names:
     rec = C[n]
@@ -176,6 +186,9 @@ else:
              f"{total:.0f} seconds of usable footage and a longer script would have to repeat shots.") +
             " Do not pad it to reach the count: say the job and stop. Every sentence must earn its place.")
     if note: task += f"\n\nWhat the shop said about this job: {note}"
+    if story: task += (f"\n\nHow the job went, judged from all the footage side by side: {story}\n"
+                       "Follow this order. Every sentence about the work must be something a segment below "
+                       "shows — if no segment shows it, leave it out.")
 
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
            "\n\nKEYS ALREADY USED (do not reuse): " + ", ".join(used_keys()) +
