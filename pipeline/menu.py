@@ -278,8 +278,13 @@ ITEMS = [
     ("only", "K", lambda st: "Ролики: " + (", ".join(st["only"]) if st["only"] else "все"), "Ограничивает "
      "шаги 3 и 4 одним ключом: пересборка не тронет остальные. Пустой ответ возвращает весь файл.", ""),
     ("openout", "O", "Открыть output\\", "Открывает папку с готовыми роликами в проводнике.", ""),
-    ("clean", "C", lambda st: f"Очистить work\\ ({human(st['work'])})", "Удаляет промежуточное видео — "
-     "именно оно съедает диск. Спросит сначала. Кэши не трогает.", ""),
+    ("clean", "C", lambda st: f"Очистить work\\ ({human(st['work'])})", "Удаляет всё промежуточное видео. "
+     "Старые версии сборка теперь удаляет сама, это — полная очистка: после неё ручной блюр [B] уже "
+     "собранного ролика потребует пересборки. Спросит сначала. Кэши не трогает.", ""),
+    ("backup", "S", "Сохранить в облако", "Отправляет в GitHub библиотеку клипов с описаниями "
+     "(library.json) и скрипты (scripts\\), заодно забирает обновления кода. Описания стоили денег — "
+     "без бэкапа они живут только на этом компьютере. Видео и mp3 не отправляет: они слишком большие.",
+     "git commit + pull + push"),
     ("quit", "Q", "Выход", "Закрывает окно.", ""),
 ]
 RUNNABLE = [i for i in ITEMS if i[0] != "~"]
@@ -727,6 +732,61 @@ def wiz_act(ident, st):
         hold()
 
 
+BACKUP = ["pipeline/library.json", "scripts"]
+
+
+def git(*a, quiet=True):
+    """Run git in the project folder. quiet -> (code, output); otherwise it talks to the console directly,
+    which a push needs: the first time, Windows may open a GitHub sign-in window."""
+    cmd = ["git", "-C", ROOT] + list(a)
+    try:
+        if not quiet: return subprocess.call(cmd), ""
+        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        return p.returncode, ((p.stdout or "") + (p.stderr or "")).strip()
+    except FileNotFoundError:
+        return 127, "git не найден"
+
+
+def backup(st):
+    """Commit the library and the scripts, take in code updates, push. Data and code never touch the same
+    files (the code side never edits library.json or scripts\\), so the rebase in between is clean."""
+    code, br = git("rev-parse", "--abbrev-ref", "HEAD")
+    if code:
+        print(f"\n  {C.RE}это не git-папка или git не установлен: {br}{C.OFF}"); hold(); return
+    git("add", "--", *BACKUP)
+    changed = git("diff", "--cached", "--quiet")[0] != 0
+    if changed:
+        stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        code, out = git("commit", "-m", f"Backup: clip library and scripts, {stamp}")
+        if code:
+            print(f"\n  {C.RE}не получилось сохранить изменения:{C.OFF}\n{out[-800:]}"); hold(); return
+        print(f"\n  {C.GR}изменения в библиотеке и скриптах записаны{C.OFF}")
+    else:
+        print(f"\n  {C.GY}в библиотеке и скриптах ничего нового{C.OFF}")
+
+    before = git("rev-parse", "HEAD")[1]
+    print(f"  {C.GY}забираю обновления…{C.OFF}")
+    code, out = git("pull", "--rebase", "--autostash", "origin", br)
+    if code:
+        git("rebase", "--abort")
+        print(f"  {C.RE}обновления не встали поверх твоих изменений — ничего не отправлял.{C.OFF}\n"
+              f"  {C.GY}пришли Claude этот текст:{C.OFF}\n{out[-1200:]}")
+        hold(); return
+    code_changed = git("diff", "--name-only", before, "HEAD", "--", "pipeline/*.py")[1].strip()
+
+    print(f"  {C.GY}отправляю в GitHub…{C.OFF}")
+    code, _ = git("push", "origin", f"HEAD:{br}", quiet=False)
+    if code:
+        print(f"  {C.RE}отправить не удалось (код {code}). Изменения сохранены локально — попробуй ещё раз "
+              f"позже; если просит вход в GitHub, войди и повтори.{C.OFF}")
+    else:
+        print(f"  {C.GR}{C.B}сохранено в облако{C.OFF}")
+    if code_changed:
+        print(f"\n  {C.YE}код обновился ({len(code_changed.splitlines())} файл(ов)) — закрой меню и "
+              f"запусти chrh.bat заново, чтобы обновления заработали{C.OFF}")
+    hold()
+
+
 def act(ident, st):
     if ident == "quit": return False
     elif ident.startswith("w_"): wiz_act(ident, st)
@@ -757,6 +817,7 @@ def act(ident, st):
     elif ident == "pick": pick_file(st)
     elif ident == "only": set_only(st)
     elif ident == "clean": cleanup(st)
+    elif ident == "backup": backup(st)
     return True
 
 

@@ -382,7 +382,25 @@ def make(key, cands, byid, apikey, dry, only):
     if d:
         d["videos"][key]["plan"] = [list(x) for x in P]
         json.dump(d, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    return autoplan.render_key(key, log=print)
+    out = autoplan.render_key(key, log=print)
+    prune_work(key)
+    return out
+
+
+def prune_work(key):
+    """Delete the cut pieces of this video's older versions. Every build writes a new work\\s<key>_vN folder
+    (several hundred MB) and nothing removed the old ones, so work\\ grew by gigabytes. The newest is kept:
+    the manual face blur (finish.py) works from it. Finished videos in output\\ are not touched."""
+    import glob
+    vers = sorted(glob.glob(os.path.join(build.WORK, f"s{key}_v*")), key=os.path.getmtime)
+    freed = 0
+    for d in vers[:-1]:
+        for base, _, files in os.walk(d):
+            for n in files:
+                try: freed += os.path.getsize(os.path.join(base, n))
+                except OSError: pass
+        shutil.rmtree(d, ignore_errors=True)
+    if freed: print(f"work\\: removed {len(vers) - 1} older version(s) of {key}, {freed / 2**20:.0f} MB freed")
 
 
 # ------------------------------------------------------------------ run
