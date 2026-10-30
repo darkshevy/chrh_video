@@ -61,8 +61,10 @@ How to work: for every cut FIRST decide what its words are about, then choose a 
   about: damage, strip, fit, weld, finish or done when the words talk about that stage of the job;
          other when they don't (a general hook, the brand, the call to action).
   A cut whose words are about "damage" takes a [damage] segment, "weld" a [weld] segment, and so on.
-  An "other" cut takes a segment of the stage the story has already reached — never an earlier one; the
-  closing call to action takes a [done] segment when there is one.
+  An "other" cut (general words: why the part matters, how to spot the problem, the brand) keeps the
+  picture moving forward through the job: the segments are listed in work order, and an "other" cut takes a
+  segment AFTER the previous cut's and not past the next cut's — never an earlier one. The closing call to
+  action takes a [done] segment when there is one.
 Your plan is checked against these stage tags, and cuts that break them are sent back to you.
 
 Reply with JSON only:
@@ -172,7 +174,44 @@ def segments_of(C, pool_names):
             cands.append({"id": f"s{len(cands) + 1}", "clip": n, "a": a, "b": b,
                           "usable": round(tot, 1), "longest": round(longest, 1),
                           "shows": s["shows"], "stage": s.get("stage", "other")})
+    return add_positions(cands, C)
+
+
+def add_positions(cands, C):
+    """Put every segment on one timeline of the job: c["pos"] = 0, 1, 2 … in work order.
+
+    When the shop said the clips are numbered in the order of the work, the file number decides; otherwise the
+    stage does (a clip's untagged stretches go with the clip's earliest stage). General words in a script
+    (why a part fails, how to spot it) carry no stage, and without this they took any segment at all — the
+    picture jumped around while the voice explained."""
+    num = lambda n: int(m.group(1)) if (m := _re.search(r"(\d+)\.\w+$", n)) else 0
+    ordered = bool(cands) and all("numbered in the order" in C.get(c["clip"], {}).get("desc_note", "").lower()
+                                  for c in cands)
+    first = {}
+    for c in cands:
+        if c["stage"] in ORDER: first[c["clip"]] = min(first.get(c["clip"], 9), ORDER[c["stage"]])
+    key = ((lambda c: (num(c["clip"]), c["clip"], c["a"])) if ordered else
+           (lambda c: (ORDER.get(c["stage"], first.get(c["clip"], 2.5)), num(c["clip"]), c["clip"], c["a"])))
+    for i, c in enumerate(sorted(cands, key=key)): c["pos"] = i
+    print(f"footage timeline: {'clip numbers (shop said they are in work order)' if ordered else 'by stage'}")
     return cands
+
+
+def order_problems(about, order):
+    """[(cut, reason, lo, hi)] for general cuts whose segment is not between its neighbours on the job timeline."""
+    out, prev = [], -1
+    anchors = [(i, c["pos"]) for i, (ab, c) in enumerate(zip(about, order)) if c and ab in ORDER]
+    for i, (ab, c) in enumerate(zip(about, order)):
+        if c is None: continue
+        if ab not in ORDER:
+            nxt = next((p for j, p in anchors if j > i), None)
+            hi = nxt if nxt is not None and nxt >= prev else 10 ** 6
+            if c["pos"] < prev:
+                out.append((i, "general words, but the segment goes back to an earlier part of the job", prev, hi))
+            elif c["pos"] > hi:
+                out.append((i, "general words, but the segment jumps ahead of what the next words show", prev, hi))
+        prev = c["pos"]
+    return out
 
 
 def in_segment(c, need, base, batch_used, oc, grows):
@@ -273,7 +312,7 @@ def make(key, cands, byid, apikey, dry, only):
                "\n\nFOOTAGE SEGMENTS:\n" +
                "\n".join(f'  {c["id"]}  {c["clip"]} {c["a"]:.1f}-{c["b"]:.1f}s '
                          f'(usable {c["usable"]}s, longest run {c["longest"]}s) [{c["stage"]}]: {c["shows"]}'
-                         for c in sorted(cands, key=lambda c: (ORDER.get(c["stage"], 9), c["clip"], c["a"]))))
+                         for c in sorted(cands, key=lambda c: c["pos"])))
     print(f"{len(slots)} cuts, {len(cands)} segment(s) from {len(set(c['clip'] for c in cands))} clip(s)")
 
     def read_plan(res):
@@ -307,7 +346,7 @@ def make(key, cands, byid, apikey, dry, only):
 
     want = [target_stage(about, i) for i in range(len(slots))]
     P, rep, problems = place(key, slots, cuts, order, cands, want)
-    problems = sorted(problems + stage_problems(about, order))
+    problems = sorted(problems + stage_problems(about, order) + [x[:2] for x in order_problems(about, order)])
 
     # A cut that could not take its assigned segment, or took one of the wrong stage, is a wrong picture under
     # those words — the thing this script exists to prevent. Hand the failures back once and let the model
@@ -331,7 +370,7 @@ def make(key, cands, byid, apikey, dry, only):
             order2 = [order2[i] or order[i] for i in range(len(slots))]
             want2 = [target_stage(about2, i) for i in range(len(slots))]
             P2, rep2, prob2 = place(key, slots, cuts, order2, cands, want2)
-            prob2 = sorted(prob2 + stage_problems(about2, order2))
+            prob2 = sorted(prob2 + stage_problems(about2, order2) + [x[:2] for x in order_problems(about2, order2)])
             if len(prob2) < len(problems):
                 print(f"corrected: {len(problems)} problem cut(s) -> {len(prob2)}")
                 print("\n" + (res2.get("why", "") or ""))
@@ -354,6 +393,20 @@ def make(key, cands, byid, apikey, dry, only):
                 print(f"   cut {i}: {why} -> {pool[0]['id']} {pool[0]['clip']} [{st}]")
                 used[pool[0]["id"]] += 1; order[i] = pool[0]
         P, rep, problems = place(key, slots, cuts, order, cands, want)
+    # Then the general cuts that still jump around: the least used segment inside their window on the job
+    # timeline, nearest the previous cut — the picture walks forward while the voice explains.
+    fixed = False
+    for _ in range(len(slots)):              # one at a time: each fix moves the window of the cuts after it
+        left = order_problems(about, order)
+        if not left: break
+        i, why, lo, hi = left[0]
+        used = collections.Counter(c["id"] for c in order if c)
+        win = [x for x in cands if lo <= x["pos"] <= hi] or [x for x in cands if x["pos"] >= lo]
+        pool = sorted(win, key=lambda x: (used[x["id"]], x["longest"] < cuts[i + 1] - cuts[i], x["pos"]))
+        if not pool: break
+        print(f"   cut {i}: {why} -> {pool[0]['id']} {pool[0]['clip']} @ step {pool[0]['pos']}")
+        order[i] = pool[0]; fixed = True
+    if fixed: P, rep, problems = place(key, slots, cuts, order, cands, want)
 
     # The whole decision, cut by cut, in one file next to the video: what was said, what stage it is about,
     # what the segment was described as and where the shot really came from. Send this file when a cut is wrong.

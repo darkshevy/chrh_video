@@ -43,6 +43,9 @@ RULES = """Each script:
   bay, not like an ad.
 - Shape: the problem and why it matters -> what the shop did, in the order it happened -> result -> a short
   call to action tied to the problem ("hear the deck creak? get it checked").
+- Balance: the explanation of the problem is at most the first two or three sentences. The middle of the
+  script is the work itself, step by step, one step per sentence, in the order of the stages below — the
+  picture is cut to those sentences, so a script that only explains leaves the editor nothing to show.
 - No self-praise: no "specialists", "experts", "professional", "best", "top quality", "toughest jobs",
   "trust us", "we make sure". The shop's name once is enough; the explanation is the selling point.
 - A different call to action in every script. The phone number is on screen: say "call the number on screen"
