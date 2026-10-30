@@ -570,6 +570,142 @@
      null
     ]
    ]
+  },
+  "rampextend": {
+   "title": "RAMP EXTENSIONS",
+   "sub": "MORE LOADING LENGTH",
+   "track": "Hyde and seek",
+   "text": "Need more loading length on your car hauler? Equipment that struggles to get on? We built ramp extensions at Car Hauler Repair Houston. First we measured and cut flat bar with a torch. On the bench, we welded hinge barrels onto perforated plates, with even beads on each one. So how does an extension attach to the trailer? We fitted the plate at the end of the deck, clamped it, and ran beads along the edge. Then we stepped back and checked the work. Now a flap lies flat at the end of the deck and tilts up on its hinge. Measured, cut, welded, and secured, with proper fit and alignment. More loading length, easier equipment access. Send us a text with a photo of your trailer.",
+   "hook": 49,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "rampextensionfabrication13.mp4",
+     1.25,
+     1.0,
+     null
+    ],
+    [
+     8,
+     "rampextensionfabrication13.mp4",
+     4.5,
+     1.0,
+     null
+    ],
+    [
+     14,
+     "rampextensionfabrication2.mp4",
+     1.0,
+     1.0,
+     null
+    ],
+    [
+     20,
+     "rampextensionfabrication10.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     23,
+     "rampextensionfabrication1.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     33,
+     "rampextensionfabrication3.mp4",
+     3.5,
+     1.0,
+     null
+    ],
+    [
+     39,
+     "rampextensionfabrication5.mp4",
+     4.5,
+     1.0,
+     null
+    ],
+    [
+     43,
+     "rampextensionfabrication4.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     49,
+     "rampextensionfabrication8.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     58,
+     "rampextensionfabrication5.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     68,
+     "rampextensionfabrication6.mp4",
+     2.25,
+     1.0,
+     null
+    ],
+    [
+     76,
+     "rampextensionfabrication10.mp4",
+     3.0,
+     1.0,
+     null
+    ],
+    [
+     84,
+     "rampextensionfabrication10.mp4",
+     6.25,
+     0.7,
+     null
+    ],
+    [
+     94,
+     "rampextensionfabrication12.mp4",
+     2.25,
+     1.0,
+     null
+    ],
+    [
+     101,
+     "rampextensionfabrication11.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     104,
+     "rampextensionfabrication13.mp4",
+     19.25,
+     1.0,
+     null
+    ],
+    [
+     111,
+     "rampextensionfabrication13.mp4",
+     12.25,
+     1.0,
+     null
+    ],
+    [
+     117,
+     "rampextensionfabrication13.mp4",
+     7.0,
+     0.7,
+     null
+    ]
+   ]
   }
  }
 }

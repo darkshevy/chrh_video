@@ -4199,11 +4199,628 @@
       "desc_mode": "project",
       "desc_at": 1793382574,
       "desc_v": 2
+    },
+    "rampextensionfabrication1.mp4": {
+      "cats": [
+        "grind",
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.57,
+        "weld": 0.43
+      },
+      "desc": "A worker crouches on the shop floor and cuts a rectangular flat-bar frame with an oxy-fuel torch, throwing sparks.",
+      "kw": [
+        "torch",
+        "cutting",
+        "flat bar",
+        "frame",
+        "sparks",
+        "oxy-fuel",
+        "floor",
+        "fabrication"
+      ],
+      "stage": "strip",
+      "subject": "flat-bar frame",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 7.4,
+          "shows": "worker crouched with cutting torch cutting a bar of a rectangular flat-bar frame on the floor, wide shot with sparks and hoses",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "16586559|1793384229",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication10.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.89
+      },
+      "desc": "Walkaround of the trailer deck showing the hinged extension flap at the end of the perforated deck, with weld beads along its hinge.",
+      "kw": [
+        "hinged flap",
+        "extension",
+        "perforated deck",
+        "trailer",
+        "walkaround",
+        "hinge",
+        "finished",
+        "steel plate"
+      ],
+      "stage": "done",
+      "subject": "hinged extension flap",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.0,
+          "shows": "wide view along the perforated deck plate to the hinged flap at the far end, a man standing beyond it",
+          "stage": "done"
+        },
+        {
+          "from": 3.0,
+          "to": 6.0,
+          "shows": "camera turns toward the open bay door, showing the perforated side deck plates and the flap angled up",
+          "stage": "done"
+        },
+        {
+          "from": 6.0,
+          "to": 8.6,
+          "shows": "camera swings back to the flap lying flat on the hinge at the end of the deck",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "18875740|1793384330",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication11.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.88
+      },
+      "desc": "Closer walkaround of the hinged perforated extension flap, with hinge barrels, weld beads and chalk marks, then the flap tilted up on its hinge.",
+      "kw": [
+        "hinge",
+        "extension flap",
+        "perforated plate",
+        "weld beads",
+        "chalk marks",
+        "trailer",
+        "walkaround",
+        "tilted"
+      ],
+      "stage": "done",
+      "subject": "hinged extension flap",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.4,
+          "shows": "close view of the flap lying flat with hinge barrels and fresh weld beads along its edges, chalk marks on the plate",
+          "stage": "done"
+        },
+        {
+          "from": 2.4,
+          "to": 3.7,
+          "shows": "camera pans across the deck frame and side perforated plates, a worker in the background",
+          "stage": "done"
+        },
+        {
+          "from": 3.7,
+          "to": 6.4,
+          "shows": "flap tilted up on its hinge, showing the hinge knuckles and perforated plate, deck frame in the foreground",
+          "stage": "done"
+        },
+        {
+          "from": 6.4,
+          "to": 8.2,
+          "shows": "flap seen flat again from the deck, with a worker walking behind it",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "18378024|1793384344",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication12.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.88
+      },
+      "desc": "Another walkaround of the finished deck and hinged extension flap, panning across perforated plates and the open frame.",
+      "kw": [
+        "hinged flap",
+        "perforated deck",
+        "extension",
+        "trailer frame",
+        "walkaround",
+        "hinge",
+        "shop"
+      ],
+      "stage": "done",
+      "subject": "hinged extension flap",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.6,
+          "shows": "perforated deck plate leading to the flap and hinge at the end, with the open frame to the left",
+          "stage": "done"
+        },
+        {
+          "from": 1.6,
+          "to": 5.6,
+          "shows": "camera pans around the open frame and perforated plates, with the flap tilted up on its hinge",
+          "stage": "done"
+        },
+        {
+          "from": 5.6,
+          "to": 8.0,
+          "shows": "flap back down at the end of the deck, wide view",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "17830964|1793384353",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication13.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.83
+      },
+      "desc": "Walkaround of the trailer showing the raised ramp frames with a hydraulic cylinder, then a low view along the perforated deck toward the open bay door.",
+      "kw": [
+        "hydraulic cylinder",
+        "ramp frame",
+        "perforated deck",
+        "trailer",
+        "upright post",
+        "walkaround",
+        "pivot",
+        "bay door"
+      ],
+      "stage": "done",
+      "subject": "trailer ramp frames",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.0,
+          "shows": "close side view of an upright post with a row of holes and a pivot bracket at the deck frame",
+          "stage": "other"
+        },
+        {
+          "from": 3.0,
+          "to": 10.0,
+          "shows": "raised perforated ramp frames with a hydraulic cylinder alongside, a worker visible beyond",
+          "stage": "done"
+        },
+        {
+          "from": 10.0,
+          "to": 19.0,
+          "shows": "low view along the perforated deck plates toward the open bay door, hammer on the deck",
+          "stage": "done"
+        },
+        {
+          "from": 19.0,
+          "to": 23.8,
+          "shows": "side of the deck edge with an orange marker light and the perforated plate above",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "51877177|1793384371",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication2.mp4": {
+      "cats": [
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 1.0
+      },
+      "desc": "A welder with a helmet stands at a perforated steel bench and MIG-welds a perforated plate.",
+      "kw": [
+        "welding",
+        "mig",
+        "welding table",
+        "perforated plate",
+        "helmet",
+        "bench",
+        "fabrication"
+      ],
+      "stage": "weld",
+      "subject": "perforated plate",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.4,
+          "shows": "welder leaning over the bench, welding gun at the plate, wide shot with a Miller welder at the right",
+          "stage": "weld"
+        },
+        {
+          "from": 2.4,
+          "to": 4.6,
+          "shows": "welder stands up with the gun lowered and a hand on the plate, checking the work",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "10425816|1793384240",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication3.mp4": {
+      "cats": [
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 0.81
+      },
+      "desc": "Close shots of a welder in a helmet MIG-welding a bar along the edge of a perforated plate on the table, with bright arc and sparks.",
+      "kw": [
+        "welding",
+        "mig",
+        "arc",
+        "sparks",
+        "perforated plate",
+        "bar",
+        "welding table",
+        "helmet"
+      ],
+      "stage": "weld",
+      "subject": "perforated plate",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.5,
+          "shows": "welder bent over the plate on the table before striking an arc, pliers lying on the plate",
+          "stage": "fit"
+        },
+        {
+          "from": 3.5,
+          "to": 20.8,
+          "shows": "bright arc and sparks as a bar is welded along the plate edge, with a wider view of the whole table",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "45190184|1793384255",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication4.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      },
+      "desc": "Four short pipe sections welded onto flat plate strips, with fresh weld beads, lying on a perforated bench.",
+      "kw": [
+        "hinge barrels",
+        "pipe",
+        "weld beads",
+        "plate strips",
+        "bench",
+        "fabricated parts",
+        "tubes",
+        "welded"
+      ],
+      "stage": "weld",
+      "subject": "hinge barrels",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 8.4,
+          "shows": "close-up of four pipe sections welded to flat plate strips with fresh, even weld beads, angled views from several sides, welding helmet and tools on the bench",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "18478270|1793384264",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication5.mp4": {
+      "cats": [
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.43
+      },
+      "desc": "A worker kneels on the trailer frame next to a perforated plate flap and welds its hinge pipe in place.",
+      "kw": [
+        "hinge",
+        "welding",
+        "perforated plate",
+        "trailer frame",
+        "fitting",
+        "helmet",
+        "crouching",
+        "extension"
+      ],
+      "stage": "weld",
+      "subject": "extension flap hinge",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.7,
+          "shows": "worker crouched on the trailer frame by a tilted perforated plate, close view of boot and cable, with a clamp on the frame",
+          "stage": "fit"
+        },
+        {
+          "from": 2.7,
+          "to": 4.5,
+          "shows": "blurred camera move over the perforated plate and hinge area, tools and cable on the frame",
+          "stage": "fit"
+        },
+        {
+          "from": 4.5,
+          "to": 7.1,
+          "shows": "welder in helmet working at the hinge pipe along the plate edge with smoke rising",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "15780127|1793384280",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication6.mp4": {
+      "cats": [
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 1.0
+      },
+      "desc": "Close shot of a welder with a bright arc welding the hinge of the perforated flap onto the trailer frame, with many sparks.",
+      "kw": [
+        "welding",
+        "arc",
+        "sparks",
+        "hinge",
+        "perforated plate",
+        "trailer",
+        "mig",
+        "helmet"
+      ],
+      "stage": "weld",
+      "subject": "extension flap hinge",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 6.8,
+          "shows": "welder crouched at the hinge edge of the perforated plate with a bright blue arc and flying sparks; the ground clamp and cable are visible and a chalk note is on the frame",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "15031141|1793384287",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication7.mp4": {
+      "cats": [
+        "wide",
+        "alu"
+      ],
+      "dull": [
+        [
+          0.0,
+          0.8
+        ],
+        [
+          1.8,
+          3.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.5,
+        "alu": 0.5
+      },
+      "desc": "Wide shot inside the shop of a worker crouched on top of a raised stepped ramp frame behind the perforated trailer deck.",
+      "kw": [
+        "ramp frame",
+        "trailer",
+        "deck",
+        "worker",
+        "shop",
+        "perforated deck",
+        "wide shot",
+        "stairs"
+      ],
+      "stage": "other",
+      "subject": "raised ramp frame",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 4.9,
+          "shows": "wide view of the perforated deck in the foreground and a worker crouched on the raised ramp frame beyond it, a green hose on the deck",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "10940269|1793384272",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication8.mp4": {
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          9.8,
+          13.8
+        ],
+        [
+          14.8,
+          16.8
+        ],
+        [
+          17.8,
+          18.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 1.0
+      },
+      "desc": "Wide static shot of a worker standing on a raised ramp frame who lifts and holds an upright perforated plate.",
+      "kw": [
+        "perforated plate",
+        "worker",
+        "ramp frame",
+        "lifting",
+        "trailer",
+        "wide shot",
+        "shop",
+        "fitting"
+      ],
+      "stage": "fit",
+      "subject": "perforated plate",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 20.4,
+          "shows": "worker standing on the raised ramp frame holding a perforated plate upright and shifting it, with the deck frame and a yellow fan in the foreground",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "44347970|1793384309",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
+    },
+    "rampextensionfabrication9.mp4": {
+      "cats": [
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.43,
+        "hyd": 0.29
+      },
+      "desc": "Close walkaround of a large perforated plate tilted up on its hinge at the trailer deck, showing the weld beads on its edges and the hinge pin.",
+      "kw": [
+        "hinge",
+        "hinge pin",
+        "perforated plate",
+        "weld beads",
+        "tilted",
+        "trailer",
+        "extension",
+        "edge"
+      ],
+      "stage": "fit",
+      "subject": "extension flap",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.0,
+          "shows": "close-up of the hinge pin and weld beads where the perforated plate meets the deck frame",
+          "stage": "fit"
+        },
+        {
+          "from": 1.0,
+          "to": 6.0,
+          "shows": "large perforated plate tilted up, seen from below with its edge weld beads, shop floor beneath",
+          "stage": "fit"
+        },
+        {
+          "from": 6.0,
+          "to": 7.5,
+          "shows": "back at the hinge pin and the plate edge against the deck",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "16709268|1793384319",
+      "desc_note": "after: Fabricated and installed ramp extensions on the trailer to increase loading length and improve equipment access. Extensions were measured, cut, welded, and secured to ensure proper fit, alignment, and structural support. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793385670,
+      "desc_v": 2
     }
   },
   "stories": {
     "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order.",
     "rampwidening": "A loading ramp that was too narrow for the tires was widened by fitting square-tube side extensions, which were then welded on, as the shop describes it. Judged by the visible condition, the order looks like: ramp with chalk width marks (clips 1-2), extension on with fresh weld heat marks (clips 3-5), then grey and black finished-looking ramp (clips 6-7).",
-    "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve."
+    "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve.",
+    "rampextensionfabrication": "The shop cut flat-bar and plate pieces and welded hinge barrels onto perforated plates on a bench. They then fitted and welded the hinged extension flap onto the end of the trailer deck, and the clips end with walkarounds of the finished flap and deck. The clip numbers are taken as the work order, 1 to 13."
   }
 }
