@@ -140,10 +140,12 @@ if not names:
 lines, total = [], 0.0
 for n in names:
     rec = C[n]
-    try: secs = usable_seconds(n, rec)
-    except Exception: secs = 0.0
-    total += secs
-    lines.append(f"  {n} ({secs:.0f}s usable):")
+    # not `secs`: that is the length asked for, and reusing the name here silently replaced it with the
+    # last clip's usable seconds — a 45 s request came out as a 21 s script
+    try: u = usable_seconds(n, rec)
+    except Exception: u = 0.0
+    total += u
+    lines.append(f"  {n} ({u:.0f}s usable):")
     for s in rec["segments"]:
         lines.append(f"      {s['from']:.1f}-{s['to']:.1f}s [{s.get('stage','other')}] {s['shows']}")
 
@@ -229,13 +231,15 @@ bad = [(k, n) for k, n in blocks(txt) if not lo <= n <= hi]
 if bad: print("still off after two tries: " + ", ".join(f"{k} {n}" for k, n in bad) + " — edit by hand")
 
 os.makedirs(os.path.dirname(outp), exist_ok=True)
+new_txt = txt
 if os.path.exists(outp):
     old = open(outp, encoding="utf-8").read().rstrip()
     txt = old + "\n\n" + txt
     print(f"appending to the existing {os.path.basename(outp)}")
 open(outp, "w", encoding="utf-8").write(txt)
 
-print("\n" + txt)
+# only what was just written: the file may already hold earlier scripts of the day
+print("\n" + new_txt)
 print(f"written to {outp}")
-for k, n in blocks(txt):
+for k, n in blocks(new_txt):
     print(f"  {k}: {n} words, voice-over goes to voiceover\\{k}.mp3")
