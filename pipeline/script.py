@@ -47,6 +47,10 @@ RULES = """Each script:
   process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never explain
   a colour ("turned orange from the heat"): discoloured steel is usually just rust.
 - Do not enlarge the work: if a description says one end or a section, never say "the whole ramp".
+- Never name a material, grade or finish (stainless, aluminum, chrome, galvanized, heavy-duty, a steel grade)
+  unless the shop's note names it: shiny steel on camera is not "stainless".
+- The shop's note defines WHAT the job was. Tell every repair it lists, and do not shrink the story to the
+  one part the footage shows best, nor add repairs it does not list.
 - Name the shop, "Car Hauler Repair Houston", once: in the opening lines or in the closing line.
 - [HOOK 2] is a question that pulls the viewer into the NEXT step of the work ("So how do you make it hold?"),
   not a general remark about the result.
