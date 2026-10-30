@@ -382,6 +382,100 @@
      null
     ]
    ]
+  },
+  "rampwide": {
+   "title": "RAMP WIDENING",
+   "sub": "WIDER FOR THE TIRES",
+   "track": "Thunder",
+   "text": "Ramp too narrow for the tires? This one was. We marked the new width in chalk. Then we cut and fabricated extensions from one and a half by two and a half inch square tubing and fitted them along the ramp sides. Ever seen a ramp get wider? We welded them on, right in the shop. Now the ramp is wider, with fresh welds along the new tubing and a clean edge. Bring it by the shop.",
+   "hook": 42,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "rampwidening1.mp4",
+     5.25,
+     1.0,
+     null
+    ],
+    [
+     6,
+     "rampwidening4.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     9,
+     "rampwidening1.mp4",
+     1.75,
+     1.0,
+     null
+    ],
+    [
+     16,
+     "rampwidening2.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     26,
+     "rampwidening2.mp4",
+     5.25,
+     1.0,
+     null
+    ],
+    [
+     35,
+     "rampwidening1.mp4",
+     12.5,
+     1.0,
+     null
+    ],
+    [
+     42,
+     "rampwidening5.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     48,
+     "rampwidening3.mp4",
+     4.25,
+     1.0,
+     null
+    ],
+    [
+     56,
+     "rampwidening7.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     61,
+     "rampwidening3.mp4",
+     8.75,
+     1.0,
+     null
+    ],
+    [
+     68,
+     "rampwidening6.mp4",
+     4.0,
+     1.0,
+     null
+    ],
+    [
+     72,
+     "rampwidening7.mp4",
+     2.25,
+     1.0,
+     null
+    ]
+   ]
   }
  }
 }
