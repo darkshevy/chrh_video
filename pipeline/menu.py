@@ -9,7 +9,7 @@
 # It does nothing on its own: every action is one of the scripts you would have typed, run exactly as it is,
 # with the output printed live. Two small things it keeps for itself, both in work\: published.json (which
 # videos have gone out) and current.json (the project you are in the middle of).
-import os, sys, json, glob, datetime, subprocess
+import os, sys, json, glob, time, datetime, subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -61,8 +61,9 @@ def wide_ok():
 
 WIDE = wide_ok()
 G = {"tl": "┌", "tr": "┐", "bl": "└", "br": "┘", "h": "─", "v": "│",
-     "dot": "·", "arrow": "▸", "dash": "—"} if WIDE else \
-    {"tl": "+", "tr": "+", "bl": "+", "br": "+", "h": "-", "v": "|", "dot": ".", "arrow": ">", "dash": "-"}
+     "dot": "·", "arrow": "▸", "dash": "—", "done": "✓", "now": "◉", "todo": "○"} if WIDE else \
+    {"tl": "+", "tr": "+", "bl": "+", "br": "+", "h": "-", "v": "|", "dot": ".", "arrow": ">", "dash": "-",
+     "done": "v", "now": "*", "todo": "o"}
 
 BLOCK = [
     " ██████╗██╗  ██╗██████╗ ██╗  ██╗",
@@ -159,15 +160,14 @@ def project_of(name):
 
 
 def projects():
-    """Every project in the library: clips, how many are described, whether its gate is lifted."""
+    """Every project in the library: clips, and how many of the enabled ones are described."""
     clips = jload(LIB, {}).get("clips", {})
     out = {}
     for n, r in clips.items():
-        g = out.setdefault(project_of(n), {"clips": 0, "on": 0, "described": 0, "loose": 0})
+        g = out.setdefault(project_of(n), {"clips": 0, "on": 0, "described": 0})
         g["clips"] += 1
         g["on"] += bool(r.get("enabled"))
         g["described"] += bool(r.get("enabled") and r.get("segments"))
-        g["loose"] += bool(r.get("sharp") or r.get("motion"))
     return out
 
 
@@ -191,6 +191,49 @@ def banner_lines():
     return out
 
 
+def progress(st):
+    """[(label, done)] for the four steps of the current project, plus a hint for the step that is next.
+
+    Everything is read from disk on each redraw, so the bar stays right after a crash, a restart or a file
+    edited by hand. Step 4 leaves nothing reliable in the output folder (the contact sheet's name is chrh.py's
+    business), so step_check stamps the time it ran per key; a build newer than that stamp reopens the step."""
+    cur = st["cur"]
+    prefix = cur.get("prefix", "")
+    g = projects().get(prefix) if prefix else None
+    s1 = bool(g and g["on"] and g["described"] >= g["on"])
+    script = cur.get("script", "")
+    keys = [k for k in cur.get("keys", []) if script and k in keys_of(script)]
+    s2 = bool(keys)
+    d = finish.outdir()
+    outs = {k: sum(finish.outputs(k, d), []) for k in keys}
+    s3 = s2 and all(outs[k] for k in keys)
+    checked = cur.get("checked", {})
+    s4 = s3 and all(checked.get(k, 0) >= max(os.path.getmtime(p) for p in outs[k]) for k in keys)
+    steps = [("ОПИСАТЬ", s1), ("СКРИПТ", s2), ("СОБРАТЬ", s3), ("ПРОВЕРИТЬ", s4)]
+
+    if not prefix: hint = "проект не выбран — начни с шага 1"
+    elif not s1: hint = f"{prefix}: описано {g['described'] if g else 0} из {g['on'] if g else 0} клипов"
+    elif not s2: hint = f"{prefix}: клипы описаны, скрипта ещё нет"
+    elif not s3:
+        vo = [k for k in keys if os.path.exists(autoplan.vo_path(k))]
+        hint = f"{', '.join(keys)}: " + ("озвучка есть, ролик не собран" if vo else "нет озвучки и ролика")
+    elif not s4: hint = f"{', '.join(keys)}: собран, контакт-лист ещё не смотрели"
+    else: hint = f"{', '.join(keys)}: готов к публикации"
+    return steps, hint
+
+
+def progress_lines(st):
+    steps, hint = progress(st)
+    now = next((i for i, (_, ok) in enumerate(steps) if not ok), None)
+    parts = []
+    for i, (name, ok) in enumerate(steps):
+        if ok: parts.append(f"{C.GR}{i + 1} {name} {G['done']}{C.OFF}")
+        elif i == now: parts.append(f"{C.YE}{C.B}{C.INV} {i + 1} {name} {G['now']} {C.OFF}")
+        else: parts.append(f"{C.GY}{i + 1} {name} {G['todo']}{C.OFF}")
+    link = f" {C.GY}{G['h'] * 3}{C.OFF} "
+    return ["", "  " + link.join(parts), f"  {C.GY}{hint}{C.OFF}"]
+
+
 def board_lines(st):
     d = finish.outdir()
     shown = [k for k in st["keys"] if not st["only"] or k in st["only"]]
@@ -199,23 +242,22 @@ def board_lines(st):
         head += f"   {C.CY}проект: {st['cur']['prefix']}{C.OFF}"
     out = ["", head, C.GY + "  " + G["h"] * W + C.OFF,
            f"  {C.GY}{'КЛЮЧ':15s}{'ОЗВУЧКА':10s}{'СОБРАНО':31s}СТАТУС{C.OFF}"]
-    voiced = built = ready = 0
+    voiced = built = 0
     for i, k in enumerate(shown):
         vo = os.path.exists(autoplan.vo_path(k))
         plain, blurred = finish.outputs(k, d)
-        voiced += bool(vo); built += bool(plain); ready += bool(blurred)
+        # blur is off by default, so the plain render is the finished video; a blurred copy, if any, is newer
+        newest = sorted(plain + blurred, key=os.path.getmtime, reverse=True)
+        voiced += bool(vo); built += bool(newest)
         if i < 9:
-            name = (C.WH + os.path.basename(plain[0])[:30] + C.OFF) if plain else (C.GY + G["dash"] + C.OFF)
-            if blurred: stt = f"{C.GR}{C.B}ГОТОВ{C.OFF}"
-            elif plain: stt = f"{C.YE}без блюра{C.OFF}"
-            else: stt = f"{C.GY}{G['dash']}{C.OFF}"
+            name = (C.WH + os.path.basename(newest[0])[:30] + C.OFF) if newest else (C.GY + G["dash"] + C.OFF)
+            stt = f"{C.GR}{C.B}ГОТОВ{C.OFF}" if newest else f"{C.GY}{G['dash']}{C.OFF}"
             ok = (C.GR + "есть" + C.OFF) if vo else (C.GY + "нет" + C.OFF)
             out.append(f"  {C.WH}{k:15s}{C.OFF}{ok.ljust(10 + len(C.GR + C.OFF))}"
                        f"{name.ljust(31 + len(C.WH + C.OFF))}{stt}")
     if len(shown) > 9: out.append(f"  {C.GY}... и ещё {len(shown) - 9}{C.OFF}")
     out.append(C.GY + "  " + G["h"] * W + C.OFF)
-    out.append(f"  {C.GY}озвучено {voiced} из {len(shown)}  {G['dot']}  собрано {built}{C.OFF}" +
-               (f"   {C.GR}{C.B}{ready} готово{C.OFF}" if ready else ""))
+    out.append(f"  {C.GY}озвучено {voiced} из {len(shown)}  {G['dot']}  собрано {built}{C.OFF}")
     return out
 
 
@@ -229,7 +271,7 @@ ITEMS = [
         "Пишет закадровый текст по тому, что снято. Длину задаёшь в секундах.",
         "Сам подставит проект из шага 1 и выберет этот файл скриптов дальше."], "script.py"),
     ("make", "3", "Озвучить и собрать ролик", [
-        "Озвучка, подбор кадров под слова, рендер, блюр лиц. Минут десять.",
+        "Озвучка, подбор кадров под слова, рендер. Минут десять.",
         "В конце пишет, какой файл публиковать."], "voice.py + plan_ai.py"),
     ("check", "4", "Посмотреть, что получилось", [
         "Контакт-лист: сетка кадров из ролика. И открывает папку с результатом.",
@@ -239,21 +281,21 @@ ITEMS = [
         "Записывает mp3 по скриптам и останавливается. Ролик не собирает.",
         "Если mp3 уже есть, он остаётся — перезаписать можно шагом 3."], "voice.py"),
     ("render", "M", "Только собрать (озвучка уже есть)", [
-        "Подбор кадров, рендер и блюр по готовым mp3. В ElevenLabs не ходит.",
-        "Для пересборки после правки клипов или порога качества."], "plan_ai.py"),
+        "Подбор кадров и рендер по готовым mp3. В ElevenLabs не ходит.",
+        "Для пересборки после правки клипов или текста."], "plan_ai.py"),
     ("dry", "D", "Показать раскладку кадров, не собирая", [
         "Какой кусок какого клипа встанет под какие слова, и почему. Без рендера.",
         "Проверить монтаж, прежде чем тратить минуты на ffmpeg."], "plan_ai.py --dry"),
-    ("blur", "B", "Заблюрить лица ещё раз", [
-        "Шаг 3 блюрит сам. Это на случай, если в таблице стоит «без блюра».",
-        "Ничего не выкладываем с узнаваемым лицом — правило цеха."], "finish.py"),
+    ("blur", "B", "Заблюрить лица вручную", [
+        "Сборка лица не блюрит: детектор ловил ржавчину и болты. Если в кадр",
+        "попал человек — прогони этим пунктом. Узнаваемых лиц не выкладываем."], "finish.py"),
     ("~", "", "МАТЕРИАЛЫ", "", ""),
     ("library", "5", "Что есть в библиотеке", [
         "Проекты: сколько клипов и сколько из них видит планировщик.",
         "Ноль в «описано» — проект для сборки пока не существует."], ""),
     ("diag", "6", "Проверить качество клипов проекта", [
         "Резкость, тряска и разрешение по каждому клипу.",
-        "Нули в PASS@700 почти везде — материал мягкий, сборка выйдет мутной."], "diag.py"),
+        "PASS@700 — справочно: отбора по нему нет, сборка просто берёт что чётче."], "diag.py"),
     ("describe", "7", "Описать клипы, которые ещё не описаны", [
         "Догоняет всё, что лежит в библиотеке с прошлых раз без описания.",
         "Нужно для общих роликов про сервис, где кадры берутся со всей библиотеки."], "describe.py"),
@@ -264,10 +306,6 @@ ITEMS = [
     ("only", "K", lambda st: "Собирать: " + (", ".join(st["only"]) if st["only"] else "все ролики файла"), [
         "Ограничивает шаги 3 и 4 одним ключом: пересборка не тронет остальные.",
         "Пустой ответ возвращает весь файл."], ""),
-    ("gate", "T", lambda st: "Порог качества: " + (
-        f"снят у {', '.join(st['loose'])}" if st["loose"] else "включён везде"), [
-        "Обычно включён: мягкие и трясущиеся секунды в кадр не попадают.",
-        "Снимать только для материала, который нельзя переснять."], "tune.py"),
     ("openout", "O", "Открыть папку с результатом", ["Открывает output\\ в проводнике.", ""], ""),
     ("clean", "C", lambda st: f"Очистить work\\ ({human(st['work'])})", [
         "Удаляет промежуточное видео — именно оно съедает диск. Спросит сначала.",
@@ -310,6 +348,7 @@ def help_lines(sel):
 def draw(st, sel):
     body = banner_lines()
     body += [f"  {C.RE}! {w}{C.OFF}" for w in st["warn"]]
+    body += progress_lines(st)
     body += board_lines(st)
     body += menu_lines(sel, st)
     body += help_lines(sel)
@@ -393,6 +432,8 @@ def step_look(st):
     code = run("describe.py", prefix, "--note", note, pause=False)
     if code != 0: hold(); return
     cur = jload(CURRENT, {})
+    if cur.get("prefix") != prefix:          # another project: its script and video are not ours
+        for k in ("keys", "script"): cur.pop(k, None)
     cur["prefix"] = prefix
     cur.setdefault("notes", {})[prefix] = note
     jsave(CURRENT, cur)
@@ -421,6 +462,7 @@ def step_write(st):
     st["path"], st["keys"] = out, keys_of(out)
     st["only"] = new                                  # step 3 builds exactly what was just written
     cur["prefix"], cur["seconds"] = prefix, secs
+    if new: cur["script"], cur["keys"] = out, new    # the progress bar follows these through steps 3 and 4
     jsave(CURRENT, cur)
     print(f"\n  {C.GR}скрипт в scripts\\{os.path.basename(out)}" +
           (f", ключ: {', '.join(new)}" if new else "") + f"{C.OFF}")
@@ -452,7 +494,10 @@ def step_check(st):
     built = [k for k in (st["only"] or st["keys"]) if finish.outputs(k, d)[0]]
     if not built:
         print(f"\n  {C.YE}собранных роликов пока нет{C.OFF}"); hold(); return
-    run("chrh.py", "sheet", *built, pause=False)
+    if run("chrh.py", "sheet", *built, pause=False) == 0:
+        cur = jload(CURRENT, {})
+        cur.setdefault("checked", {}).update({k: time.time() for k in built})
+        jsave(CURRENT, cur)
     try:
         if os.name == "nt": os.startfile(d)
         else: subprocess.call(["xdg-open", d])
@@ -469,29 +514,14 @@ def show_library(st):
     total = sum(g["clips"] for g in P.values())
     print(f"\n  {C.WH}{C.B}{total} клип(ов), {len(P)} проект(ов){C.OFF}")
     print(C.GY + "  " + G["h"] * W + C.OFF)
-    print(f"  {C.GY}{'ПРОЕКТ':26s}{'КЛИПОВ':9s}{'В РАБОТЕ':11s}{'ОПИСАНО':10s}ПОРОГ{C.OFF}")
+    print(f"  {C.GY}{'ПРОЕКТ':26s}{'КЛИПОВ':9s}{'В РАБОТЕ':11s}ОПИСАНО{C.OFF}")
     for n, g in sorted(P.items(), key=lambda kv: -kv[1]["clips"]):
         col = C.GR if g["described"] >= g["on"] and g["on"] else (C.YE if g["described"] else C.GY)
-        print(f"  {C.WH}{n[:25]:26s}{C.OFF}{g['clips']:<9d}{g['on']:<11d}{col}{g['described']:<10d}{C.OFF}"
-              f"{(C.YE + 'снят' + C.OFF) if g['loose'] else C.GY + 'обычный' + C.OFF}")
+        print(f"  {C.WH}{n[:25]:26s}{C.OFF}{g['clips']:<9d}{g['on']:<11d}{col}{g['described']}{C.OFF}")
     print(C.GY + "  " + G["h"] * W + C.OFF)
     nd = sum(g["on"] - g["described"] for g in P.values())
-    if nd: print(f"  {C.YE}{nd} клип(ов) без описания — планировщик их не видит (шаг 8){C.OFF}")
+    if nd: print(f"  {C.YE}{nd} клип(ов) без описания — планировщик их не видит (пункт 7){C.OFF}")
     hold()
-
-
-def set_gate(st):
-    P = projects()
-    rows = [(n, f"{C.WH}{n:24s}{C.OFF}" +
-             (f"{C.YE}порог снят{C.OFF}" if g["loose"] else f"{C.GY}обычный порог{C.OFF}"))
-            for n, g in sorted(P.items())]
-    p = choose("у какого проекта менять порог качества?", rows)
-    if not p: return
-    on = not P[p]["loose"]
-    m = ask(f"\n  {C.WH}[с]нять порог или [в]ернуть обычный "
-            f"[{'с' if on else 'в'}] : {C.OFF}", "с" if on else "в").lower()
-    if m.startswith(("с", "f")): run("tune.py", "free", p)
-    elif m.startswith(("в", "g")): run("tune.py", "gate", p)
 
 
 def pick_file(st):
@@ -551,7 +581,6 @@ def act(ident, st):
         rows = [(n, f"{C.WH}{n}{C.OFF}   {g['clips']} клип(ов)") for n, g in sorted(projects().items())]
         p = choose("какой проект проверить?", rows)
         if p: run("diag.py", p)
-    elif ident == "gate": set_gate(st)
     elif ident == "dry": run("plan_ai.py", st["path"], *st["only"], "--dry")
     elif ident == "blur": run("finish.py", st["path"], *st["only"])
     elif ident == "openout":
@@ -586,14 +615,13 @@ if not os.environ.get("ELEVENLABS_API_KEY", "").strip():
     warn.append("ELEVENLABS_API_KEY не задан — озвучки не будет")
 
 st = {"path": path, "keys": keys_of(path), "only": [], "warn": warn,
-      "work": work_size(), "cur": jload(CURRENT, {}), "loose": []}
+      "work": work_size(), "cur": jload(CURRENT, {})}
 sel, live = 0, True
 if COLOUR: sys.stdout.write("\033[2J")
 
 try:
     while live:
         st["cur"] = jload(CURRENT, {})
-        st["loose"] = [n for n, g in projects().items() if g["loose"]]
         draw(st, sel)
         keys_on()
         k = getkey()
