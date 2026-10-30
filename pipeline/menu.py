@@ -275,6 +275,9 @@ ITEMS = [
      "отбора по нему нет, сборка просто берёт что чётче.", "diag.py"),
     ("describe", "7", "Описать остальные", "Догоняет всё, что лежит в библиотеке с прошлых раз без описания. "
      "Нужно для общих роликов про сервис, где кадры берутся со всей библиотеки.", "describe.py"),
+    ("boss", "T", lambda st: f"Тексты шефа ({len(glob.glob(os.path.join(BOSS_DIR, '*.txt')))})", "Сохранить текст, "
+     "который прислал шеф: откроется Блокнот, вставь текст, сохрани и закрой. Скрипты берут эти тексты как "
+     "образец тона и знания цеха — почему ломаются детали. [S] отправляет их в облако.", "scripts\\boss\\"),
     ("~", "", "НАСТРОЙКИ", "", ""),
     ("pick", "F", lambda st: f"Файл: {os.path.basename(st['path'])}", "Какой файл со скриптами сейчас "
      "в работе. Шаг 2 ставит его сам. Менять руками нужно, только если вернулся к старой партии.", ""),
@@ -783,6 +786,38 @@ def wiz_act(ident, st):
 
 
 BACKUP = ["pipeline/library.json", "scripts"]
+BOSS_DIR = os.path.join(ROOT, "scripts", "boss")
+
+
+def add_boss_text(st):
+    """A new file in scripts\\boss\\ for one of the owner's texts, opened in Notepad. script.py reads the folder
+    every time, so a text saved here shapes every script after it."""
+    have = sorted(glob.glob(os.path.join(BOSS_DIR, "*.txt")), reverse=True)
+    if have:
+        print(f"\n  {C.GY}уже сохранено {len(have)}:{C.OFF}")
+        for p in have[:8]: print(f"   {C.GY}{os.path.basename(p)}{C.OFF}")
+    name = ask(f"\n  {C.WH}о чём текст, пара слов латиницей (например telescopic post), пусто — отмена : {C.OFF}")
+    slug = "_".join(re.findall(r"[a-z0-9]+", name.lower()))[:40]
+    if not slug:
+        if name: print(f"  {C.YE}нужны латинские буквы{C.OFF}"); hold()
+        return
+    os.makedirs(BOSS_DIR, exist_ok=True)
+    path = os.path.join(BOSS_DIR, f"{datetime.date.today():%Y-%m-%d}_{slug}.txt")
+    if not os.path.exists(path): open(path, "w", encoding="utf-8").close()
+    print(f"  {C.GY}открываю Блокнот: вставь текст шефа, сохрани (Ctrl+S) и закрой окно{C.OFF}")
+    try:
+        if os.name == "nt": subprocess.call(["notepad", path])        # waits until Notepad is closed
+        else: print(f"  {path}"); input(f"  {C.GY}вставь текст в этот файл и нажми Enter{C.OFF}")
+    except Exception as e:
+        print(f"  {C.RE}не открылось: {e}{C.OFF}\n  {path}")
+    try: size = len(open(path, encoding="utf-8-sig").read().strip())
+    except Exception: size = 0
+    if size:
+        print(f"  {C.GR}сохранено: scripts\\boss\\{os.path.basename(path)} ({size} знаков). "
+              f"Не забудь [S], чтобы отправить в облако.{C.OFF}")
+    else:
+        os.remove(path); print(f"  {C.YE}файл пустой — не сохранял{C.OFF}")
+    hold()
 
 
 def git(*a, quiet=True):
@@ -868,6 +903,7 @@ def act(ident, st):
     elif ident == "only": set_only(st)
     elif ident == "clean": cleanup(st)
     elif ident == "backup": backup(st)
+    elif ident == "boss": add_boss_text(st)
     return True
 
 

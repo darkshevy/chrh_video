@@ -63,6 +63,10 @@ RULES = """Each script:
   "perfectly smooth") that neither the shop's note nor the footage descriptions state.
 - Sound different from the recent scripts listed below: a different opening pattern, a different hook
   question, a different call to action.
+- The OWNER'S TEXTS below are how the shop talks about its work. Match their voice: confident, plain,
+  practical, about the customer's risk and the fix. Their general technical points (why a part fails, what a
+  correct fit looks like) are verified and may be used to explain why the repair matters. What was done on
+  THIS trailer still comes only from this job's note. Never copy a whole sentence from them.
 
 Output format, exactly this and nothing else, one block per script:
 
@@ -153,6 +157,22 @@ def recent_scripts(n=8):
     return out[:n]
 
 
+BOSS_DIR = os.path.join(ROOT, "scripts", "boss")
+
+
+def boss_texts(limit=9000):
+    """The owner's own texts from scripts\\boss\\, newest first, up to `limit` characters. The API keeps no memory
+    between calls; this folder is the memory: his tone, and what he knows about why parts fail."""
+    out, total = [], 0
+    for p in sorted(glob.glob(os.path.join(BOSS_DIR, "*.txt")), key=lambda p: (os.path.basename(p), os.path.getmtime(p)),
+                    reverse=True):
+        try: t = open(p, encoding="utf-8-sig").read().strip()     # Notepad may add a BOM
+        except Exception: continue
+        if not t or total + len(t) > limit: continue
+        out.append((os.path.splitext(os.path.basename(p))[0], t)); total += len(t)
+    return out
+
+
 def opt(name, default=""):
     if name in sys.argv:
         i = sys.argv.index(name)
@@ -233,7 +253,10 @@ else:
                        "Follow this order of stages, but take the facts of the repair only from the shop's note.")
 
 RECENT = recent_scripts()
+BOSS = boss_texts()
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
+           ("\n\nOWNER'S TEXTS (verified, written by the shop owner):\n" +
+            "\n\n".join(f"[{n}]\n{t}" for n, t in BOSS) if BOSS else "") +
            ("\n\nRECENT SCRIPTS — do not reuse their opening pattern, hook question or call to action:\n" +
             "\n".join(f"  - {x}" for x in RECENT) if RECENT else "") +
            "\n\nKEYS ALREADY USED (do not reuse): " + ", ".join(used_keys()) +
@@ -251,6 +274,7 @@ if count == 1:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage -> {fit} words, about {fit / WPS:.0f}s ({why})")
 else:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage")
+print(f"owner's texts: {len(BOSS)}" + (f" ({', '.join(n for n, _ in BOSS)})" if BOSS else " — add them with [T] in the menu"))
 
 
 def blocks(t):
