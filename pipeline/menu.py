@@ -620,7 +620,10 @@ def step_check(st):
     built = [k for k in (st["only"] or st["keys"]) if finish.outputs(k, d)[0]]
     if not built:
         print(f"\n  {C.YE}собранных роликов пока нет{C.OFF}"); hold(); return
-    if run("chrh.py", "sheet", *built, pause=False) == 0:
+    # chrh.py sheet takes video FILES, not keys: given "rampwiden" it looked for a file of that name, failed,
+    # and step 4 was never stamped — the project stayed open forever. Pass the newest render of each key.
+    videos = [sorted(sum(finish.outputs(k, d), []), key=os.path.getmtime)[-1] for k in built]
+    if run("chrh.py", "sheet", *videos, pause=False) == 0:
         cur = jload(CURRENT, {})
         cur.setdefault("checked", {}).update({k: time.time() for k in built})
         st["cur"] = cur
