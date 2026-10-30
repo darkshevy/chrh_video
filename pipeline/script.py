@@ -37,35 +37,18 @@ RULES = """Each script:
 - one paragraph, natural spoken English, short sentences, no line breaks inside it.
 - First sentence is a hook: the customer's problem, or a question.
 - Around the middle, a second hook sentence (a question works best) with the marker [HOOK 2] right before it.
-- The viewer should LEARN something: what is wrong with this part, why it is dangerous or costly, how to spot it
-  on their own trailer — then what was done about it, as the footage shows it. A viewer who understood the
-  problem remembers who explained it; that is what brings them in. Talk like a mechanic explaining it at the
-  bay, not like an ad.
-- Shape: the problem and why it matters -> what the shop did, in the order it happened -> result -> a short
-  call to action tied to the problem ("hear the deck creak? get it checked").
-- Balance: the explanation of the problem is at most the first two or three sentences. The middle of the
-  script is the work itself, step by step, one step per sentence, in the order of the stages below — the
-  picture is cut to those sentences, so a script that only explains leaves the editor nothing to show.
-- No self-praise: no "specialists", "experts", "professional", "best", "top quality", "toughest jobs",
-  "trust us", "we make sure". The shop's name once is enough; the explanation is the selling point.
+- Shape: problem -> what the shop did, in the order it happened -> result -> a short call to action.
 - A different call to action in every script. The phone number is on screen: say "call the number on screen"
   or "bring it by the shop", never read digits.
 - NO DIGITS ANYWHERE. Write numbers as words: "six-month", "seventeen and three sixteenths", "two thousand one".
 - Never invent prices, measurements, causes, specs or promises. Use only the facts given below and what the
   footage descriptions actually show.
-- The shop's note is the ONLY source of facts about the repair: which parts, what was wrong with them, what
-  was done, how, with what. The footage descriptions are a camera model's guesses — they tell you what is on
-  screen and in what order, nothing more. Never take a part name, a defect, a colour, a tool, a material or a
-  step from them ("latch hook bent", "built on the bench", "red clevis plate", "pinned the cylinder" were all
-  guesses that the boss rejected). If the note is short, the script is general about the work and fills the
-  rest with the verified facts about the shop — never with details from the footage.
-- Name a process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never
-  explain a colour ("turned orange from the heat"): discoloured steel is usually just rust.
+- What the shop said about the job outranks the footage descriptions: those are a camera's guesses. Name a
+  process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never explain
+  a colour ("turned orange from the heat"): discoloured steel is usually just rust.
 - Do not enlarge the work: if a description says one end or a section, never say "the whole ramp".
 - Never name a material, grade or finish (stainless, aluminum, chrome, galvanized, heavy-duty, a steel grade)
   unless the shop's note names it: shiny steel on camera is not "stainless".
-- The shop's note defines WHAT the job was. Tell every repair it lists, and do not shrink the story to the
-  one part the footage shows best, nor add repairs it does not list.
 - Name the shop, "Car Hauler Repair Houston", once: in the opening lines or in the closing line.
 - [HOOK 2] is a question that pulls the viewer into the NEXT step of the work ("So how do you make it hold?"),
   not a general remark about the result.
@@ -73,9 +56,6 @@ RULES = """Each script:
   "perfectly smooth") that neither the shop's note nor the footage descriptions state.
 - Sound different from the recent scripts listed below: a different opening pattern, a different hook
   question, a different call to action.
-- The OWNER'S TEXTS below are the shop's technical knowledge: why parts fail, what a correct fit looks like,
-  what goes wrong if it is ignored. Those points are verified — use them to explain the problem. Do NOT copy
-  their advertising tone or their slogans. What was done on THIS trailer still comes only from this job's note.
 
 Output format, exactly this and nothing else, one block per script:
 
@@ -166,22 +146,6 @@ def recent_scripts(n=8):
     return out[:n]
 
 
-BOSS_DIR = os.path.join(ROOT, "scripts", "boss")
-
-
-def boss_texts(limit=9000):
-    """The owner's own texts from scripts\\boss\\, newest first, up to `limit` characters. The API keeps no memory
-    between calls; this folder is the memory: his tone, and what he knows about why parts fail."""
-    out, total = [], 0
-    for p in sorted(glob.glob(os.path.join(BOSS_DIR, "*.txt")), key=lambda p: (os.path.basename(p), os.path.getmtime(p)),
-                    reverse=True):
-        try: t = open(p, encoding="utf-8-sig").read().strip()     # Notepad may add a BOM
-        except Exception: continue
-        if not t or total + len(t) > limit: continue
-        out.append((os.path.splitext(os.path.basename(p))[0], t)); total += len(t)
-    return out
-
-
 def opt(name, default=""):
     if name in sys.argv:
         i = sys.argv.index(name)
@@ -251,7 +215,7 @@ if count > 1:
             f"the shop does and let the footage illustrate it. Aim for 115 to 125 words each.")
 else:
     task = (f"Write ONE script telling the story of this single job, in the order the work actually happened, "
-            f"with every fact about the repair taken from the shop's note. Write about {fit} words, which is roughly "
+            f"using only what the footage shows. Write about {fit} words, which is roughly "
             f"{fit / WPS:.0f} seconds read aloud" +
             (f" — the length asked for." if fit >= want else
              f". That is shorter than the {secs:.0f} seconds asked for, because the material only holds "
@@ -259,13 +223,11 @@ else:
             " Do not pad it to reach the count: say the job and stop. Every sentence must earn its place.")
     if note: task += f"\n\nWhat the shop said about this job: {note}"
     if story: task += (f"\n\nHow the job went, judged from all the footage side by side: {story}\n"
-                       "Follow this order of stages, but take the facts of the repair only from the shop's note.")
+                       "Follow this order. Every sentence about the work must be something a segment below "
+                       "shows — if no segment shows it, leave it out.")
 
 RECENT = recent_scripts()
-BOSS = boss_texts()
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
-           ("\n\nOWNER'S TEXTS (verified, written by the shop owner):\n" +
-            "\n\n".join(f"[{n}]\n{t}" for n, t in BOSS) if BOSS else "") +
            ("\n\nRECENT SCRIPTS — do not reuse their opening pattern, hook question or call to action:\n" +
             "\n".join(f"  - {x}" for x in RECENT) if RECENT else "") +
            "\n\nKEYS ALREADY USED (do not reuse): " + ", ".join(used_keys()) +
@@ -283,7 +245,6 @@ if count == 1:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage -> {fit} words, about {fit / WPS:.0f}s ({why})")
 else:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage")
-print(f"owner's texts: {len(BOSS)}" + (f" ({', '.join(n for n, _ in BOSS)})" if BOSS else " — add them with [T] in the menu"))
 
 
 def blocks(t):
@@ -315,11 +276,6 @@ _recent_ends = {sentences(x)[-1] for x in RECENT[:2] if sentences(x)}
 _recent_starts = {" ".join(sentences(x)[:2]) for x in RECENT if sentences(x)}
 
 
-# Advertising words the owner's texts are full of and the viewers tune out; a script with them goes back.
-BRAG = ["specialists?", "experts?", "professionals?", "professional", "the best", "top quality", "top-notch",
-        "toughest", "trust us", "trust the", "we make sure", "second to none", "unmatched", "world-class"]
-
-
 def problems(t):
     out = []
     for k, body in block_texts(t):
@@ -327,8 +283,6 @@ def problems(t):
         if not lo <= n <= hi: out.append(f"{k}: {n} words, must be between {lo} and {hi}")
         if "car hauler repair houston" not in low: out.append(f"{k}: the shop name Car Hauler Repair Houston is missing")
         if re.search(r"\d", body.replace("[HOOK 2]", "")): out.append(f"{k}: contains digits, write numbers as words")
-        brag = [w for w in BRAG if re.search(r"\b" + w + r"\b", low)]
-        if brag: out.append(f"{k}: self-praise ({', '.join(brag)}) — explain the problem instead")
         if count == 1 and "[HOOK 2]" not in body: out.append(f"{k}: the [HOOK 2] marker is missing")
         if ss and ss[-1] in _recent_ends: out.append(f'{k}: the call to action "{ss[-1]}" is copied from a recent script')
         if len(ss) > 1 and " ".join(ss[:2]) in _recent_starts: out.append(f"{k}: the opening is copied from a recent script")
