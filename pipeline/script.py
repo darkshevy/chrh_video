@@ -47,6 +47,13 @@ RULES = """Each script:
   process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never explain
   a colour ("turned orange from the heat"): discoloured steel is usually just rust.
 - Do not enlarge the work: if a description says one end or a section, never say "the whole ramp".
+- Name the shop, "Car Hauler Repair Houston", once: in the opening lines or in the closing line.
+- [HOOK 2] is a question that pulls the viewer into the NEXT step of the work ("So how do you make it hold?"),
+  not a general remark about the result.
+- No key word more than twice. Write what is on screen; do not add guessed details ("a clean edge",
+  "perfectly smooth") that neither the shop's note nor the footage descriptions state.
+- Sound different from the recent scripts listed below: a different opening pattern, a different hook
+  question, a different call to action.
 
 Output format, exactly this and nothing else, one block per script:
 
@@ -194,7 +201,10 @@ else:
                        "Follow this order. Every sentence about the work must be something a segment below "
                        "shows — if no segment shows it, leave it out.")
 
+RECENT = recent_scripts()
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
+           ("\n\nRECENT SCRIPTS — do not reuse their opening pattern, hook question or call to action:\n" +
+            "\n".join(f"  - {x}" for x in RECENT) if RECENT else "") +
            "\n\nKEYS ALREADY USED (do not reuse): " + ", ".join(used_keys()) +
            (f"\n\nUse this music track: {track}" if track else "") +
            "\n\nFOOTAGE AVAILABLE, clip by clip:\n" + "\n".join(lines))
@@ -210,6 +220,29 @@ if count == 1:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage -> {fit} words, about {fit / WPS:.0f}s ({why})")
 else:
     print(f"{len(names)} clip(s), {total:.0f}s usable footage")
+
+
+def block_texts(t):
+    """-> [(key, text)] for every script in t."""
+    return [(m.group(1), re.sub(r"\s+", " ", m.group(2)).strip())     # keeps [HOOK 2], unlike clean_text
+            for m in re.finditer(r"^===\s*([A-Za-z][A-Za-z0-9_]*)[^\n]*\n(.+?)(?=\n===|\Z)", t, re.M | re.S)]
+
+
+def sentences(t):
+    return [x.strip().lower() for x in re.split(r"(?<=[.!?])\s+", t.replace("[HOOK 2]", "")) if x.strip()]
+
+
+def recent_scripts(n=8):
+    """The last n scripts written before, newest first — shown to the writer so a new one does not reuse the
+    same opening, hook and call to action (two scripts in a row had come back with "This one was." and
+    "Bring it by the shop." word for word)."""
+    out = []
+    for p in sorted(glob.glob(os.path.join(ROOT, "scripts", "topics_*.txt")), key=os.path.getmtime, reverse=True):
+        try: vids = autoplan.parse_batch(open(p, encoding="utf-8").read())
+        except Exception: continue
+        out += [v["text"] for v in reversed(vids) if v.get("text")]
+        if len(out) >= n: break
+    return out[:n]
 
 
 def blocks(t):
@@ -233,19 +266,37 @@ if not txt: sys.exit("the reply had no script block")
 
 # Length is not a detail here: words decide how many cuts there are, and cuts decide whether the footage has
 # to repeat itself. So check it and send it back rather than accepting whatever came out.
+# Checked in code and sent back rather than accepted: length (words decide how many cuts there are, and cuts
+# decide whether the footage has to repeat itself), and the rules a prompt alone kept losing.
+_recent_ends = {sentences(x)[-1] for x in RECENT if sentences(x)}
+_recent_starts = {" ".join(sentences(x)[:2]) for x in RECENT if sentences(x)}
+
+
+def problems(t):
+    out = []
+    for k, body in block_texts(t):
+        n, low, ss = len(body.replace("[HOOK 2]", " ").split()), body.lower(), sentences(body)
+        if not lo <= n <= hi: out.append(f"{k}: {n} words, must be between {lo} and {hi}")
+        if "car hauler repair houston" not in low: out.append(f"{k}: the shop name Car Hauler Repair Houston is missing")
+        if re.search(r"\d", body.replace("[HOOK 2]", "")): out.append(f"{k}: contains digits, write numbers as words")
+        if count == 1 and "[HOOK 2]" not in body: out.append(f"{k}: the [HOOK 2] marker is missing")
+        if ss and ss[-1] in _recent_ends: out.append(f'{k}: the call to action "{ss[-1]}" is copied from a recent script')
+        if len(ss) > 1 and " ".join(ss[:2]) in _recent_starts: out.append(f"{k}: the opening is copied from a recent script")
+    return out
+
+
 for attempt in range(2):
-    bad = [(k, n) for k, n in blocks(txt) if not lo <= n <= hi]
+    bad = problems(txt)
     if not bad: break
-    print("length off: " + ", ".join(f"{k} {n} words" for k, n in bad) + f" (want {lo}-{hi})")
+    print("needs another pass: " + "; ".join(bad))
     fix = (payload + "\n\nYOUR PREVIOUS ANSWER WAS:\n" + txt +
-           "\n\nThese scripts are the wrong length: " +
-           "; ".join(f"{k} came out at {n} words" for k, n in bad) +
-           f". Every script must be between {lo} and {hi} words. Rewrite ALL of them, same format, "
-           f"keeping what works and cutting or adding sentences to land in range. Count as you write.")
+           "\n\nIt breaks these rules:\n" + "\n".join(f"  - {b}" for b in bad) +
+           "\n\nRewrite ALL the scripts, same format, keeping what works and fixing exactly these points. "
+           "Count the words as you write.")
     again = clean(ask(system, fix, apikey))
     if again: txt = again
-bad = [(k, n) for k, n in blocks(txt) if not lo <= n <= hi]
-if bad: print("still off after two tries: " + ", ".join(f"{k} {n}" for k, n in bad) + " — edit by hand")
+bad = problems(txt)
+if bad: print("still off after two tries: " + "; ".join(bad) + " — edit by hand")
 
 os.makedirs(os.path.dirname(outp), exist_ok=True)
 new_txt = txt
