@@ -189,6 +189,18 @@ def pad(s, n):
     return s + " " * max(0, n - vlen(s))
 
 
+def clip(s, n):
+    """Cut s to n visible characters, keeping the colour codes intact. A line wider than its panel wraps in
+    the console and drags the rest of the screen down with it."""
+    if vlen(s) <= n: return s
+    out, seen, i = [], 0, 0
+    while i < len(s) and seen < n - 1:
+        m = _ANSI.match(s, i)
+        if m: out.append(m.group(0)); i = m.end(); continue
+        out.append(s[i]); seen += 1; i += 1
+    return "".join(out) + "…" + C.OFF
+
+
 def term_cols():
     try: return shutil.get_terminal_size((120, 40)).columns
     except Exception: return 120
@@ -345,8 +357,8 @@ def draw_a(st, sel):
         steps, hint = progress(st)
         i = first_open(steps)
         if i is not None:
-            right += ["", f"{C.YE}проект {st['cur'].get('prefix', '')} в работе: шаг {i + 1} "
-                          f"{steps[i][0]} {G['dot']} {hint}{C.OFF}",
+            right += ["", f"{C.YE}проект {st['cur'].get('prefix', '')} в работе: шаг {i + 1} {steps[i][0]}{C.OFF}",
+                      f"{C.GY}{hint}{C.OFF}",
                       f"{C.YE}{C.B}Tab{C.OFF}{C.YE} {G['dash']} вернуться к нему{C.OFF}"]
     left = left_lines(sel, st)
     foot = (f"{C.GY}стрелки {G['dash']} выбор  {G['dot']}  Enter {G['dash']} запустить  {G['dot']}  "
@@ -354,7 +366,7 @@ def draw_a(st, sel):
     n = max(len(left), len(right) + 2)
     right += [""] * (n - 2 - len(right)) + [C.GY + G["h"] * rw + C.OFF, foot]
     left += [""] * (n - len(left))
-    body = [pad(l, LW) + f"{C.GY}{G['v']}{C.OFF} " + r for l, r in zip(left, right)]
+    body = [pad(clip(l, LW), LW) + f"{C.GY}{G['v']}{C.OFF} " + clip(r, rw) for l, r in zip(left, right)]
     flush(body)
 
 
@@ -453,7 +465,7 @@ def draw_b(st, sel):
     body += ["", "  " + C.GY + G["h"] * (w - 2) + C.OFF,
              f"  {C.GY}стрелки {G['dash']} выбор  {G['dot']}  Tab {G['dash']} всё меню целиком  {G['dot']}  "
              f"Q {G['dash']} выход{C.OFF}"]
-    flush(body)
+    flush([clip(l, w + 2) for l in body])
 
 
 def flush(body):
