@@ -43,9 +43,14 @@ RULES = """Each script:
 - NO DIGITS ANYWHERE. Write numbers as words: "six-month", "seventeen and three sixteenths", "two thousand one".
 - Never invent prices, measurements, causes, specs or promises. Use only the facts given below and what the
   footage descriptions actually show.
-- What the shop said about the job outranks the footage descriptions: those are a camera's guesses. Name a
-  process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never explain
-  a colour ("turned orange from the heat"): discoloured steel is usually just rust.
+- The shop's note is the ONLY source of facts about the repair: which parts, what was wrong with them, what
+  was done, how, with what. The footage descriptions are a camera model's guesses — they tell you what is on
+  screen and in what order, nothing more. Never take a part name, a defect, a colour, a tool, a material or a
+  step from them ("latch hook bent", "built on the bench", "red clevis plate", "pinned the cylinder" were all
+  guesses that the boss rejected). If the note is short, the script is general about the work and fills the
+  rest with the verified facts about the shop — never with details from the footage.
+- Name a process (painting, priming, coating, heating, sandblasting) ONLY if the shop's note names it. Never
+  explain a colour ("turned orange from the heat"): discoloured steel is usually just rust.
 - Do not enlarge the work: if a description says one end or a section, never say "the whole ramp".
 - Never name a material, grade or finish (stainless, aluminum, chrome, galvanized, heavy-duty, a steel grade)
   unless the shop's note names it: shiny steel on camera is not "stainless".
@@ -217,7 +222,7 @@ if count > 1:
             f"the shop does and let the footage illustrate it. Aim for 115 to 125 words each.")
 else:
     task = (f"Write ONE script telling the story of this single job, in the order the work actually happened, "
-            f"using only what the footage shows. Write about {fit} words, which is roughly "
+            f"with every fact about the repair taken from the shop's note. Write about {fit} words, which is roughly "
             f"{fit / WPS:.0f} seconds read aloud" +
             (f" — the length asked for." if fit >= want else
              f". That is shorter than the {secs:.0f} seconds asked for, because the material only holds "
@@ -225,8 +230,7 @@ else:
             " Do not pad it to reach the count: say the job and stop. Every sentence must earn its place.")
     if note: task += f"\n\nWhat the shop said about this job: {note}"
     if story: task += (f"\n\nHow the job went, judged from all the footage side by side: {story}\n"
-                       "Follow this order. Every sentence about the work must be something a segment below "
-                       "shows — if no segment shows it, leave it out.")
+                       "Follow this order of stages, but take the facts of the repair only from the shop's note.")
 
 RECENT = recent_scripts()
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
