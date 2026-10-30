@@ -476,6 +476,100 @@
      null
     ]
    ]
+  },
+  "sleeveswap": {
+   "title": "SLEEVE REPLACED",
+   "sub": "NEW SLEEVE AND SPRING LOCK",
+   "track": "Thunder",
+   "text": "Sleeve rusty and the latch hook bent? This one was. We took off the damaged sleeve and spring lock assembly. That left a bare ground hole in the bracket. So what goes back in? We built a new tube on the bench and welded on a red clevis plate. We fitted it and pinned the cylinder. Then the coiled spring lock went back on the new sleeve. Fitted, aligned, locking. Car Hauler Repair Houston. Call the number on screen.",
+   "hook": 29,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "sleevereplacement1.mp4",
+     5.0,
+     1.0,
+     null
+    ],
+    [
+     7,
+     "sleevereplacement2.mp4",
+     7.25,
+     1.0,
+     null
+    ],
+    [
+     10,
+     "sleevereplacement4.mp4",
+     1.5,
+     1.0,
+     null
+    ],
+    [
+     20,
+     "sleevereplacement3.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     29,
+     "sleevereplacement6.mp4",
+     2.75,
+     1.0,
+     null
+    ],
+    [
+     34,
+     "sleevereplacement5.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     43,
+     "sleevereplacement5.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     49,
+     "sleevereplacement6.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     56,
+     "sleevereplacement7.mp4",
+     3.0,
+     1.0,
+     null
+    ],
+    [
+     67,
+     "sleevereplacement7.mp4",
+     6.75,
+     1.0,
+     null
+    ],
+    [
+     69,
+     "sleevereplacement7.mp4",
+     9.25,
+     1.0,
+     null
+    ],
+    [
+     74,
+     "sleevereplacement2.mp4",
+     0.0,
+     1.0,
+     null
+    ]
+   ]
   }
  }
 }
