@@ -37,7 +37,14 @@ RULES = """Each script:
 - one paragraph, natural spoken English, short sentences, no line breaks inside it.
 - First sentence is a hook: the customer's problem, or a question.
 - Around the middle, a second hook sentence (a question works best) with the marker [HOOK 2] right before it.
-- Shape: problem -> what the shop did, in the order it happened -> result -> a short call to action.
+- The viewer should LEARN something: what is wrong with this part, why it is dangerous or costly, how to spot it
+  on their own trailer — then what was done about it, as the footage shows it. A viewer who understood the
+  problem remembers who explained it; that is what brings them in. Talk like a mechanic explaining it at the
+  bay, not like an ad.
+- Shape: the problem and why it matters -> what the shop did, in the order it happened -> result -> a short
+  call to action tied to the problem ("hear the deck creak? get it checked").
+- No self-praise: no "specialists", "experts", "professional", "best", "top quality", "toughest jobs",
+  "trust us", "we make sure". The shop's name once is enough; the explanation is the selling point.
 - A different call to action in every script. The phone number is on screen: say "call the number on screen"
   or "bring it by the shop", never read digits.
 - NO DIGITS ANYWHERE. Write numbers as words: "six-month", "seventeen and three sixteenths", "two thousand one".
@@ -63,10 +70,9 @@ RULES = """Each script:
   "perfectly smooth") that neither the shop's note nor the footage descriptions state.
 - Sound different from the recent scripts listed below: a different opening pattern, a different hook
   question, a different call to action.
-- The OWNER'S TEXTS below are how the shop talks about its work. Match their voice: confident, plain,
-  practical, about the customer's risk and the fix. Their general technical points (why a part fails, what a
-  correct fit looks like) are verified and may be used to explain why the repair matters. What was done on
-  THIS trailer still comes only from this job's note. Never copy a whole sentence from them.
+- The OWNER'S TEXTS below are the shop's technical knowledge: why parts fail, what a correct fit looks like,
+  what goes wrong if it is ignored. Those points are verified — use them to explain the problem. Do NOT copy
+  their advertising tone or their slogans. What was done on THIS trailer still comes only from this job's note.
 
 Output format, exactly this and nothing else, one block per script:
 
@@ -306,6 +312,11 @@ _recent_ends = {sentences(x)[-1] for x in RECENT[:2] if sentences(x)}
 _recent_starts = {" ".join(sentences(x)[:2]) for x in RECENT if sentences(x)}
 
 
+# Advertising words the owner's texts are full of and the viewers tune out; a script with them goes back.
+BRAG = ["specialists?", "experts?", "professionals?", "professional", "the best", "top quality", "top-notch",
+        "toughest", "trust us", "trust the", "we make sure", "second to none", "unmatched", "world-class"]
+
+
 def problems(t):
     out = []
     for k, body in block_texts(t):
@@ -313,6 +324,8 @@ def problems(t):
         if not lo <= n <= hi: out.append(f"{k}: {n} words, must be between {lo} and {hi}")
         if "car hauler repair houston" not in low: out.append(f"{k}: the shop name Car Hauler Repair Houston is missing")
         if re.search(r"\d", body.replace("[HOOK 2]", "")): out.append(f"{k}: contains digits, write numbers as words")
+        brag = [w for w in BRAG if re.search(r"\b" + w + r"\b", low)]
+        if brag: out.append(f"{k}: self-praise ({', '.join(brag)}) — explain the problem instead")
         if count == 1 and "[HOOK 2]" not in body: out.append(f"{k}: the [HOOK 2] marker is missing")
         if ss and ss[-1] in _recent_ends: out.append(f'{k}: the call to action "{ss[-1]}" is copied from a recent script')
         if len(ss) > 1 and " ".join(ss[:2]) in _recent_starts: out.append(f"{k}: the opening is copied from a recent script")
