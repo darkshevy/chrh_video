@@ -18,6 +18,9 @@ autoplan.refresh_footage()
 print("picker module file:", picker.__file__)
 print("has MAX_POOL (new picker):", hasattr(picker, "MAX_POOL"))
 print("has USE_TIERS (new picker):", hasattr(picker, "USE_TIERS"))
+print(f"quality gate in the picker: {'ON' if getattr(picker, 'GATE', True) else 'OFF'}")
+print("PASS@700 below is a reference figure only (sharpness 700, motion 35 handheld / 20 drone, raised for")
+print("sharp windows) - the picker no longer rejects seconds by it, it just prefers the sharper ones.")
 print()
 
 names = sorted(n for n in L["clips"] if n.lower().startswith(PREFIX)) if PREFIX else []
@@ -56,9 +59,12 @@ for n in names:
     sharps = [s for (_, _, s) in win]
     motions = [m for (_, m, _) in win]
     drone = picker.is_drone(n)
-    mlim = picker.motion_ceiling(n, 20 if drone else 35)
-    th = picker.sharp_floor(n, 700)
-    good = [picker.ok_window(m, s, th, mlim) for (_, m, s) in win]
+    # Measured against the original fixed thresholds, bypassing picker.GATE and the per-clip overrides:
+    # with the gate off ok_window() says yes to everything, and this report is the only place the real
+    # quality of the footage is visible. Nothing is selected by these numbers any more.
+    mlim = 20 if drone else 35
+    th = 700
+    good = [picker.passes_gate(m, s, th, mlim) for (_, m, s) in win]
     ok = sum(good)
     # The count alone hides the thing that actually decides a build: a cut needs one UNBROKEN stretch, so
     # twenty good seconds scattered in half-second islands carry no 3-second shot at all.
@@ -69,7 +75,7 @@ for n in names:
     line.append(f"dur={d:.1f}s win={len(win)}")
     line.append(f"sharp min/med/max={min(sharps):.0f}/{sorted(sharps)[len(sharps)//2]:.0f}/{max(sharps):.0f}")
     line.append(f"motion max={max(motions):.0f} (base limit {mlim})")
-    line.append(f"PASS={ok}/{len(win)} longest run={best_run:.1f}s")
+    line.append(f"PASS@700={ok}/{len(win)} longest run={best_run:.1f}s")
     print(" | ".join(line))
 
 print()

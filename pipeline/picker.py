@@ -1,7 +1,8 @@
 # Automatic shot picking for the phrases of a voice-over.
 # Every cut has a topic pool of clips (chosen from the words of the phrase). From the pool a window is taken where
-#   * every 1-second sub-window is sharp (sharp25 >= TH) and not shaky (motion <= 20 drone / 35 handheld, raised
-#     for sharp windows because a sharp move is a pan and vidstab fixes it — see motion_allowed),
+#   * (only while GATE is on) every 1-second sub-window is sharp (sharp25 >= TH) and not shaky (motion <= 20
+#     drone / 35 handheld, raised for sharp windows because a sharp move is a pan — see motion_allowed);
+#     with GATE off nothing is rejected for quality, the sharper window simply ranks higher,
 #   * nothing overlaps forbidden ranges (yesterday's videos, seconds already used in this video, dull seconds),
 #   * all else equal, clips that have been shown LEAST across all videos win, so new footage gets used.
 import json, os, subprocess, collections
@@ -95,10 +96,22 @@ def motion_allowed(mlim, sharp, th):
     return mlim * min(2.5, 1.0 + (sharp / th - 1.0) * 0.5)
 
 
+# The hard quality gate. Off: the footage is shot by the techs on their phones, and rejecting soft or shaky
+# seconds left whole projects with almost nothing — the script shrank to the minimum, shots were slowed to 0.7x
+# and the wrong picture landed under the words. Sharpness is now a preference in best() instead.
+# Set back to True to restore the old pass/fail rule everywhere (picker, plan_ai, script.py).
+GATE = False
+
+
+def passes_gate(m, s, th, mlim):
+    """The old pass/fail rule itself, independent of GATE — diag.py reports it as a reference figure."""
+    return s >= th and m <= motion_allowed(mlim, s, th)
+
+
 def ok_window(m, s, th, mlim):
     """Is this one-second window usable? The single rule — the picker and everything that reports 'usable
     seconds' both call it, so the numbers the planner is given match the shots it can actually get."""
-    return s >= th and m <= motion_allowed(mlim, s, th)
+    return passes_gate(m, s, th, mlim) if GATE else True
 
 def overlap(a, b, rngs, tol=0.1):
     return any(x < b - tol and y > a + tol for x, y in rngs)
@@ -140,14 +153,18 @@ def best(pool, need, forbid, soft_used, th=700, allow_slow=True, own_count=None)
                         # how many other videos already show these exact seconds
                         reused = sum(1 for x, y in soft_used.get(f, []) if x < t + src - 0.1 and y > t + 0.1)
                         # rank: variety inside this video > fresh seconds > full-bleed > real speed >
-                        #       least-used clip overall > topic fit > fewest reuses > sharpest
-                        cands.append(((oc, reused > 0, lb, sp != 1.0, uses, rank_in_pool, reused, -ms),
+                        #       sharpness in coarse 300-unit steps > least-used clip overall > topic fit >
+                        #       fewest reuses > sharpest.
+                        # The coarse step is what replaced the hard gate: a clearly sharper window wins, but
+                        # small differences don't override freshness and topic fit. Keep rank[7] == reused below.
+                        cands.append(((oc, reused > 0, lb, sp != 1.0, -int(ms / 300), uses, rank_in_pool,
+                                       reused, -ms),
                                       f, round(t, 2), sp, ms))
                 t += 0.25
     if not cands: return None
     cands.sort()
     rank, f, t, sp, ms = cands[0]
-    return f, t, sp, ms, rank[6]
+    return f, t, sp, ms, rank[7]
 
 MAXSHOT = 3.5   # boss 09-24: "something happens every 3-4 s" -> no shot longer than this (end card excluded)
 
