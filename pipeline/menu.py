@@ -109,7 +109,10 @@ def getkey():
         fd = sys.stdin.fileno()
         # os.read, not sys.stdin.read: the buffered reader would swallow the rest of an escape sequence into
         # its own buffer, select would see nothing pending, and every arrow would look like Esc.
-        ch = os.read(fd, 1).decode("utf-8", "ignore")
+        raw = os.read(fd, 1)
+        # a Cyrillic letter is two bytes in UTF-8: read the rest of it, or "д" arrives as nothing
+        if raw and raw[0] >= 0xC0: raw += os.read(fd, 1 if raw[0] < 0xE0 else 2 if raw[0] < 0xF0 else 3)
+        ch = raw.decode("utf-8", "ignore")
         if ch == "\x1b":
             nxt = os.read(fd, 2).decode("utf-8", "ignore") if select.select([fd], [], [], 0.05)[0] else ""
             return {"[A": "up", "[B": "down", "[D": "left", "[C": "right"}.get(nxt, "esc")
@@ -523,12 +526,40 @@ def choose(title, rows, allow_blank=True):
 ORDER_LINE = "The clips are numbered in the order the work was done."
 
 
+def yes_no(question, default=False):
+    """Two buttons, [ нет ] [ да ], picked with the arrows (or н/д, y/n) and Enter. Falls back to typing on a
+    console that cannot read single keys."""
+    val = default
+    print(f"\n  {C.WH}{question}{C.OFF}")
+    keys_on()
+    try:
+        while True:
+            btn = lambda on, t: (C.INV + C.B + f" {t} " + C.OFF) if on else (C.GY + f" {t} " + C.OFF)
+            sys.stdout.write(f"\r    {btn(not val, 'нет')}   {btn(val, 'да')}   "
+                             f"{C.GY}{G['larr']} {G['arrow']} выбор {G['dot']} Enter{C.OFF}\033[K")
+            sys.stdout.flush()
+            k = getkey()
+            if k is None:                       # no single-key input here: type it
+                keys_off()
+                a = ask(f"\n  {C.WH}да / нет [{'да' if default else 'нет'}] : {C.OFF}", "да" if default else "нет")
+                return a.lower().startswith(("д", "y", "l"))
+            if k in ("left", "right", "up", "down", "\t"): val = not val
+            elif k in ("д", "y", "l"): val = True; break
+            elif k in ("н", "n"): val = False; break
+            elif k == "enter": break
+            elif k == "esc": val = default; break
+    finally:
+        keys_off()
+    print()
+    return val
+
+
 def ask_order(note):
-    """Add the clip-order sentence to the note when he says the files are in work order. Of everything tried,
-    this one line did most to tell 'before' from 'after': the model stops guessing the order from colours."""
+    """Add the clip-order sentence to the note when the files are in work order. Of everything tried, this one
+    line did most to tell 'before' from 'after': the model stops guessing the order from colours. Off unless
+    said so — a wrong 'yes' would be worse than none."""
     if "numbered in the order" in note.lower(): return note
-    a = ask(f"  {C.WH}клипы пронумерованы по порядку работы (1 — начало, последний — готово)? [д/н, пусто — д] : {C.OFF}", "д")
-    if a.lower().startswith(("д", "y", "l")):     # "l" is "д" typed with the English layout on
+    if yes_no("клипы пронумерованы по порядку работы (1 — начало, последний — готово)?"):
         note = note.rstrip(" .") + ". " + ORDER_LINE
         print(f"  {C.GR}добавил: {ORDER_LINE}{C.OFF}")
     return note
