@@ -1,5 +1,5 @@
 @echo off
-rem One day's batch in one go: record the voice-overs, then plan, render and blur every video in the script file.
+rem One day's batch in one go: record the voice-overs, then plan and render every video in the script file.
 rem
 rem   day.bat                                  the newest scripts\topics_*.txt
 rem   day.bat scripts\topics_1103.txt          that file
@@ -39,7 +39,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo ----- plan, render, blur -----------------------------------------
+echo ----- plan and render ---------------------------------------------
 python pipeline\plan_ai.py "%SCRIPTS%" %2 %3 %4 %5
 if errorlevel 1 echo.& echo Some videos did not finish - see the list above.
 

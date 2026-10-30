@@ -1,9 +1,8 @@
 # Blur the faces on a finished video and say which file is the one to publish.
 #
 # Rule 7: nothing goes out with a recognisable face in it. Blurring is a second pass over the finished video,
-# not part of the render, so it has always been a separate command that was easy to forget. This file makes it
-# part of the build: plan_ai.py calls run() after every successful render, and this is also how to do it for
-# videos that were built earlier.
+# not part of the render. It is OFF in the build by default (the detector kept firing on rust and bolt heads);
+# plan_ai.py --blur runs it after the render, and the menu's [B] runs this file by hand when a person is in shot.
 #
 #   python pipeline\finish.py scripts\topics_1027.txt     every video in that file
 #   python pipeline\finish.py upperdeck rampwidth         these keys

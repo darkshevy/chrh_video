@@ -1,127 +1,210 @@
-# CHRH Video — automatic promo-video pipeline
+# CHRH Video — сборка промо-роликов
 
-Turns ready footage + a voice-over into finished vertical promo videos (9:16, 1080×1920, ~45 s) for
-Facebook / Instagram / TikTok / YouTube Shorts, in the Car Hauler Repair Houston style: word-by-word captions,
-phone number on screen, the boss's music, end card with the address. Ten videos a day is the intended rhythm.
+Автоматически собирает короткие вертикальные ролики (9:16, 1080×1920, ~45 с) для Facebook, Instagram, TikTok и
+YouTube Shorts из видео, снятого в цеху Car Hauler Repair Houston. На выходе готовый mp4: пословные субтитры,
+телефон сверху, музыка DJ KOZ LOVE, финальная карточка с адресом.
 
-- **Operators:** read `OPERATOR_GUIDE.md`. Everything is done in the desktop app `CHRH Video`.
-- **Writing the scripts:** `SCRIPT_PROMPT.md` — paste it into ChatGPT / Claude to get the day's 10 scripts.
-- **Programmer:** this file, then `docs/HOW_IT_WORKS.md` for the internals.
-- **AI coding agent (Codex / Claude Code):** `AGENTS.md` (project memory) and the skill in `.codex/skills/chrh-video/`.
+Никакого видеоредактора: Python + ffmpeg, а смотрит видео и пишет текст Claude через API.
 
 ---
 
-## 1. Quick start (Windows 10/11, nothing to install)
+## 1. Запуск
 
-1. Copy the whole `CarHaulerRepairHouston` folder to the PC (any drive; keep the folder together).
-2. Double-click **`CHRH Video.bat`** (or `app\CHRH Video\CHRH Video.exe`).
-3. In the app: *Open script file…* → pick `scripts\topics_0929.txt` → *Check*. All ten rows must say OK.
-4. Select one row → *Build selected*. After ~3 minutes `output\CHRH_<Key>_v2.mp4` appears. Double-click the row to play it.
+Двойной клик по **`chrh.bat`** в папке проекта. Откроется консольное меню.
 
-The `.exe` contains Python, ffmpeg, all models and libraries. It must stay inside the project folder: it finds
-`pipeline\`, `footage\`, `voiceover\` … by walking up from its own location.
+Перед первым запуском один раз задать ключи (Пуск → «Изменение системных переменных среды» → Переменные среды):
 
-## 2. Folder layout
-
-| Folder / file | What |
+| Переменная | Для чего |
 |---|---|
-| `app\CHRH Video\` | the built program (PyInstaller, ~670 MB incl. `bin\ffmpeg.exe`, `bin\ffprobe.exe`) |
-| `footage\` | all source clips, any subfolders. `footage\_contact\` = contact sheets (previews), safe to delete |
-| `music\` | the boss's tracks (DJ KOZ LOVE). Only the 7 instrumental ones are used |
-| `voiceover\` | voice-overs, one mp3 per video: `<key>.mp3` |
-| `scripts\` | scripts per day (`topics_*.txt`); `scripts\batches\<date>.json` = what was built |
-| `output\` | finished videos `CHRH_<Key>_vN.mp4` + contact sheet `.jpg` per video |
-| `pipeline\` | the source code, clip library, models (see §5) |
-| `work\` | temporary render files and caches — can grow to many GB; delete freely when nothing is building |
-| `docs\` | `HOW_IT_WORKS.md` (internals), `PROJECT_HISTORY.md` |
+| `ANTHROPIC_API_KEY` | Claude: описание клипов, скрипт, подбор кадров |
+| `ELEVENLABS_API_KEY` | озвучка |
 
-## 3. Daily workflow (summary)
+Ключи живут только в переменных окружения. **В файлы проекта их не писать никогда.**
 
-1. New footage → put it in `footage\` → app tab **Clip library** → **Refresh** (auto-tags new clips).
-2. Generate 10 scripts with `SCRIPT_PROMPT.md`, save as `scripts\topics_MMDD.txt`.
-3. Record voice-overs (ElevenLabs, voice "Alistair Kingsley"), save as `voiceover\<key>.mp3`.
-4. App → open the script file → **Check** → **Build all**. ~3–4 min per video.
-5. Review each video (contact sheet = right-click the row). Send to the boss.
-6. After approval: select the approved rows → **Blur faces** → `output\CHRH_<Key>_blur.mp4` is the version to post.
+Если ключ не задан, меню покажет красное предупреждение сверху.
 
-## 4. Running from source (for the programmer)
+---
 
-Requirements: Windows, Python 3.12, ffmpeg *full* build (needs libass + libvidstab).
+## 2. Меню
+
+У меню два экрана.
+
+### Экран A — общее меню (открывается при запуске)
+
+Слева список действий, справа таблица роликов текущего файла скриптов и подсказка «что это делает» к
+выбранному пункту. Управление: стрелки + Enter или сразу буква/цифра.
+
+| Клавиша | Действие |
+|---|---|
+| **1** | Описать клипы — начать новый проект (откроется экран B) |
+| **2** | Написать скрипт |
+| **3** | Озвучить и собрать |
+| **4** | Посмотреть результат (контакт-лист + папка) |
+| **V** | Только озвучить |
+| **M** | Только собрать (озвучка уже есть) |
+| **D** | Раскладка кадров без сборки — проверить монтаж, не тратя время на рендер |
+| **B** | Заблюрить лица вручную |
+| **5** | Библиотека: какие проекты есть и сколько клипов описано |
+| **6** | Качество клипов проекта: резкость и тряска (справочно) |
+| **7** | Описать остальные клипы библиотеки |
+| **F** | Выбрать файл скриптов |
+| **K** | Ограничить сборку одним роликом |
+| **O** | Открыть `output\` |
+| **C** | Очистить `work\` |
+| **S** | Сохранить в облако (бэкап, см. §5) |
+| **Q** | Выход |
+
+Если проект не доведён до конца, справа внизу написано, на каком он шаге, и **Tab** возвращает к нему.
+
+### Экран B — проект по шагам
+
+Открывается после [1]. Сверху полоса из четырёх шагов, текущий подсвечен:
+
+```
+  ●  ───────  ◉  ───────  ○  ───────  ○
+1 ОПИСАТЬ   2 СКРИПТ   3 СОБРАТЬ   4 ПРОВЕРИТЬ
+ готово     вы здесь
+```
+
+Ниже — проект, твоя строка о работе, что произойдёт на этом шаге, и только те действия, что имеют смысл
+сейчас. **Enter** — главное действие шага, **←** — показать предыдущий шаг, **Tab** — общее меню.
+
+Когда шаг 4 пройден, проект считается готовым и меню возвращается на экран A.
+
+---
+
+## 3. Как сделать ролик
+
+1. **Скинуть клипы в `footage\`.** Имена по проекту с номером: `springlock1.mp4`, `springlock2.mp4`…
+   Префикс до цифр (`springlock`) — это название проекта.
+2. **[1] Описать.** Выбрать проект из списка, написать пару слов о работе: что за трейлер, что делали и в каком
+   порядке. Например: «срезаем старый spring lock, варим новый, финал — пандус покрашен в серый».
+   Claude (Sonnet) смотрит **все клипы проекта одним запросом**, сравнивает одно и то же место «до» и «после» и
+   размечает каждый отрезок стадией: `damage` → `strip` → `fit` → `weld` → `finish` → `done`.
+   На экран выводятся две фразы — как шла работа. Проверь, что они верные.
+3. **[2] Скрипт.** Длина в секундах (по умолчанию 45). Текст пишется по ходу работы и только про то, что
+   реально снято. Если материала мало — скрипт выйдет короче и скажет об этом.
+   Прочитать скрипт можно кнопкой [E] на шаге 3 (откроет файл в Блокноте).
+4. **[3] Собрать.** Озвучка через ElevenLabs → Claude раскладывает отрезки клипов под слова → ffmpeg собирает.
+   Минут десять.
+5. **[4] Проверить.** Контакт-лист — сетка кадров с таймкодами — и папка с результатом.
+
+Готовый ролик: `output\CHRH_<Ключ>_vN.mp4`. Рядом лежит **`CHRH_<Ключ>_plan.txt`** — по каждому куску: что звучит,
+о какой стадии слова, какой отрезок взят. Если кадр не на месте — смотреть сюда.
+
+Если клипы описаны заново после того, как был написан скрипт, меню само вернёт на шаг 2: старый скрипт
+рассказывал историю по старым описаниям.
+
+---
+
+## 4. Как подбираются кадры
+
+1. Скрипт режется на куски по фразам, не длиннее 3.5 с.
+2. Claude для каждого куска сначала решает, **о какой стадии слова**, потом выбирает отрезок той же стадии.
+3. Код проверяет: отрезок `done` не может стоять под словами о поломке, и после того как история дошла до
+   результата, кадры «до» уже не возвращаются. Ошибки уходят модели на исправление, оставшиеся код исправляет
+   сам.
+4. Внутри отрезка выбирается конкретное окно: сначала нужный отрезок, потом он же, расширенный на 1.5 и 3 с,
+   потом другой отрезок **той же стадии**, и только потом что-то ещё. Замедление (0.8×, 0.7×) — только если
+   ничего не влезло на нормальной скорости.
+5. Отбраковки по качеству нет: материал снимают работники на телефон, и жёсткий порог оставлял без кадров.
+   Из доступных секунд просто берутся те, что чётче.
+6. Блюр лиц **выключен** — детектор ловил ржавчину и болты. Если в кадр попал человек — [B] вручную.
+
+---
+
+## 5. Бэкап — кнопка [S]
+
+Описания клипов стоили денег, а лежат только на этом компьютере. **[S] «Сохранить в облако»**:
+
+- отправляет в GitHub `pipeline\library.json` (библиотека с описаниями) и всё из `scripts\`;
+- заодно забирает обновления кода — отдельный `git pull` не нужен. Если код обновился, меню попросит
+  перезапустить `chrh.bat`;
+- видео и mp3 не отправляет — они слишком большие.
+
+Нажимать в конце дня или после описания нового проекта. При первом нажатии Windows может открыть окно входа в
+GitHub — войти один раз.
+
+---
+
+## 6. Папки
+
+| Папка | Что там |
+|---|---|
+| `footage\` | исходные клипы, можно в подпапках |
+| `voiceover\` | озвучка, `<ключ>.mp3` |
+| `scripts\` | скрипты по дням `topics_MMDD.txt`; `batches\` — что из них собрано |
+| `output\` | готовые ролики, контакт-листы, отчёты `_plan.txt` |
+| `music\` | треки DJ KOZ LOVE (используются только инструментальные) |
+| `work\` | временные файлы сборки и кэши |
+| `pipeline\` | код и библиотека клипов `library.json` |
+
+**`work\`** растёт от сборок. После каждой сборки старые версии того же ролика удаляются сами, остаётся последняя
+(нужна для ручного блюра). **[C]** — полная очистка промежуточного видео; кэши замеров и автотегов не трогает.
+После [C] ручной блюр уже собранного ролика потребует пересборки.
+
+---
+
+## 7. Код (`pipeline\`)
+
+**Наша часть:**
+
+| Файл | Что делает |
+|---|---|
+| `menu.py` | консольное меню, экраны A и B, состояние проекта в `work\current.json`, бэкап |
+| `describe.py` | Claude смотрит кадры и описывает клипы по отрезкам со стадиями. С префиксом проекта — весь проект одним запросом (Sonnet), без — по клипу (Haiku) |
+| `script.py` | Claude Sonnet пишет закадровый текст по описаниям и ходу работы |
+| `voice.py` | озвучка через ElevenLabs (`eleven_v4`) |
+| `plan_ai.py` | весь цикл сборки: скан, описание, план кадров со стадиями, рендер, отчёт `_plan.txt`, уборка `work\` |
+| `picker.py` | выбор конкретного окна в клипе; резкость — предпочтение, не фильтр (`GATE = False`) |
+| `finish.py` | блюр лиц для готового ролика |
+| `diag.py` | качество клипов проекта по старым порогам (справочно, отбора по ним нет) |
+| `tune.py`, `only.py` | ручные правки библиотеки: вкл/выкл клип, ограничить библиотеку одним проектом |
+
+**Часть Дэвида** (по возможности не трогать): `build.py` (рендер ffmpeg: кадрирование, стабилизация, цвет,
+субтитры, телефон, карточка, звук), `autoplan.py`, `align.py` (привязка слов к озвучке), `autotag.py`,
+`liveness.py`, `chrh.py`, `app.py` (старый оконный интерфейс).
+
+Без меню, из командной строки:
+
+```bat
+python pipeline\describe.py springlock --note "срезаем старый замок, варим новый"
+python pipeline\script.py --only springlock --seconds 45 --note "..."
+python pipeline\voice.py scripts\topics_1030.txt newlock
+python pipeline\plan_ai.py scripts\topics_1030.txt newlock --only springlock
+python pipeline\plan_ai.py scripts\topics_1030.txt newlock --dry      :: только раскладка
+python pipeline\plan_ai.py scripts\topics_1030.txt newlock --blur     :: с блюром лиц
+```
+
+`day.bat` — вся партия файла скриптов одной командой: озвучка, потом сборка.
+
+---
+
+## 8. Установка с нуля (Windows)
 
 ```bat
 winget install Gyan.FFmpeg
+winget install Git.Git
+git clone https://github.com/darkshevy/chrh_video.git C:\CarHaulerRepairHouston
+cd C:\CarHaulerRepairHouston
 python -m pip install --user -r pipeline\requirements.txt
-pythonw pipeline\app.py                 :: the GUI
-python pipeline\chrh.py status          :: the same engine from the command line
 ```
 
-Command line (`pipeline\chrh.py`):
+Клипы, музыку и озвучку в репозитории не хранят — их скопировать в `footage\`, `music\`, `voiceover\` отдельно.
 
-```
-status                       what is where: clips, batches, latest outputs
-scan                         auto-tag new clips in footage\
-check  SCRIPTS.txt           validate scripts + voice-over files (exit code 1 on errors)
-build  SCRIPTS.txt [keys..]  align -> pick shots -> render; forbids the previous batch's footage
-       --allow-repeat        allow reusing the previous batch's seconds
-sheet  VIDEO.mp4             contact sheet (24 frames with timecodes)
-blur   KEY [KEY..]           face blur for approved videos
-```
+Нужен ffmpeg в полной сборке (с libass и libvidstab) — `Gyan.FFmpeg` такой. Шрифты не нужны: субтитры Arial.
 
-**After changing any `pipeline\*.py`, rebuild the exe:** close the app, run `pipeline\rebuild_exe.bat`
-(needs `pyinstaller`, included in requirements). Data files (`library.json`, `align.json`, `extra_dict.txt`,
-`scripts\batches\*.json`) are read at runtime and do not need a rebuild.
+---
 
-Self-test of the exe without a window (results in `work\app.log`):
-```bat
-"app\CHRH Video\CHRH Video.exe" --selftest scripts\topics_0929.txt
-"app\CHRH Video\CHRH Video.exe" --run brakes scripts\topics_0929.txt
-```
+## 9. Ограничения
 
-## 5. Code map (`pipeline\`)
+- **ElevenLabs Starter** — 30 000 символов в месяц, это ~40 роликов. Для 10 в день нужен тариф выше.
+- **Описано пока мало клипов** (springlock, trailerrepair). Остальные ~119 планировщик не видит, пока их не
+  описать ([1] по проекту или [7] для всего сразу).
+- **Качество упирается в исходники.** Ролики из мессенджеров приходят 848×464 — лучше брать оригиналы с телефона.
+- Правила шефа (порядок пескоструй → серый → грунт → красный, покраска только в помещении, Cottrell раз в день,
+  без узнаваемых лиц и т. д.) — в `CLAUDE.md`.
 
-| File | Role |
-|---|---|
-| `app.py` | Tkinter GUI (Batch / Clip library / Log tabs), runs jobs in a worker thread |
-| `chrh.py` | command-line front end |
-| `autoplan.py` | parse script files, checks, register a batch, split text into phrases, pick shots, render driver |
-| `align.py` | forced alignment of the script to the voice-over with pocketsphinx → `align.json` (word start/end times) |
-| `autotag.py` | CLIP (ONNX) auto-tagging of clips: topics, dull seconds, outdoor painting, foreign edits with captions |
-| `liveness.py` | sharpness (Laplacian variance) and motion per second of a clip |
-| `picker.py` | chooses the best clip window for each phrase (variety, freshness, topic, sharpness) |
-| `build.py` | ffmpeg render: crop/letterbox, stabilisation, colour grade, ASS captions, phone bar, end card, logo, audio mix |
-| `faces.py` | face blur (YuNet) for approved videos |
-| `contact.py` | contact sheets |
-| `paths.py` | all folder paths; finds the project root (also from the exe) |
-| `library.json` | clip library: topics + keywords, one record per clip (enabled, topics, dull seconds, manual) |
-| `scripts.py`, `plan.py` | legacy hand-made videos (first weeks); new batches live in `scripts\batches\` |
-| `models\` | CLIP image model, YuNet face model, CLIP prompt embeddings |
-| `assets\` | Cottrell logo (vector + PNG) |
-| `beats\` | beat grids of the music tracks (music starts on a beat) |
-| `extra_dict.txt` | pronunciations for words the speech dictionary lacks |
-
-Legacy one-off planners (`replan_0923.py`, `replan_0924.py`, `plan_0923b.json`, `plan_0924.json`) are kept only so
-that old videos can be re-rendered; new work never needs them.
-
-## 6. Common maintenance
-
-| Task | Where |
-|---|---|
-| Phone number / address on screen | `PHONE`, `ADDRESS` in `pipeline\build.py` → rebuild exe |
-| Colour grade | `GRADE` in `pipeline\build.py` |
-| Caption font / sizes / positions | ASS styles in `make_ass()` in `pipeline\build.py` |
-| Cut more or less often | `MAXSHOT` in `pipeline\picker.py` (3.5 s) |
-| Sharpness / motion thresholds | `pipeline\liveness.py` |
-| New topic or keywords | `categories` in `pipeline\library.json` (no rebuild) |
-| Disable a clip or some seconds | app → Clip library, or `clips[<file>].enabled` / `.dull` in `library.json` |
-| Add a music track | mp3 into `music\`, add its name to `tracks` in `library.json`, beat grid: see `docs\HOW_IT_WORKS.md` |
-| Partner logo | `logos` in `library.json` (PNG with transparency in `pipeline\assets\`) |
-
-## 7. Known limits
-
-- The editor matches shots to **words**, not to meaning: it cannot know that a clip shows *brakes* unless a clip
-  tagged "running gear" exists. Topics with no matching footage get general shop shots. Film what the scripts talk about.
-- Auto-tagging gets the main topic right in about 5 of 6 clips — glance over new clips after **Refresh**.
-- Footage received through messengers is 848×464; it is shown letterboxed over a blurred copy. Original phone
-  files (full resolution) give much better results.
-- Voice-overs are made by hand in ElevenLabs; the voice must read exactly the script text.
-- The Cottrell logo is Cottrell's trademark — confirm the partnership agreement allows it in ads.
+Другие документы: `CLAUDE.md` — память проекта и правила шефа; `SCRIPT_PROMPT.md` — промпт для скриптов партии;
+`docs\HOW_IT_WORKS.md` — внутренности сборки Дэвида; `OPERATOR_GUIDE.md` — инструкция к старому оконному
+интерфейсу (англ.).
