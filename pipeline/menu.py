@@ -520,6 +520,20 @@ def choose(title, rows, allow_blank=True):
 
 
 # ------------------------------------------------------------------ the five steps
+ORDER_LINE = "The clips are numbered in the order the work was done."
+
+
+def ask_order(note):
+    """Add the clip-order sentence to the note when he says the files are in work order. Of everything tried,
+    this one line did most to tell 'before' from 'after': the model stops guessing the order from colours."""
+    if "numbered in the order" in note.lower(): return note
+    a = ask(f"  {C.WH}клипы пронумерованы по порядку работы (1 — начало, последний — готово)? [д/н, пусто — д] : {C.OFF}", "д")
+    if a.lower().startswith(("д", "y", "l")):     # "l" is "д" typed with the English layout on
+        note = note.rstrip(" .") + ". " + ORDER_LINE
+        print(f"  {C.GR}добавил: {ORDER_LINE}{C.OFF}")
+    return note
+
+
 def step_look(st):
     """Scan whatever is new, let him pick the project from a list, then describe it with the job in mind.
     True when a project was chosen and described: that starts the step-by-step screen."""
@@ -549,6 +563,7 @@ def step_look(st):
     note = ask(f"  {C.WH}: {C.OFF}", known)
     if not note:
         print(f"  {C.YE}без описания работы смысла мало — отменяю{C.OFF}"); hold(); return
+    note = ask_order(note)
 
     code = run("describe.py", prefix, "--note", note, pause=False)
     if code != 0: hold(); return
@@ -711,6 +726,7 @@ def wiz_act(ident, st):
         if note: print(f"\n  {C.GY}сейчас: {note}{C.OFF}")
         new = ask(f"\n  {C.WH}пара слов о работе (пусто — оставить) : {C.OFF}")
         if not new: return
+        new = ask_order(new)
         cur.setdefault("notes", {})[prefix] = new
         jsave(CURRENT, cur)
         # the descriptions were written with the old note; redoing them costs a call per clip, so ask
