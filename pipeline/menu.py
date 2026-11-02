@@ -266,9 +266,10 @@ ITEMS = [
      "Для пересборки после правки клипов или текста.", "plan_ai.py"),
     ("dry", "D", "Раскладка без сборки", "Какой кусок какого клипа встанет под какие слова, и почему. "
      "Без рендера — проверить монтаж, прежде чем тратить минуты на ffmpeg.", "plan_ai.py --dry"),
-    ("montage", "N", "Динамичный монтаж", "Ролик без звука и субтитров: кадры меняются каждые 2–3 секунды, "
-     "от повреждения к готовому. Claude сам расставляет отрезки и придумывает название. Сверху телефон, "
-     "в конце карточка с адресом. Нужны описанные клипы (шаг 1).", "montage.py"),
+    ("montage", "N", "Динамичный монтаж", "Ролик без звука и субтитров, кадры каждые 2–3 секунды от повреждения "
+     "к готовому. Выбираешь проект, вводишь описание работы от цеха, отвечаешь про порядок клипов — дальше "
+     "сам: опишет новые клипы, расставит кадры, придумает название. Сверху телефон, в конце адрес.",
+     "describe.py + montage.py"),
     ("blur", "B", "Заблюрить лица", "Сборка лица не блюрит: детектор ловил ржавчину и болты. Если в кадр "
      "попал человек — прогони этим пунктом. Узнаваемых лиц не выкладываем.", "finish.py"),
     ("~", "", "МАТЕРИАЛЫ", "", ""),
@@ -873,43 +874,46 @@ def backup(st):
 
 
 def step_montage(st):
-    """Silent 2-3 s montages of one or several described projects, built one after another. For each project:
-    are the clips in work order (asked here, the answer from step 1 offered first). Length asked once."""
+    """One silent 2-3 s montage, start to finish: new footage scanned, project chosen, the job described in a
+    few words (kept from last time on Enter), clips in work order or not, length. The project is (re)described
+    when its clips or the note changed — describe.py skips it otherwise — and then the montage is built."""
+    print(f"\n  {C.GY}смотрю, что нового в footage\\{C.OFF}")
+    code, out = run("chrh.py", "scan", quiet=True)
+    if code != 0:
+        print(out.strip()[-1500:]); print(f"  {C.RE}сканирование не прошло{C.OFF}"); hold(); return
     cur = jload(CURRENT, {})
-    clips = jload(LIB, {}).get("clips", {})
-    P = {n: g for n, g in projects().items() if g["described"]}
+    P = projects()
     if not P:
-        print(f"\n  {C.YE}описанных проектов нет — сначала шаг 1{C.OFF}"); hold(); return
-    names = sorted(P, key=lambda n: (n != cur.get("prefix"), n))
-    print(f"\n  {C.WH}{C.B}из каких проектов монтаж?{C.OFF}\n")
-    for i, n in enumerate(names, 1):
-        print(f"   {C.YE}{i:2d}{C.OFF}  {C.WH}{n:28s}{C.OFF}{P[n]['described']} описанных клип(ов)" +
-              (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else ""))
-    raw = ask(f"\n  {C.WH}номера через пробел (например 1 3 5), «все» — все, пусто — отмена : {C.OFF}").lower()
-    if not raw: return
-    if raw in ("все", "all", "*"): picked = names
-    else:
-        picked = [names[int(x) - 1] for x in re.findall(r"\d+", raw) if 1 <= int(x) <= len(names)]
-    picked = list(dict.fromkeys(picked))
-    if not picked:
-        print(f"  {C.YE}таких номеров нет{C.OFF}"); hold(); return
-    secs = ask(f"  {C.WH}длина каждого ролика в секундах [30] : {C.OFF}", "30")
+        print(f"\n  {C.YE}в footage\\ пусто{C.OFF}"); hold(); return
+    names = sorted(P, key=lambda n: (n != cur.get("prefix"), -P[n]["clips"]))
+    rows = [(n, f"{C.WH}{n:28s}{C.OFF}{P[n]['clips']:3d} клип(ов)   " +
+             (f"{C.GR}описан{C.OFF}" if P[n]["on"] and P[n]["described"] >= P[n]["on"]
+              else f"{C.YE}описано {P[n]['described']} из {P[n]['on']}{C.OFF}") +
+             (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else "")) for n in names]
+    prefix = choose("из какого проекта монтаж?", rows)
+    if not prefix: return
+
+    known = cur.get("notes", {}).get(prefix, "")
+    base = known.replace(" " + ORDER_LINE, "").replace(ORDER_LINE, "").strip()
+    print(f"\n  {C.GY}описание работы от цеха: что за трейлер, что сделали. Enter — оставить как есть.{C.OFF}")
+    if base: print(f"  {C.GY}сейчас: {base}{C.OFF}")
+    note = ask(f"  {C.WH}: {C.OFF}", base)
+    if not note:
+        print(f"  {C.YE}без описания работы Claude не поймёт, что было до и после — отменяю{C.OFF}"); hold(); return
+    ordered = yes_no("клипы пронумерованы по порядку работы (1 — начало, последний — готово)?",
+                     default=ORDER_LINE in known)
+    if ordered: note = note.rstrip(" .") + ". " + ORDER_LINE
+    secs = ask(f"  {C.WH}длина ролика в секундах [30] : {C.OFF}", "30")
     if not secs.replace(".", "", 1).isdigit():
         print(f"  {C.YE}нужно число{C.OFF}"); hold(); return
-    jobs = []
-    for n in picked:
-        said = any("numbered in the order" in r.get("desc_note", "").lower()
-                   for k, r in clips.items() if project_of(k) == n)
-        ordered = yes_no(f"{n}: клипы пронумерованы по порядку работы?", default=said)
-        jobs.append((n, ordered))
-    done, failed = [], []
-    for i, (n, ordered) in enumerate(jobs, 1):
-        print(f"\n  {C.CY}{C.B}── {i}/{len(jobs)}  {n} ──{C.OFF}")
-        code = run("montage.py", n, "--seconds", secs, "--ordered" if ordered else "--unordered", pause=False)
-        (done if code == 0 else failed).append(n)
-    print(f"\n  {C.GR}{C.B}готово {len(done)}{C.OFF}" + (f"   {C.RE}не вышло: {', '.join(failed)}{C.OFF}" if failed else ""))
-    print(f"  {C.GY}ролики в output\\ — CHRH_<Проект>_montage_vN.mp4, рядом контакт-листы{C.OFF}")
-    hold()
+
+    cur["prefix"] = prefix
+    cur.setdefault("notes", {})[prefix] = note
+    jsave(CURRENT, cur)
+    # describes only what is new or was described with another note; costs nothing for a known project
+    if run("describe.py", prefix, "--note", note, pause=False) != 0:
+        print(f"  {C.RE}описание не получилось — монтаж не собирал{C.OFF}"); hold(); return
+    run("montage.py", prefix, "--seconds", secs, "--ordered" if ordered else "--unordered")
 
 
 def act(ident, st):
