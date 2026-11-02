@@ -7,6 +7,10 @@
 #   python pipeline\montage.py springlock --dry           show the plan, render nothing
 #   --ordered / --unordered   the clips are / are not numbered in work order (overrides the note from step 1)
 #
+# Photos: put them in footage\ named like the clips, springlock5.jpg (JPG or PNG; an iPhone HEIC has to be
+# saved as JPG first). They are described once, planned like the video stretches and shown ~2 s with a slow
+# zoom; with the clips in work order their number places them in the job like a clip's.
+#
 # Claude (Sonnet) chooses which described stretch goes where: the order of the work, the most watchable
 # moments, no clip twice in a row. Code then checks what a prompt alone kept getting wrong — stage order and
 # repeats — and fixes what is left, picks the exact seconds inside each stretch (the sharpest, not the smeared
@@ -30,6 +34,8 @@ URL = "https://api.anthropic.com/v1/messages"
 FPS = build.FPS
 END = 4.0                         # end card, over the last shots
 SHOT_MIN, SHOT_MAX = 2.0, 3.0     # boss: something new on screen every 2-3 seconds
+PHOTO_EXT = (".jpg", ".jpeg", ".png", ".webp")
+PHOTO_DUR = 2.0                   # a still is on screen 1.5-2 s; longer and it reads as a frozen video
 LENGTH_SLACK = 2.0                # the video may run this much under the length asked for (30 -> 28-32 is fine)
 ORDER = {"damage": 0, "strip": 1, "fit": 2, "weld": 3, "finish": 4, "done": 5}
 CURRENT = os.path.join(os.path.dirname(HERE), "work", "current.json")
@@ -55,6 +61,10 @@ Rules, in order of importance:
 5. A segment can only carry a shot if its "longest run" is at least the shot's length.
 6. Give the stages room in proportion to how much good footage each has — do not spend half the video on the
    damage if most of the footage is the work.
+
+Segments marked PHOTO are still pictures, shown about two seconds with a slow zoom. Use a photo where it shows
+something the video does not — a sharp close-up of the damage, the finished part. Never two photos in a row,
+and at most one photo in every three shots.
 
 Also write the title shown at the start: "title" 2-4 words, max 22 characters, capitals, naming the repair
 (e.g. "SPRING LOCK REPAIR"); "sub" max 30 characters, capitals, the gist (e.g. "BROKEN LOCK OUT, NEW ONE IN").
@@ -98,6 +108,94 @@ def segments(C, names):
                         "stage": s.get("stage", "other"), "shows": s["shows"],
                         "usable": round(tot, 1), "longest": round(longest, 1)})
     return out, ordered
+
+
+def add_photos(cands, photos, L):
+    """Described photos as one-shot 'segments', placed among the clips by their number."""
+    num = lambda n: int(m.group(1)) if (m := re.search(r"(\d+)\.\w+$", n)) else 0
+    rec = L.get("photos", {})
+    k = 0
+    for n, path in photos.items():
+        d = rec.get(n)
+        if not d or not d.get("shows"): continue
+        k += 1
+        cands.append({"id": f"p{k}", "clip": n, "num": num(n), "a": 0.0, "b": PHOTO_DUR, "photo": True,
+                      "path": path, "stage": d.get("stage", "other"), "shows": d["shows"],
+                      "usable": PHOTO_DUR, "longest": PHOTO_DUR})
+    cands.sort(key=lambda c: (c["num"], c["clip"], c["a"]))
+    return cands
+
+
+def find_photos(prefix):
+    """name -> path of the project's photos anywhere under footage\\ (same naming as the clips)."""
+    from paths import FOOTAGE
+    out, heic = {}, []
+    for dp, _, fs in os.walk(FOOTAGE):
+        if "_contact" in dp: continue
+        for f in sorted(fs):
+            low = f.lower()
+            if not low.startswith(prefix): continue
+            if low.endswith(PHOTO_EXT): out.setdefault(f, os.path.join(dp, f))
+            elif low.endswith((".heic", ".heif")): heic.append(f)
+    if heic:
+        print(f"skipping {len(heic)} HEIC photo(s) ({', '.join(heic[:3])}…): save them as JPG to use them")
+    return out
+
+
+def _photo_b64(path, maxpx=768):
+    import cv2, base64
+    img = cv2.imread(path)           # applies the EXIF rotation a phone stores instead of turning the pixels
+    if img is None: return None
+    h, w = img.shape[:2]
+    s = maxpx / max(h, w)
+    if s < 1: img = cv2.resize(img, (int(w * s), int(h * s)), interpolation=cv2.INTER_AREA)
+    ok, buf = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 82])
+    return base64.b64encode(buf.tobytes()).decode() if ok else None
+
+
+def describe_photos(photos, L, key, note):
+    """One request for the project's new or changed photos: what is in each and which stage of the job.
+    Kept in library.json under "photos", keyed by file name, redone when the file or the note changes."""
+    rec = L.setdefault("photos", {})
+    sig = lambda p: f"{os.path.getsize(p)}|{int(os.path.getmtime(p))}"
+    todo = {n: p for n, p in photos.items()
+            if rec.get(n, {}).get("sig") != sig(p) or rec.get(n, {}).get("note", "") != note}
+    if not todo: return 0
+    content = []
+    for n, p in todo.items():
+        b = _photo_b64(p)
+        if not b: print(f"  {n}: cannot read, skipped"); continue
+        content += [{"type": "text", "text": f"PHOTO {n}"},
+                    {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b}}]
+    if not content: return 0
+    content.append({"type": "text", "text":
+        (f"WHAT THE SHOP SAYS THIS JOB IS: {note}\n\n" if note else "") +
+        "These photos are from ONE repair job on a car hauler trailer. For each, say in one short concrete "
+        "phrase what is visible (name the part, close-up or wide, damage or finished) and the stage: damage, "
+        "strip (cutting/grinding/removal), fit, weld, finish (paint/coating), done (the finished result) or "
+        "other. Describe what is visible, not its cause: orange on steel is rust unless you see heat.\n"
+        'Reply with JSON only: {"photos": {"<file name>": {"shows": "...", "stage": "..."}}}'})
+    print(f"describing {len(todo)} photo(s) with {MODEL}…")
+    body = json.dumps({"model": MODEL, "max_tokens": 4000,
+                       "messages": [{"role": "user", "content": content}]}).encode()
+    req = urllib.request.Request(URL, data=body, headers={
+        "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
+    with urllib.request.urlopen(req, timeout=300) as resp:
+        data = json.load(resp)
+    txt = "".join(p.get("text", "") for p in data.get("content", []))
+    a, b = txt.find("{"), txt.rfind("}")
+    got = (json.loads(txt[a:b + 1]) if a >= 0 else {}).get("photos", {})
+    n_ok = 0
+    for n, p in todo.items():
+        d = got.get(n) or next((v for k, v in got.items() if k.lower() == n.lower()), None)
+        if not isinstance(d, dict): continue
+        stage = str(d.get("stage", "other")).lower()
+        rec[n] = {"shows": str(d.get("shows", ""))[:200], "stage": stage if stage in ORDER else "other",
+                  "sig": sig(p), "note": note}
+        print(f"  {n}: [{rec[n]['stage']}] {rec[n]['shows']}")
+        n_ok += 1
+    autoplan.save_lib(L)
+    return n_ok
 
 
 def durations(total, seed):
@@ -190,10 +288,15 @@ def check(order, durs, ordered=False):
             if prev and prev["clip"] == c["clip"]: out.append((i, f"same clip as the shot before ({c['clip']})"))
         seen[c["id"]] += 1
         if seen[c["id"]] > 2: out.append((i, f"{c['id']} used a third time"))
-        # in clip order the lengths are handed out afterwards (fit_durations), so only a stretch too short for
-        # any shot counts here
-        need = min(durs) if ordered else durs[i]
-        if c["longest"] < need: out.append((i, f"{c['id']} longest run {c['longest']}s < shot {need:.1f}s"))
+        if c.get("photo"):
+            if prev and prev.get("photo"): out.append((i, "two photos in a row"))
+            if sum(1 for x in order[:i + 1] if x and x.get("photo")) > max(1, (i + 1) // 3):
+                out.append((i, "too many photos so far — at most one in three shots"))
+        # the lengths are handed out afterwards (fit_durations), so only a stretch too short for any shot counts
+        need = min(durs)
+        # 0.1 s of slack: the stretches are measured in half-second steps, the shots in frames; place() can
+        # borrow a second next to the stretch anyway
+        if c["longest"] + 0.1 < need: out.append((i, f"{c['id']} longest run {c['longest']}s < shot {need:.1f}s"))
     return out
 
 
@@ -210,7 +313,8 @@ def repair(order, durs, cands, ordered=False):
         if ordered:
             lo = okey(order[i - 1]) if i and order[i - 1] else (-1, "", 0)
             hi = next((okey(c) for c in order[i + 1:] if c), (10 ** 6, "", 0))
-            pool = [x for x in cands if lo <= okey(x) <= hi and x["longest"] >= min(durs) and used[x["id"]] < 2
+            pool = [x for x in cands if lo <= okey(x) <= hi and x["longest"] + 0.1 >= min(durs) and used[x["id"]] < 2
+                    and not x.get("photo")
                     and not (i and order[i - 1] and order[i - 1]["id"] == x["id"])]
             pool.sort(key=lambda x: (used[x["id"]], -x["longest"]))
             if not pool:     # nothing fits between the neighbours: keep the order, accept a shorter stretch
@@ -222,7 +326,7 @@ def repair(order, durs, cands, ordered=False):
             lo, hi = prev_r, max(prev_r, next_r)
             nb = {order[j]["clip"] for j in (i - 1, i + 1) if 0 <= j < len(order) and order[j]}
             pool = [x for x in cands if (rank(x) is None or lo <= rank(x) <= hi) and x["clip"] not in nb
-                    and x["longest"] >= durs[i] and used[x["id"]] < 2]
+                    and x["longest"] + 0.1 >= min(durs) and used[x["id"]] < 2 and not x.get("photo")]
             if not pool:
                 pool = [x for x in cands if x["clip"] not in nb and x["longest"] >= durs[i]] or cands
             dist = lambda x: abs((lo if rank(x) is None else rank(x)) - max(lo, 0))
@@ -246,7 +350,8 @@ def plan(prefix, cands, ordered, durs, note, key):
                 "clip to the last. Two shots in a row from one clip are fine when they show different moments."
                 if ordered else "") +
                "\n\nFOOTAGE SEGMENTS (in clip order):\n" +
-               "\n".join(f'  {c["id"]}  {c["clip"]} {c["a"]:.1f}-{c["b"]:.1f}s (longest run {c["longest"]}s) '
+               "\n".join((f'  {c["id"]}  {c["clip"]} PHOTO ' if c.get("photo") else
+                          f'  {c["id"]}  {c["clip"]} {c["a"]:.1f}-{c["b"]:.1f}s (longest run {c["longest"]}s) ') +
                          f'[{c["stage"]}]: {c["shows"]}' for c in cands))
     byid = {c["id"]: c for c in cands}
 
@@ -278,7 +383,7 @@ def plan(prefix, cands, ordered, durs, note, key):
         except Exception as e:
             print(f"no correction ({e}); fixing in code")
     order = repair(order, durs, cands, ordered)
-    if ordered: durs = fit_durations(order, durs)
+    durs = fit_durations(order, durs)     # longest shots to the longest stretches, a photo gets ~2 s
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
     return order, title, sub, durs
@@ -303,6 +408,8 @@ def place(order, durs, cands):
     own = collections.defaultdict(list)
     shots = []
     for i, (c, d) in enumerate(zip(order, durs)):
+        if c.get("photo"):
+            shots.append(dict(file=c["clip"], path=c["path"], tin=0.0, dur=d, seg=c, photo=True)); continue
         got, seg = window(c, d, own), c
         if got is None:
             nb = {order[j]["clip"] for j in (i - 1, i + 1) if 0 <= j < len(order)}
@@ -364,8 +471,33 @@ def make_ass(path, total, title, sub):
     open(path, "w", encoding="utf-8").write(ASS_HEAD + "\n".join(ev) + "\n")
 
 
+def render_photo(s, out):
+    """A still as a moving shot: a slow push-in (portrait) or the whole picture over a blurred copy of itself
+    (landscape), graded like the video. The photo goes through OpenCV first so the phone's EXIF rotation is
+    applied — ffmpeg reads the pixels as stored and would show a portrait photo lying on its side."""
+    import cv2
+    n = round(s["dur"] * FPS)
+    img = cv2.imread(s["path"])
+    if img is None: raise RuntimeError(f"cannot read {s['file']}")
+    tmp = out[:-4] + "_src.jpg"
+    cv2.imwrite(os.path.join(build.WORK, tmp), img, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+    h, w = img.shape[:2]
+    if w > h:
+        vf = build.fit_filters()
+    else:
+        # cover a slightly larger frame, then zoom in 6% over the shot, centred
+        vf = ["scale=1188:2112:flags=lanczos:force_original_aspect_ratio=increase,crop=1188:2112",
+              f"zoompan=z='1+0.06*on/{max(1, n - 1)}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps={FPS}"]
+    vf += [build.GRADE, "fps=30", "setpts=PTS-STARTPTS", "format=yuv420p"]
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{s['dur'] + 0.2:.3f}",
+                    "-i", tmp, "-an", "-vf", ",".join(vf), "-frames:v", str(n),
+                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", "-g", "30", out],
+                   check=True, cwd=build.WORK)
+
+
 def render_shot(s, out, trf):
     """One shot, 1080x1920, graded and stabilised like build.render, no audio."""
+    if s.get("photo"): return render_photo(s, out)
     f = s["file"]
     n = round(s["dur"] * FPS)
     vf = []
@@ -447,13 +579,19 @@ def main():
             describe.describe(missing, L, key, note=note)
         L = autoplan.apply_lib(); C = L["clips"]
 
+    photos = find_photos(prefix)
+    if photos:
+        try: describe_photos(photos, L, key, note)
+        except Exception as e: print(f"photos not described ({e}); building without them")
     cands, ordered = segments(C, names)
+    cands = add_photos(cands, photos, L)
     # asked again at montage time: the note from step 1 may say nothing, or the wrong thing
     if "--ordered" in sys.argv: ordered = True
     if "--unordered" in sys.argv: ordered = False
     if not cands: sys.exit("no usable stretches in these clips")
     durs = durations(seconds, prefix)
-    print(f"{prefix}: {len(names)} clip(s), {len(cands)} usable stretch(es), {len(durs)} shots for {seconds:.0f} s"
+    print(f"{prefix}: {len(names)} clip(s), {sum(1 for c in cands if c.get('photo'))} photo(s), "
+          f"{len(cands)} usable stretch(es), {len(durs)} shots for {seconds:.0f} s"
           + (" — clip numbers give the order" if ordered else ""))
 
     order, title, sub, durs = plan(prefix, cands, ordered, durs, note, key)
