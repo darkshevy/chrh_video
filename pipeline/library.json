@@ -5171,7 +5171,51 @@
       "manual": false,
       "share": {
         "grind": 0.58
-      }
+      },
+      "desc": "A worker grinds a steel piece at a perforated bench, then the camera pans over the trailer's frame, perforated deck plates and a second worker grinding.",
+      "kw": [
+        "grinding",
+        "prep",
+        "perforated decking",
+        "car hauler",
+        "workbench",
+        "deck plates",
+        "shop",
+        "angle grinder"
+      ],
+      "stage": "strip",
+      "subject": "decking plate prep",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.4,
+          "shows": "worker in a green shirt grinding a steel piece on a perforated metal bench, sparks flying, wide shot",
+          "stage": "strip"
+        },
+        {
+          "from": 3.4,
+          "to": 6.0,
+          "shows": "pan across the trailer frame with perforated deck plates laid on top and cross members below, blurry",
+          "stage": "fit"
+        },
+        {
+          "from": 6.0,
+          "to": 9.5,
+          "shows": "second worker in a blue shirt grinding beside the trailer, perforated plates in the foreground",
+          "stage": "strip"
+        },
+        {
+          "from": 9.5,
+          "to": 12.2,
+          "shows": "pan back along the trailer: perforated plates on the deck, a curved perforated plate on the side, yellow grinder and tape measure lying on the deck",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "26900063|1793635871",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation2.mp4": {
       "cats": [
@@ -5183,7 +5227,45 @@
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Close-up pan over perforated deck plates tacked and fitted on the trailer frame, with seams and tack welds visible.",
+      "kw": [
+        "decking",
+        "fit-up",
+        "tack welds",
+        "perforated plate",
+        "trailer deck",
+        "seam",
+        "wheel",
+        "car hauler"
+      ],
+      "stage": "fit",
+      "subject": "deck plates",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.4,
+          "shows": "perforated deck plates fitted over the frame near the wheels, tack welds along the seams, close-up",
+          "stage": "fit"
+        },
+        {
+          "from": 3.4,
+          "to": 7.0,
+          "shows": "side-edge decking strip running along the trailer, tacked at the seam, wide pan toward the welder area",
+          "stage": "fit"
+        },
+        {
+          "from": 7.0,
+          "to": 9.4,
+          "shows": "close-up of perforated plates and the seam between them, frame opening and gloves in the background",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "20784558|1793635887",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation3.mp4": {
       "cats": [
@@ -5195,7 +5277,33 @@
       "manual": false,
       "share": {
         "weld": 1.0
-      }
+      },
+      "desc": "A welder in a red helmet kneels on the deck and welds the perforated plates in place.",
+      "kw": [
+        "welding",
+        "mig",
+        "welder",
+        "helmet",
+        "deck plates",
+        "gas bottle",
+        "car hauler",
+        "sparks"
+      ],
+      "stage": "weld",
+      "subject": "deck plate welding",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 9.3,
+          "shows": "welder kneeling on the trailer deck welding the perforated plate seam, bright arc and sparks, gas bottle at left",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "20490599|1793635898",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation4.mp4": {
       "cats": [
@@ -5209,7 +5317,39 @@
       "share": {
         "close": 0.8,
         "hyd": 0.2
-      }
+      },
+      "desc": "A long run of perforated deck with tack-welded seams, a welder grinding at the far end and a welding lead and tools lying on the deck.",
+      "kw": [
+        "decking",
+        "grinding",
+        "seam",
+        "tack welds",
+        "welding lead",
+        "tape measure",
+        "square",
+        "deck"
+      ],
+      "stage": "fit",
+      "subject": "perforated deck",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.4,
+          "shows": "long perforated deck with a seam down the middle, welder in red helmet grinding at the far end, electrode holder on the deck",
+          "stage": "strip"
+        },
+        {
+          "from": 3.2,
+          "to": 4.8,
+          "shows": "wide shot again of the deck with the welder grinding at the far end and a square and tools lying on it",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "10570562|1793635878",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation5.mp4": {
       "cats": [
@@ -5221,7 +5361,45 @@
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Walkaround of perforated deck plates with fresh weld beads along the edges and joints.",
+      "kw": [
+        "weld beads",
+        "decking",
+        "perforated plate",
+        "joint",
+        "finished welds",
+        "car hauler",
+        "seam",
+        "walkaround"
+      ],
+      "stage": "weld",
+      "subject": "welded deck plates",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.4,
+          "shows": "perforated plates with fresh weld beads along the edge and end, close-up near the frame opening",
+          "stage": "weld"
+        },
+        {
+          "from": 3.4,
+          "to": 7.0,
+          "shows": "plate joint with weld beads, gap and a frame opening behind, other trailers in the background",
+          "stage": "weld"
+        },
+        {
+          "from": 7.0,
+          "to": 11.4,
+          "shows": "view along the deck showing short weld beads at the edge and the seam gap between plates",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "25143295|1793635910",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation6.mp4": {
       "cats": [
@@ -5233,7 +5411,33 @@
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Short clip of perforated deck plates with fresh weld beads along the edge and joints.",
+      "kw": [
+        "weld beads",
+        "decking",
+        "edge weld",
+        "perforated",
+        "seam",
+        "plates",
+        "car hauler",
+        "close-up"
+      ],
+      "stage": "weld",
+      "subject": "welded deck plates",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.0,
+          "shows": "close-up of perforated plates with weld beads along the edge and the seam between plates",
+          "stage": "weld"
+        }
+      ],
+      "desc_sig": "6868476|1793637267",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation7.mp4": {
       "cats": [
@@ -5245,7 +5449,45 @@
       "manual": false,
       "share": {
         "close": 0.82
-      }
+      },
+      "desc": "Low-angle view across the installed perforated deck plates and frame openings, showing welded seams.",
+      "kw": [
+        "decking",
+        "installed",
+        "perforated plates",
+        "seam welds",
+        "trailer",
+        "frame",
+        "low angle",
+        "shop"
+      ],
+      "stage": "done",
+      "subject": "installed decking",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.4,
+          "shows": "low-angle view of perforated deck plates with welded seams, open frame and tires below",
+          "stage": "done"
+        },
+        {
+          "from": 3.4,
+          "to": 7.0,
+          "shows": "deck plates and edge welds, wide view toward the shop wall and welding gear",
+          "stage": "done"
+        },
+        {
+          "from": 7.0,
+          "to": 10.8,
+          "shows": "low-angle view over the decking toward the frame opening and the structure beyond",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "23647380|1793635930",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation8.mp4": {
       "cats": [
@@ -5262,7 +5504,39 @@
       "manual": false,
       "share": {
         "wide": 0.9
-      }
+      },
+      "desc": "A worker stands on the trailer deck, wearing a welding helmet and working on the upper deck and stair structure, with the perforated deck in the foreground.",
+      "kw": [
+        "worker",
+        "upper deck",
+        "stairs",
+        "perforated deck",
+        "welding",
+        "car hauler",
+        "shop",
+        "standing"
+      ],
+      "stage": "other",
+      "subject": "upper deck ramp",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 1.0,
+          "shows": "wide view of perforated deck, with the upper deck ramp and stair structure in the back",
+          "stage": "other"
+        },
+        {
+          "from": 1.0,
+          "to": 11.5,
+          "shows": "worker in a blue shirt and waders standing on the trailer, working on the upper ramp structure, perforated deck in the foreground",
+          "stage": "other"
+        }
+      ],
+      "desc_sig": "25029508|1793635945",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     },
     "deckinginstallation9.mp4": {
       "cats": [
@@ -5274,7 +5548,51 @@
       "manual": false,
       "share": {
         "close": 0.76
-      }
+      },
+      "desc": "Walkaround of the finished perforated decking on the trailer, showing plate seams and edges, with a grinder visible underneath.",
+      "kw": [
+        "finished decking",
+        "walkaround",
+        "perforated plates",
+        "welded seams",
+        "trailer",
+        "car hauler",
+        "ramp",
+        "grinding"
+      ],
+      "stage": "done",
+      "subject": "finished decking",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 7.0,
+          "shows": "long run of installed perforated decking with welded seams and chalk marks, fan at the far end",
+          "stage": "done"
+        },
+        {
+          "from": 7.0,
+          "to": 12.0,
+          "shows": "decking plates and edge welds from the side, with the frame opening and the upper deck behind",
+          "stage": "done"
+        },
+        {
+          "from": 12.0,
+          "to": 19.0,
+          "shows": "rear deck section and frame with tape measure and a black end cap, perforated plates fully in place",
+          "stage": "done"
+        },
+        {
+          "from": 19.0,
+          "to": 25.3,
+          "shows": "side of the trailer with the deck installed, worker grinding underneath the frame, welder at right",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "55096098|1793635963",
+      "desc_note": "Decking installation on a car hauler. Work: the new decking was prepped for installation and welding, then fitted, welded in place and installed. After: decking fully installed. There is no damage footage: the job starts with the prep. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793637322,
+      "desc_v": 2
     }
   },
   "stories": {
@@ -5283,7 +5601,8 @@
     "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve.",
     "rampextensionfabrication": "The shop cut flat-bar and plate pieces and welded hinge barrels onto perforated plates on a bench. They then fitted and welded the hinged extension flap onto the end of the trailer deck, and the clips end with walkarounds of the finished flap and deck. The clip numbers are taken as the work order, 1 to 13.",
     "crossmemberrepair": "A rusty, pinholed trailer crossmember beside the hydraulic cylinders was cut out and lay loose on the ground, with the grinder and rubber mat nearby. A new bare steel bar was then fitted across the frame, and the last clip shows a bright red crossmember in place.",
-    "supportbracketmountingpoint": "The trailer's support bracket mounting point had cracked welds along the frame, with a visible crack running through the weld area, and it was ground back to bright metal. A reinforcement plate was then welded over the repaired area, as seen in the finished clips with fresh weld beads around the plate."
+    "supportbracketmountingpoint": "The trailer's support bracket mounting point had cracked welds along the frame, with a visible crack running through the weld area, and it was ground back to bright metal. A reinforcement plate was then welded over the repaired area, as seen in the finished clips with fresh weld beads around the plate.",
+    "deckinginstallation": "The job was installing new perforated steel decking on a car hauler trailer. The shop cut and ground the plates at a bench, fitted them over the frame, welded them in place, and the clips end with the decking fully installed across the deck and ramp sections."
   },
   "photos": {
     "supportbracketmountingpoint2.jpg": {
