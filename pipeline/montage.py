@@ -70,7 +70,7 @@ Also write the title shown at the start: "title" 2-4 words, max 22 characters, c
 (e.g. "SPRING LOCK REPAIR"); "sub" max 30 characters, capitals, the gist (e.g. "BROKEN LOCK OUT, NEW ONE IN").
 Only what the footage and the shop's note show — no invented parts or materials.
 
-Reply with JSON only:
+Reply with the JSON object only — no reasoning written out before it:
 {"shots": [{"shot": 0, "seg": "s3"}, ...], "title": "...", "sub": "...", "why": "one sentence"}"""
 
 
@@ -221,29 +221,37 @@ def durations(total, seed):
 
 # ------------------------------------------------------------------ the plan
 def ask(payload, key):
-    body = json.dumps({"model": MODEL, "max_tokens": 8000, "system": SYSTEM,
-                       "messages": [{"role": "user", "content": payload}]}).encode()
-    req = urllib.request.Request(URL, data=body, headers={
-        "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-    for attempt in range(4):
+    """One planning call. A reply cut off at the token cap (the model thinking aloud before the JSON — it hit
+    8000 on a 12-shot plan) is asked again once, told to answer with the JSON alone."""
+    tail = ""
+    for attempt in range(5):
+        body = json.dumps({"model": MODEL, "max_tokens": 16000, "system": SYSTEM,
+                           "messages": [{"role": "user", "content": payload + tail}]}).encode()
+        req = urllib.request.Request(URL, data=body, headers={
+            "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=180) as r:
+            with urllib.request.urlopen(req, timeout=300) as r:
                 data = json.load(r)
-            if data.get("stop_reason") == "max_tokens": raise RuntimeError("the reply was cut off")
+            u = data.get("usage", {})
+            if data.get("stop_reason") == "max_tokens":
+                if tail: raise RuntimeError(f"the reply was cut off twice ({u.get('output_tokens')} tokens)")
+                print(f"(the reply ran past {u.get('output_tokens')} tokens; asking again for the JSON alone)")
+                tail = ("\n\nAnswer with the JSON object ONLY: no reasoning, no text before or after it, "
+                        "\"why\" in one short sentence.")
+                continue
             txt = "".join(p.get("text", "") for p in data.get("content", []))
             a, b = txt.find("{"), txt.rfind("}")
             if a < 0: raise ValueError(f"no JSON in the reply: {txt[:300]!r}")
-            u = data.get("usage", {})
             print(f"(planned by {data.get('model')}, {u.get('input_tokens')} in / {u.get('output_tokens')} out)")
             return json.loads(txt[a:b + 1])
         except urllib.error.HTTPError as e:
             msg = e.read().decode(errors="replace")[:300]
-            if e.code in (429, 500, 502, 503, 529) and attempt < 3: time.sleep(3 * (attempt + 1)); continue
+            if e.code in (429, 500, 502, 503, 529) and attempt < 4: time.sleep(3 * (attempt + 1)); continue
             raise RuntimeError(f"HTTP {e.code}: {msg}")
         except RuntimeError:
             raise
         except Exception:
-            if attempt < 3: time.sleep(2 * (attempt + 1)); continue
+            if attempt < 4: time.sleep(2 * (attempt + 1)); continue
             raise
     raise RuntimeError("gave up after retries")
 
