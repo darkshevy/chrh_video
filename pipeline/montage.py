@@ -36,6 +36,7 @@ END = 4.0                         # end card, over the last shots
 SHOT_MIN, SHOT_MAX = 2.0, 3.0     # boss: something new on screen every 2-3 seconds
 PHOTO_EXT = (".jpg", ".jpeg", ".png", ".webp")
 PHOTO_DUR = 2.0                   # a still is on screen 1.5-2 s; longer and it reads as a frozen video
+MAX_PER_CLIP = 3                  # shots from one clip in a video; past that it is the same picture again
 LENGTH_SLACK = 2.0                # the video may run this much under the length asked for (30 -> 28-32 is fine)
 ORDER = {"damage": 0, "strip": 1, "fit": 2, "weld": 3, "finish": 4, "done": 5}
 CURRENT = os.path.join(os.path.dirname(HERE), "work", "current.json")
@@ -57,12 +58,12 @@ Rules, in order of importance:
 3. Prefer action and detail: sparks, welding, cutting, grinding, a hand fitting a part, a close-up of the
    damage or of the new weld. Skip empty, dull or repetitive stretches when there is better material.
 4. Variety: never the same clip in two shots in a row; a segment at most twice in the whole video, and only
-   when there is nothing else for that stage.
+   when there is nothing else for that stage; at most three shots from one clip in the whole video.
 5. A segment can only carry a shot if its "longest run" is at least the shot's length.
 6. Give the stages room in proportion to how much good footage each has — do not spend half the video on the
    damage if most of the footage is the work.
 
-Segments marked PHOTO are still pictures, shown about two seconds with a slow zoom. Use a photo where it shows
+Segments marked PHOTO are still pictures, shown about two seconds. Use a photo where it shows
 something the video does not — a sharp close-up of the damage, the finished part. Never two photos in a row,
 and at most one photo in every three shots.
 
@@ -297,16 +298,19 @@ def check(order, durs, ordered=False):
         prev = order[i - 1] if i else None
         if ordered:
             if prev and okey(c) < okey(prev): out.append((i, f"goes back to {c['clip']} after {prev['clip']}"))
-            if prev and prev["id"] == c["id"]: out.append((i, f"same stretch twice in a row ({c['id']})"))
+            if prev and prev["id"] == c["id"] and per_stretch(c) < 2:
+                out.append((i, f"same stretch twice in a row ({c['id']})"))
         else:
             r = rank(c)
             if r is not None:
                 if r < reached: out.append((i, f"goes back to [{c['stage']}] after the job reached a later stage"))
                 reached = max(reached, r)
             if prev and prev["clip"] == c["clip"]: out.append((i, f"same clip as the shot before ({c['clip']})"))
+        if sum(1 for x in order[:i + 1] if x and x["clip"] == c["clip"]) > MAX_PER_CLIP:
+            out.append((i, f"more than {MAX_PER_CLIP} shots from {c['clip']}"))
         seen[c["id"]] += 1
         if seen[c["id"]] > 2: out.append((i, f"{c['id']} used a third time"))
-        if c.get("photo"):
+        if c.get("photo") and not ordered:      # in work order the photo numbers decide where they go
             if prev and prev.get("photo"): out.append((i, "two photos in a row"))
             if sum(1 for x in order[:i + 1] if x and x.get("photo")) > max(1, (i + 1) // 3):
                 out.append((i, "too many photos so far — at most one in three shots"))
@@ -318,11 +322,52 @@ def check(order, durs, ordered=False):
     return out
 
 
+def per_stretch(c):
+    """Shots one stretch can give: two only when it is long enough (6 s) to hold two different moments."""
+    return 1 if c.get("photo") or c.get("short") or c["longest"] < 6.0 else 2
+
+
+def quota(cands):
+    """How many shots each clip may give: what its stretches hold, at most MAX_PER_CLIP."""
+    n = collections.Counter()
+    for c in cands: n[c["clip"]] += per_stretch(c)
+    return {k: min(MAX_PER_CLIP, v) for k, v in n.items()}
+
+
+def pick_ordered(picks, durs, cands):
+    """Clips in work order: keep the model's picks within each clip's quota, fill the rest from stretches not
+    yet shown — always from the clip with the fewest shots so far — and sort by clip number and time.
+
+    Swapping one shot at a time could not get out of a plan that spent half the video on one clip: every
+    neighbour on the timeline was that same clip."""
+    q, need = quota(cands), len(durs)
+    fits = lambda c: c.get("photo") or c.get("short") or c["longest"] + 0.1 >= min(durs)
+    chosen, per, seg = [], collections.Counter(), collections.Counter()
+
+    def take(c, per_seg):
+        if c and fits(c) and per[c["clip"]] < q[c["clip"]] and seg[c["id"]] < per_seg and len(chosen) < need:
+            chosen.append(c); per[c["clip"]] += 1; seg[c["id"]] += 1
+            return True
+        return False
+
+    for c in picks: take(c, 1)
+    for per_seg in (1, 2):           # first every stretch once, then a second moment of a long stretch
+        while len(chosen) < need:
+            left = [c for c in cands if fits(c) and per[c["clip"]] < q[c["clip"]]
+                    and seg[c["id"]] < min(per_seg, per_stretch(c))]
+            if not left: break
+            left.sort(key=lambda c: (per[c["clip"]], seg[c["id"]], okey(c)))
+            take(left[0], per_seg)
+    dropped = len([c for c in picks if c]) - sum(1 for c in picks if c and c in chosen)
+    if dropped: print(f"   {dropped} pick(s) over a clip's quota replaced from the rest of the footage")
+    return sorted(chosen, key=okey)
+
+
 def repair(order, durs, cands, ordered=False):
     """Fix what is still wrong, shot by shot, without asking: the least used segment that keeps the work order
     (between the neighbouring shots), is long enough and is not used up."""
-    if ordered:      # the order itself is not the model's to choose here: sort what it picked
-        order = sorted(order, key=lambda c: okey(c) if c else (10 ** 6, "", 0))
+    if ordered:      # the order is the clip numbers'; the model's part is which stretches
+        return pick_ordered(order, durs, cands)
     for _ in range(len(order) * 2):
         bad = check(order, durs, ordered)
         if not bad: break
@@ -331,8 +376,9 @@ def repair(order, durs, cands, ordered=False):
         if ordered:
             lo = okey(order[i - 1]) if i and order[i - 1] else (-1, "", 0)
             hi = next((okey(c) for c in order[i + 1:] if c), (10 ** 6, "", 0))
+            per = collections.Counter(c["clip"] for j, c in enumerate(order) if c and j != i)
             pool = [x for x in cands if lo <= okey(x) <= hi and x["longest"] + 0.1 >= min(durs) and used[x["id"]] < 2
-                    and not x.get("photo")
+                    and per[x["clip"]] < MAX_PER_CLIP
                     and not (i and order[i - 1] and order[i - 1]["id"] == x["id"])]
             pool.sort(key=lambda x: (used[x["id"]], -x["longest"]))
             if not pool:     # nothing fits between the neighbours: keep the order, accept a shorter stretch
@@ -343,8 +389,9 @@ def repair(order, durs, cands, ordered=False):
             next_r = min([rank(c) for c in order[i + 1:] if c and rank(c) is not None], default=99)
             lo, hi = prev_r, max(prev_r, next_r)
             nb = {order[j]["clip"] for j in (i - 1, i + 1) if 0 <= j < len(order) and order[j]}
+            per = collections.Counter(c["clip"] for j, c in enumerate(order) if c and j != i)
             pool = [x for x in cands if (rank(x) is None or lo <= rank(x) <= hi) and x["clip"] not in nb
-                    and x["longest"] + 0.1 >= min(durs) and used[x["id"]] < 2 and not x.get("photo")]
+                    and x["longest"] + 0.1 >= min(durs) and used[x["id"]] < 2 and per[x["clip"]] < MAX_PER_CLIP]
             if not pool:
                 pool = [x for x in cands if x["clip"] not in nb and x["longest"] >= durs[i]] or cands
             dist = lambda x: abs((lo if rank(x) is None else rank(x)) - max(lo, 0))
@@ -401,6 +448,7 @@ def plan(prefix, cands, ordered, durs, note, key):
         except Exception as e:
             print(f"no correction ({e}); fixing in code")
     order = repair(order, durs, cands, ordered)
+    durs = durs[:len(order)]             # pick_ordered may find fewer usable shots than asked for
     durs = fit_durations(order, durs)     # longest shots to the longest stretches, a photo gets ~2 s
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
@@ -490,9 +538,9 @@ def make_ass(path, total, title, sub):
 
 
 def render_photo(s, out):
-    """A still as a moving shot: a slow push-in (portrait) or the whole picture over a blurred copy of itself
-    (landscape), graded like the video. The photo goes through OpenCV first so the phone's EXIF rotation is
-    applied — ffmpeg reads the pixels as stored and would show a portrait photo lying on its side."""
+    """A still, held: cover-cropped if portrait, whole over a blurred copy if landscape, graded like the
+    video. No zoom — ffmpeg's zoompan steps whole pixels per frame and the picture visibly shook. The photo
+    goes through OpenCV first so the phone's EXIF rotation is applied (ffmpeg would show it on its side)."""
     import cv2
     n = round(s["dur"] * FPS)
     img = cv2.imread(s["path"])
@@ -500,12 +548,8 @@ def render_photo(s, out):
     tmp = out[:-4] + "_src.jpg"
     cv2.imwrite(os.path.join(build.WORK, tmp), img, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     h, w = img.shape[:2]
-    if w > h:
-        vf = build.fit_filters()
-    else:
-        # cover a slightly larger frame, then zoom in 6% over the shot, centred
-        vf = ["scale=1188:2112:flags=lanczos:force_original_aspect_ratio=increase,crop=1188:2112",
-              f"zoompan=z='1+0.06*on/{max(1, n - 1)}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps={FPS}"]
+    vf = (build.fit_filters() if w > h else
+          ["scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920"])
     vf += [build.GRADE, "fps=30", "setpts=PTS-STARTPTS", "format=yuv420p"]
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{s['dur'] + 0.2:.3f}",
                     "-i", tmp, "-an", "-vf", ",".join(vf), "-frames:v", str(n),
@@ -526,7 +570,10 @@ def render_shot(s, out, trf):
                         "-f", "null", "-"], check=True, cwd=build.WORK)
         vf.append(f"vidstabtransform=input={trf}:smoothing=14:optzoom=1:zoomspeed=0.2:interpol=bicubic"
                   f":maxshift={max(8, int(0.04 * min(build.dims(f))))}:maxangle=0.05")
-    if build.fit_mode(f):
+    w, h = build.dims(f)
+    if build.fit_mode(f) or w > h:
+        # a landscape clip shown whole over a blurred copy: a 9:16 slice of it keeps a third of the picture and
+        # looked "zoomed far in" for a whole montage
         vf += build.fit_filters()
     else:
         z, cx, cy = (1.0, 0.5, 0.5)
@@ -618,6 +665,14 @@ def main():
     if "--unordered" in sys.argv: ordered = False
     if not cands: sys.exit("no usable stretches in these clips")
     durs = durations(seconds, prefix)
+    # Do not ask for more shots than the footage holds without showing the same picture again: a clip gives
+    # at most MAX_PER_CLIP shots (fewer if it has fewer stretches, a short one gives one), a photo one. Three
+    # clips cannot fill 30 s — padding them out was half a video of one scene. Shorter beats repeated.
+    cap = sum(quota(cands).values())
+    if cap < len(durs):
+        durs = durs[:cap]
+        print(f"! the footage holds about {sum(durs):.0f} s without repeats — making a {sum(durs):.0f} s video "
+              f"instead of {seconds:.0f} s (more clips or photos give a longer one)")
     print(f"{prefix}: {len(names)} clip(s), {sum(1 for c in cands if c.get('photo'))} photo(s), "
           f"{len(cands)} usable stretch(es), {len(durs)} shots for {seconds:.0f} s"
           + (" — clip numbers give the order" if ordered else ""))
