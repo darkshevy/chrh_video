@@ -5,6 +5,7 @@
 #   python pipeline\montage.py springlock                 ~30 s, title invented from the footage
 #   python pipeline\montage.py springlock --seconds 40
 #   python pipeline\montage.py springlock --dry           show the plan, render nothing
+#   --ordered / --unordered   the clips are / are not numbered in work order (overrides the note from step 1)
 #
 # Claude (Sonnet) chooses which described stretch goes where: the order of the work, the most watchable
 # moments, no clip twice in a row. Code then checks what a prompt alone kept getting wrong — stage order and
@@ -447,6 +448,9 @@ def main():
         L = autoplan.apply_lib(); C = L["clips"]
 
     cands, ordered = segments(C, names)
+    # asked again at montage time: the note from step 1 may say nothing, or the wrong thing
+    if "--ordered" in sys.argv: ordered = True
+    if "--unordered" in sys.argv: ordered = False
     if not cands: sys.exit("no usable stretches in these clips")
     durs = durations(seconds, prefix)
     print(f"{prefix}: {len(names)} clip(s), {len(cands)} usable stretch(es), {len(durs)} shots for {seconds:.0f} s"

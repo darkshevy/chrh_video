@@ -873,20 +873,43 @@ def backup(st):
 
 
 def step_montage(st):
-    """A silent 2-3 s cut montage of one described project. Asks the project (current one first) and the length."""
+    """Silent 2-3 s montages of one or several described projects, built one after another. For each project:
+    are the clips in work order (asked here, the answer from step 1 offered first). Length asked once."""
     cur = jload(CURRENT, {})
+    clips = jload(LIB, {}).get("clips", {})
     P = {n: g for n, g in projects().items() if g["described"]}
     if not P:
         print(f"\n  {C.YE}описанных проектов нет — сначала шаг 1{C.OFF}"); hold(); return
     names = sorted(P, key=lambda n: (n != cur.get("prefix"), n))
-    rows = [(n, f"{C.WH}{n:24s}{C.OFF}{P[n]['described']} описанных клип(ов)" +
-             (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else "")) for n in names]
-    prefix = choose("из какого проекта монтаж?", rows)
-    if not prefix: return
-    secs = ask(f"  {C.WH}длина ролика в секундах [30] : {C.OFF}", "30")
+    print(f"\n  {C.WH}{C.B}из каких проектов монтаж?{C.OFF}\n")
+    for i, n in enumerate(names, 1):
+        print(f"   {C.YE}{i:2d}{C.OFF}  {C.WH}{n:28s}{C.OFF}{P[n]['described']} описанных клип(ов)" +
+              (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else ""))
+    raw = ask(f"\n  {C.WH}номера через пробел (например 1 3 5), «все» — все, пусто — отмена : {C.OFF}").lower()
+    if not raw: return
+    if raw in ("все", "all", "*"): picked = names
+    else:
+        picked = [names[int(x) - 1] for x in re.findall(r"\d+", raw) if 1 <= int(x) <= len(names)]
+    picked = list(dict.fromkeys(picked))
+    if not picked:
+        print(f"  {C.YE}таких номеров нет{C.OFF}"); hold(); return
+    secs = ask(f"  {C.WH}длина каждого ролика в секундах [30] : {C.OFF}", "30")
     if not secs.replace(".", "", 1).isdigit():
         print(f"  {C.YE}нужно число{C.OFF}"); hold(); return
-    run("montage.py", prefix, "--seconds", secs)
+    jobs = []
+    for n in picked:
+        said = any("numbered in the order" in r.get("desc_note", "").lower()
+                   for k, r in clips.items() if project_of(k) == n)
+        ordered = yes_no(f"{n}: клипы пронумерованы по порядку работы?", default=said)
+        jobs.append((n, ordered))
+    done, failed = [], []
+    for i, (n, ordered) in enumerate(jobs, 1):
+        print(f"\n  {C.CY}{C.B}── {i}/{len(jobs)}  {n} ──{C.OFF}")
+        code = run("montage.py", n, "--seconds", secs, "--ordered" if ordered else "--unordered", pause=False)
+        (done if code == 0 else failed).append(n)
+    print(f"\n  {C.GR}{C.B}готово {len(done)}{C.OFF}" + (f"   {C.RE}не вышло: {', '.join(failed)}{C.OFF}" if failed else ""))
+    print(f"  {C.GY}ролики в output\\ — CHRH_<Проект>_montage_vN.mp4, рядом контакт-листы{C.OFF}")
+    hold()
 
 
 def act(ident, st):
