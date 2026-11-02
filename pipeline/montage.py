@@ -567,6 +567,16 @@ def main():
 
     L = autoplan.apply_lib(); autoplan.refresh_footage()
     C = L["clips"]
+    # Every clip of the project is used. The auto-tagger switches clips off on a guess ("outdoor painting",
+    # "someone else's edit") and those guesses kept throwing out good footage; for a montage of one job the
+    # shop's own clips are the material. Kept off: a clip switched off by hand, and a file that cannot be read.
+    back = [n for n in sorted(C) if n.lower().startswith(prefix) and n in build.FILES and not C[n].get("enabled")
+            and not C[n].get("manual") and not str(C[n].get("reason", "")).startswith(("could not", "error"))]
+    if back:
+        for n in back:
+            C[n]["auto_reason"] = C[n].get("reason", ""); C[n].update(enabled=True, reason="")
+            print(f"switched back on: {n} (the auto-tagger had it off: {C[n]['auto_reason'] or 'no reason'})")
+        autoplan.save_lib(L); L = autoplan.apply_lib(); C = L["clips"]
     names = [n for n in sorted(C) if n.lower().startswith(prefix) and C[n].get("enabled") and n in build.FILES]
     if not names: sys.exit(f"no enabled clips starting with '{prefix}' — scan and describe them first (menu step 1)")
     note = ""
