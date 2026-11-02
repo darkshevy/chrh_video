@@ -706,6 +706,236 @@
      null
     ]
    ]
+  },
+  "slideoutboss": {
+   "title": "SLIDE-OUT RAMP REPAIR",
+   "sub": "HOUSING, LOCK, RAMP DOOR",
+   "track": "Another Day",
+   "text": "At Car Hauler Repair Houston, we make sure your equipment is built to handle the toughest jobs! In this repair, we restored the rear slide-out ramp housing, replaced the damaged locking mechanism, and reinforced the rear ramp door with heavier-duty angle steel to prevent bending. Stronger construction, reliable locking, and long-lasting performance. When your car hauler needs professional structural repairs, trust the specialists at Car Hauler Repair Houston! Call the number on screen today!",
+   "hook": 47,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "springlock6.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     5,
+     "springlock7.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     13,
+     "springlock6.mp4",
+     8.75,
+     1.0,
+     null
+    ],
+    [
+     17,
+     "springlock5.mp4",
+     1.5,
+     1.0,
+     null
+    ],
+    [
+     23,
+     "springlock6.mp4",
+     2.75,
+     1.0,
+     null
+    ],
+    [
+     28,
+     "springlock7.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     33,
+     "springlock7.mp4",
+     5.75,
+     1.0,
+     null
+    ],
+    [
+     41,
+     "springlock6.mp4",
+     5.0,
+     1.0,
+     null
+    ],
+    [
+     47,
+     "springlock4.mp4",
+     0.75,
+     1.0,
+     null
+    ],
+    [
+     49,
+     "springlock1.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     55,
+     "springlock3.mp4",
+     4.25,
+     1.0,
+     null
+    ],
+    [
+     63,
+     "springlock3.mp4",
+     8.0,
+     1.0,
+     null
+    ],
+    [
+     71,
+     "springlock2.mp4",
+     1.75,
+     0.7,
+     null
+    ]
+   ]
+  },
+  "sleeveboss": {
+   "title": "TELESCOPIC POST REPAIR",
+   "sub": "SLEEVE AND LOCK RESTORED",
+   "track": "Hollywood waves",
+   "text": "Rear telescopic post failure is one of the most common problems on car haulers! These posts often break near the lower bottom pin or at the upper sleeve when reinforcement is missing or worn out. The locking mechanism must fit tightly against the pin-hole rail, with the locking pin entering the holes straight and perpendicular. Worn holes, loose sleeves, and damaged locks allow movement during transport, potentially causing structural failure and damaging vehicles below. At Car Hauler Repair Houston, we repair, reinforce, and restore these critical components. Call the number on screen!",
+   "hook": 56,
+   "logo": null,
+   "plan": [
+    [
+     null,
+     "sleevereplacement2.mp4",
+     2.75,
+     1.0,
+     null
+    ],
+    [
+     8,
+     "sleevereplacement1.mp4",
+     5.0,
+     1.0,
+     null
+    ],
+    [
+     14,
+     "sleevereplacement2.mp4",
+     9.0,
+     1.0,
+     null
+    ],
+    [
+     23,
+     "sleevereplacement2.mp4",
+     6.0,
+     1.0,
+     null
+    ],
+    [
+     30,
+     "sleevereplacement2.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     35,
+     "sleevereplacement5.mp4",
+     0.0,
+     1.0,
+     null
+    ],
+    [
+     40,
+     "sleevereplacement6.mp4",
+     0.25,
+     1.0,
+     null
+    ],
+    [
+     46,
+     "sleevereplacement6.mp4",
+     2.75,
+     1.0,
+     null
+    ],
+    [
+     53,
+     "sleevereplacement5.mp4",
+     3.25,
+     1.0,
+     null
+    ],
+    [
+     56,
+     "sleevereplacement1.mp4",
+     8.75,
+     1.0,
+     null
+    ],
+    [
+     60,
+     "sleevereplacement7.mp4",
+     4.25,
+     1.0,
+     null
+    ],
+    [
+     67,
+     "sleevereplacement2.mp4",
+     12.25,
+     0.7,
+     null
+    ],
+    [
+     71,
+     "sleevereplacement3.mp4",
+     2.25,
+     1.0,
+     null
+    ],
+    [
+     75,
+     "sleevereplacement7.mp4",
+     7.75,
+     1.0,
+     null
+    ],
+    [
+     80,
+     "sleevereplacement7.mp4",
+     0.75,
+     1.0,
+     null
+    ],
+    [
+     83,
+     "sleevereplacement7.mp4",
+     10.25,
+     0.7,
+     null
+    ],
+    [
+     88,
+     "sleevereplacement4.mp4",
+     1.75,
+     0.7,
+     null
+    ]
+   ]
   }
  }
 }
