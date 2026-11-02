@@ -270,9 +270,9 @@ ITEMS = [
      "к готовому. Выбираешь проект, вводишь описание работы от цеха, отвечаешь про порядок клипов — дальше "
      "сам: опишет новые клипы, расставит кадры, придумает название. Сверху телефон, в конце адрес.",
      "describe.py + montage.py"),
-    ("dub", "A", "Озвучить готовый монтаж", "Для текста, который приходит после ролика: выбираешь ролик, в "
-     "Блокноте вставляешь текст шефа как есть. Длинный текст Claude сократит под ролик, ElevenLabs озвучит, "
-     "голос ляжет на ролик. Выйдет новый файл …_voiced.mp4, исходный остаётся.", "dub.py"),
+    ("dub", "A", "Озвучить готовый ролик", "Свой ролик — положи в output\\ — или монтаж [N]. В Блокноте "
+     "вставляешь текст шефа как есть: Claude сократит, если не влезает, ElevenLabs озвучит, лягут субтитры. "
+     "Свой ролик получает ещё телефон, название, музыку и карточку с адресом. Выйдет …_voiced.mp4.", "dub.py"),
     ("blur", "B", "Заблюрить лица", "Сборка лица не блюрит: детектор ловил ржавчину и болты. Если в кадр "
      "попал человек — прогони этим пунктом. Узнаваемых лиц не выкладываем.", "finish.py"),
     ("~", "", "МАТЕРИАЛЫ", "", ""),
@@ -879,12 +879,14 @@ def backup(st):
 def step_dub(st):
     """Voice an existing montage with a text that came later: pick the video, paste the text in Notepad."""
     d = finish.outdir()
-    vids = sorted((f for f in glob.glob(os.path.join(d, "CHRH_*_montage_v*.mp4")) if not f.endswith("_voiced.mp4")),
-                  key=os.path.getmtime, reverse=True)[:15]
+    # any video in output\ — a montage from [N] or one edited by hand and dropped there
+    vids = sorted((f for f in glob.glob(os.path.join(d, "*.mp4")) + glob.glob(os.path.join(d, "*.mov"))
+                   if not os.path.splitext(f)[0].endswith("_voiced")), key=os.path.getmtime, reverse=True)[:20]
     if not vids:
-        print(f"\n  {C.YE}готовых монтажей нет — сначала [N]{C.OFF}"); hold(); return
+        print(f"\n  {C.YE}в output\\ нет роликов — положи туда свой или собери монтаж [N]{C.OFF}"); hold(); return
     rows = [(f, f"{C.WH}{os.path.basename(f):48s}{C.OFF}" +
-             (f"{C.GR}уже озвучен{C.OFF}" if os.path.exists(f[:-4] + "_voiced.mp4") else ""))
+             (f"{C.GY}монтаж{C.OFF}   " if "_montage_" in os.path.basename(f).lower() else f"{C.CY}свой{C.OFF}     ") +
+             (f"{C.GR}уже озвучен{C.OFF}" if os.path.exists(os.path.splitext(f)[0] + "_voiced.mp4") else ""))
             for f in vids]
     video = choose("какой ролик озвучить?", rows)
     if not video: return
