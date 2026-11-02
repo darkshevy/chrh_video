@@ -5028,19 +5028,89 @@
       "share": {
         "hub": 0.6,
         "close": 0.27
-      }
+      },
+      "desc": "Close-up pass along the frame at the support bracket mount showing ground-back weld areas with visible cracks, then pulling back to show the bracket below with no reinforcement plate.",
+      "kw": [
+        "crack",
+        "cracked weld",
+        "support bracket",
+        "trailer frame",
+        "mounting point",
+        "ground weld",
+        "damage",
+        "before repair"
+      ],
+      "stage": "damage",
+      "subject": "support bracket mount",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 4.0,
+          "shows": "close-up of ground frame weld area with yellow paint marking and a crack running down through the weld, bracket edge below",
+          "stage": "damage"
+        },
+        {
+          "from": 4.0,
+          "to": 8.0,
+          "shows": "camera sweeps along dark frame side past a chalk line, blurry, with ground bright metal at the left edge",
+          "stage": "damage"
+        },
+        {
+          "from": 8.0,
+          "to": 14.0,
+          "shows": "close-up of ground weld patch at the bracket corner with a visible crack branching through it and chalk marks beside it",
+          "stage": "damage"
+        },
+        {
+          "from": 14.0,
+          "to": 19.6,
+          "shows": "wider view of the bracket below the frame, ground cracked weld at the top corner, bracket with hole and bolt, no plate over it",
+          "stage": "damage"
+        }
+      ],
+      "desc_sig": "42630105|1793634384",
+      "desc_note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793635307,
+      "desc_v": 2
     },
     "supportbracketmountingpoint5.mp4": {
       "cats": [
         "close"
       ],
       "dull": [],
-      "enabled": false,
-      "reason": "clip shorter than 2 s",
+      "enabled": true,
+      "reason": "",
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Steady view of the finished reinforcement plate welded across the frame above the support bracket, with fresh weld beads on the plate edges.",
+      "kw": [
+        "reinforcement plate",
+        "fresh weld",
+        "support bracket",
+        "trailer frame",
+        "finished",
+        "weld bead",
+        "repair done"
+      ],
+      "stage": "done",
+      "subject": "reinforcement plate",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.2,
+          "shows": "wide view of bracket with a new plate welded above it, weld beads along the plate edges and ends, bracket with hole and bolt below",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "4903998|1793634398",
+      "desc_note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793635307,
+      "desc_v": 2,
+      "auto_reason": "clip shorter than 2 s"
     },
     "supportbracketmountingpoint6.mp4": {
       "cats": [
@@ -5052,7 +5122,44 @@
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Walkaround of the finished reinforcement plate welded over the support bracket mount, seen from both ends and the front, with weld beads along its edges.",
+      "kw": [
+        "reinforcement plate",
+        "weld bead",
+        "support bracket",
+        "trailer frame",
+        "finished weld",
+        "walkaround",
+        "repair done"
+      ],
+      "stage": "done",
+      "subject": "reinforcement plate",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 2.1,
+          "shows": "close-up of the plate end welded to the frame corner, weld bead along its lower edge and end, bracket below",
+          "stage": "done"
+        },
+        {
+          "from": 2.1,
+          "to": 5.8,
+          "shows": "plate seen from the other side and front, weld beads along the lower edge and end, bracket with hole and bolt below",
+          "stage": "done"
+        },
+        {
+          "from": 5.8,
+          "to": 6.9,
+          "shows": "back to the first corner, plate end weld at the frame corner and bracket below",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "15102207|1793634408",
+      "desc_note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793635307,
+      "desc_v": 2
     }
   },
   "stories": {
@@ -5060,6 +5167,27 @@
     "rampwidening": "A loading ramp that was too narrow for the tires was widened by fitting square-tube side extensions, which were then welded on, as the shop describes it. Judged by the visible condition, the order looks like: ramp with chalk width marks (clips 1-2), extension on with fresh weld heat marks (clips 3-5), then grey and black finished-looking ramp (clips 6-7).",
     "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve.",
     "rampextensionfabrication": "The shop cut flat-bar and plate pieces and welded hinge barrels onto perforated plates on a bench. They then fitted and welded the hinged extension flap onto the end of the trailer deck, and the clips end with walkarounds of the finished flap and deck. The clip numbers are taken as the work order, 1 to 13.",
-    "crossmemberrepair": "A rusty, pinholed trailer crossmember beside the hydraulic cylinders was cut out and lay loose on the ground, with the grinder and rubber mat nearby. A new bare steel bar was then fitted across the frame, and the last clip shows a bright red crossmember in place."
+    "crossmemberrepair": "A rusty, pinholed trailer crossmember beside the hydraulic cylinders was cut out and lay loose on the ground, with the grinder and rubber mat nearby. A new bare steel bar was then fitted across the frame, and the last clip shows a bright red crossmember in place.",
+    "supportbracketmountingpoint": "The trailer's support bracket mounting point had cracked welds along the frame, with a visible crack running through the weld area, and it was ground back to bright metal. A reinforcement plate was then welded over the repaired area, as seen in the finished clips with fresh weld beads around the plate."
+  },
+  "photos": {
+    "supportbracketmountingpoint2.jpg": {
+      "shows": "Close-up of the trailer frame rail at the support bracket mounting point. The old weld has been ground down to bright metal, and a crack line is still visible in the ground area. Chalk marks are on th",
+      "stage": "strip",
+      "sig": "2181921|1793634385",
+      "note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done."
+    },
+    "supportbracketmountingpoint3.jpg": {
+      "shows": "Close-up of the frame rail side. A rectangular patch of steel has been ground or sanded, leaving a rough dark scored surface with some bright ground metal. Weld bead remains along the top seam and the",
+      "stage": "strip",
+      "sig": "2205297|1793634387",
+      "note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done."
+    },
+    "supportbracketmountingpoint4.jpg": {
+      "shows": "Wide view of the frame rail above the support bracket. Ground bright patches are at both ends and the cracked area is in the middle, with chalk marks. The bracket with its round hole and bolt cap is b",
+      "stage": "damage",
+      "sig": "2273329|1793634391",
+      "note": "BEFORE:Damaged and cracked welds at the trailer support bracket mounting point. Requires welding repair and reinforcement to restore structural strength and secure attachment. after: Repaired cracks in the trailer frame mounting area by welding the damaged sections. Fabricated and welded an additional reinforcement plate over the repaired area to provide added structural support, improve strength, and reinforce the support bracket attachment. The clips are numbered in the order the work was done."
+    }
   }
 }
