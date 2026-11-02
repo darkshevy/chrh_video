@@ -4998,6 +4998,61 @@
       "desc_mode": "project",
       "desc_at": 1793633644,
       "desc_v": 2
+    },
+    "supportbracketmountingpoint1.mp4": {
+      "cats": [
+        "hub",
+        "close"
+      ],
+      "dull": [
+        [
+          0.8,
+          2.8
+        ],
+        [
+          6.8,
+          7.8
+        ],
+        [
+          10.8,
+          11.8
+        ],
+        [
+          13.8,
+          14.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "hub": 0.6,
+        "close": 0.27
+      }
+    },
+    "supportbracketmountingpoint5.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": false,
+      "reason": "clip shorter than 2 s",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "supportbracketmountingpoint6.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
     }
   },
   "stories": {
