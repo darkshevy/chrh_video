@@ -270,6 +270,9 @@ ITEMS = [
      "к готовому. Выбираешь проект, вводишь описание работы от цеха, отвечаешь про порядок клипов — дальше "
      "сам: опишет новые клипы, расставит кадры, придумает название. Сверху телефон, в конце адрес.",
      "describe.py + montage.py"),
+    ("dub", "A", "Озвучить готовый монтаж", "Для текста, который приходит после ролика: выбираешь ролик, в "
+     "Блокноте вставляешь текст шефа как есть. Длинный текст Claude сократит под ролик, ElevenLabs озвучит, "
+     "голос ляжет на ролик. Выйдет новый файл …_voiced.mp4, исходный остаётся.", "dub.py"),
     ("blur", "B", "Заблюрить лица", "Сборка лица не блюрит: детектор ловил ржавчину и болты. Если в кадр "
      "попал человек — прогони этим пунктом. Узнаваемых лиц не выкладываем.", "finish.py"),
     ("~", "", "МАТЕРИАЛЫ", "", ""),
@@ -873,6 +876,34 @@ def backup(st):
     hold()
 
 
+def step_dub(st):
+    """Voice an existing montage with a text that came later: pick the video, paste the text in Notepad."""
+    d = finish.outdir()
+    vids = sorted((f for f in glob.glob(os.path.join(d, "CHRH_*_montage_v*.mp4")) if not f.endswith("_voiced.mp4")),
+                  key=os.path.getmtime, reverse=True)[:15]
+    if not vids:
+        print(f"\n  {C.YE}готовых монтажей нет — сначала [N]{C.OFF}"); hold(); return
+    rows = [(f, f"{C.WH}{os.path.basename(f):48s}{C.OFF}" +
+             (f"{C.GR}уже озвучен{C.OFF}" if os.path.exists(f[:-4] + "_voiced.mp4") else ""))
+            for f in vids]
+    video = choose("какой ролик озвучить?", rows)
+    if not video: return
+    tdir = os.path.join(ROOT, "work", "dub"); os.makedirs(tdir, exist_ok=True)
+    tpath = os.path.join(tdir, os.path.basename(video)[:-4] + "_input.txt")
+    if not os.path.exists(tpath): open(tpath, "w", encoding="utf-8").close()
+    print(f"  {C.GY}открываю Блокнот: вставь текст шефа как есть (с телефоном, абзацами), сохрани и закрой{C.OFF}")
+    try:
+        if os.name == "nt": subprocess.call(["notepad", tpath])
+        else: print(f"  {tpath}"); input(f"  {C.GY}вставь текст в этот файл и нажми Enter{C.OFF}")
+    except Exception as e:
+        print(f"  {C.RE}не открылось: {e}{C.OFF}\n  {tpath}")
+    try: has = open(tpath, encoding="utf-8-sig").read().strip()
+    except Exception: has = ""
+    if not has:
+        print(f"  {C.YE}текст пустой — ничего не делаю{C.OFF}"); hold(); return
+    run("dub.py", video, tpath)
+
+
 def step_montage(st):
     """One silent 2-3 s montage, start to finish: new footage scanned, project chosen, the job described in a
     few words (kept from last time on Enter), clips in work order or not, length. The project is (re)described
@@ -960,6 +991,7 @@ def act(ident, st):
     elif ident == "clean": cleanup(st)
     elif ident == "backup": backup(st)
     elif ident == "montage": step_montage(st)
+    elif ident == "dub": step_dub(st)
     return True
 
 
