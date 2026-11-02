@@ -266,6 +266,9 @@ ITEMS = [
      "Для пересборки после правки клипов или текста.", "plan_ai.py"),
     ("dry", "D", "Раскладка без сборки", "Какой кусок какого клипа встанет под какие слова, и почему. "
      "Без рендера — проверить монтаж, прежде чем тратить минуты на ffmpeg.", "plan_ai.py --dry"),
+    ("montage", "N", "Динамичный монтаж", "Ролик без звука и субтитров: кадры меняются каждые 2–3 секунды, "
+     "от повреждения к готовому. Claude сам расставляет отрезки и придумывает название. Сверху телефон, "
+     "в конце карточка с адресом. Нужны описанные клипы (шаг 1).", "montage.py"),
     ("blur", "B", "Заблюрить лица", "Сборка лица не блюрит: детектор ловил ржавчину и болты. Если в кадр "
      "попал человек — прогони этим пунктом. Узнаваемых лиц не выкладываем.", "finish.py"),
     ("~", "", "МАТЕРИАЛЫ", "", ""),
@@ -869,6 +872,23 @@ def backup(st):
     hold()
 
 
+def step_montage(st):
+    """A silent 2-3 s cut montage of one described project. Asks the project (current one first) and the length."""
+    cur = jload(CURRENT, {})
+    P = {n: g for n, g in projects().items() if g["described"]}
+    if not P:
+        print(f"\n  {C.YE}описанных проектов нет — сначала шаг 1{C.OFF}"); hold(); return
+    names = sorted(P, key=lambda n: (n != cur.get("prefix"), n))
+    rows = [(n, f"{C.WH}{n:24s}{C.OFF}{P[n]['described']} описанных клип(ов)" +
+             (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else "")) for n in names]
+    prefix = choose("из какого проекта монтаж?", rows)
+    if not prefix: return
+    secs = ask(f"  {C.WH}длина ролика в секундах [30] : {C.OFF}", "30")
+    if not secs.replace(".", "", 1).isdigit():
+        print(f"  {C.YE}нужно число{C.OFF}"); hold(); return
+    run("montage.py", prefix, "--seconds", secs)
+
+
 def act(ident, st):
     if ident == "quit": return False
     elif ident.startswith("w_"): wiz_act(ident, st)
@@ -900,6 +920,7 @@ def act(ident, st):
     elif ident == "only": set_only(st)
     elif ident == "clean": cleanup(st)
     elif ident == "backup": backup(st)
+    elif ident == "montage": step_montage(st)
     return True
 
 
