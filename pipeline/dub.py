@@ -75,7 +75,8 @@ def main():
     room = D - START - END_CARD - 0.2          # seconds of picture before the black card
     words = len(text.split())
     print(f"video {D:.1f} s, room for the voice ~{room:.1f} s (~{int(room * WPS)} words); the text has {words} words")
-    if words > room * WPS * 1.08:
+    # shorten only what a speed-up cannot absorb: every word of his kept is worth more than a perfect fit
+    if words > room * WPS * (MAX_TEMPO - 0.03):
         key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
         if not key: sys.exit("the text is too long for the video and there is no ANTHROPIC_API_KEY to shorten it")
         target = int(room * WPS * 0.97)
