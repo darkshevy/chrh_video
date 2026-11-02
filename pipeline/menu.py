@@ -9,7 +9,7 @@
 # It does nothing on its own: every action is one of the scripts you would have typed, run exactly as it is,
 # with the output printed live. Two small things it keeps for itself, both in work\: published.json (which
 # videos have gone out) and current.json (the project you are in the middle of).
-import os, re, sys, json, glob, time, shutil, datetime, subprocess, textwrap
+import os, re, sys, json, glob, time, shutil, datetime, subprocess, textwrap, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -885,10 +885,22 @@ def step_montage(st):
     P = projects()
     if not P:
         print(f"\n  {C.YE}в footage\\ пусто{C.OFF}"); hold(); return
+    # What the montage will actually use: every clip (it switches the auto-tagger's guesses back on) and every
+    # photo with the project's name. Counting only 'enabled' clips and no photos made a ready project look
+    # half empty before it had even started.
+    lib = jload(LIB, {})
+    photos = collections.Counter()
+    for dp, _, fs in os.walk(os.path.join(ROOT, "footage")):
+        if "_contact" in dp: continue
+        for f in fs:
+            if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif")):
+                photos[project_of(f).lower()] += 1
+    described = collections.Counter(project_of(n) for n, r in lib.get("clips", {}).items() if r.get("segments"))
     names = sorted(P, key=lambda n: (n != cur.get("prefix"), -P[n]["clips"]))
-    rows = [(n, f"{C.WH}{n:28s}{C.OFF}{P[n]['clips']:3d} клип(ов)   " +
-             (f"{C.GR}описан{C.OFF}" if P[n]["on"] and P[n]["described"] >= P[n]["on"]
-              else f"{C.YE}описано {P[n]['described']} из {P[n]['on']}{C.OFF}") +
+    rows = [(n, f"{C.WH}{n:28s}{C.OFF}{P[n]['clips']:3d} клип(ов)" +
+             (f" + {photos[n.lower()]} фото" if photos[n.lower()] else "") + "   " +
+             (f"{C.GR}описан{C.OFF}" if described[n] >= P[n]["clips"] else
+              f"{C.YE}опишется при сборке{C.OFF}") +
              (f"   {C.CY}текущий{C.OFF}" if n == cur.get("prefix") else "")) for n in names]
     prefix = choose("из какого проекта монтаж?", rows)
     if not prefix: return
