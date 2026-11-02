@@ -76,12 +76,31 @@ Reply with the JSON object only — no reasoning written out before it:
 
 
 # ------------------------------------------------------------------ footage
+# A montage drops the badly shaken seconds outright. The voiced videos keep them as a last resort (a cut has
+# to carry its words); a montage has no words to carry, and a shot that shakes hard is worse than a shorter
+# video. Shaken = motion past SHAKE x the handheld/drone limit (the old quality gate's 35/20), or far softer
+# than the rest of its clip (smeared by the shake).
+SHAKE = 1.5
+
+
+def shaky(f):
+    """[(t0, t1)] of the clip's 1-second windows that shake too hard or are smeared."""
+    d, w = picker.windows(f)
+    if not w: return []
+    mlim = picker.motion_ceiling(f, 20 if picker.is_drone(f) else 35)
+    sh = sorted(s for (_, _, s) in w); med = sh[len(sh) // 2]
+    mo = sorted(m for (_, m, _) in w); mmed = mo[len(mo) // 2]
+    # also relative to the clip: 2 s that shake far more than the other 8 are the shake, even under the limit
+    local = lambda m: m > 0.6 * mlim and m > 2.5 * max(mmed, 1.0)
+    return [(t, t + 1.0) for (t, m, s) in w if m > SHAKE * mlim or local(m) or s < picker.JUNK_SHARP * med]
+
+
 def usable(f, rec, a, b):
-    """(good seconds, longest unbroken stretch) inside a..b, the dull seconds left out."""
+    """(good seconds, longest unbroken stretch) inside a..b — dull and shaken seconds left out."""
     d, w = picker.windows(f)
     th = picker.sharp_floor(f, 700)
     mlim = picker.motion_ceiling(f, 20 if picker.is_drone(f) else 35)
-    bad = [tuple(r) for r in rec.get("dull", [])]
+    bad = [tuple(r) for r in rec.get("dull", [])] + shaky(f)
     runs, cur = [], None
     for (t, m, sh) in w:
         ok = t >= a - 0.01 and t + 1.0 <= b + 0.01 and picker.ok_window(m, sh, th, mlim) \
@@ -461,7 +480,7 @@ def window(c, d, own):
     for grow in (0.0, 1.0, 2.0):
         forbid = collections.defaultdict(list)
         for f, r in own.items(): forbid[f] += r
-        forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)]
+        forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)] + shaky(c["clip"])
         got = picker.best([c["clip"]], d, forbid, collections.defaultdict(list), 700, allow_slow=False)
         if got: return got
     return None
@@ -483,10 +502,12 @@ def place(order, durs, cands):
                             key=lambda x: (x["clip"] in nb, -x["longest"])):
                 got = window(x, d, own)
                 if got: seg = x; break
+        if got is None:      # last resort: seconds already shown in this video — but never shaken ones
+            got = picker.best([c["clip"]], d, collections.defaultdict(list, {c["clip"]: shaky(c["clip"])}),
+                              collections.defaultdict(list), 700, allow_slow=False)
         if got is None:
-            got = picker.best([c["clip"]], d, collections.defaultdict(list), collections.defaultdict(list), 700,
-                              allow_slow=False)
-        if got is None: raise RuntimeError(f"shot {i}: no window in {c['clip']}")
+            print(f"   shot {i}: nothing steady left in {c['clip']} — dropped, the video is {d:.1f} s shorter")
+            continue
         f, t, sp, ms, _ = got
         own[f].append((t, t + d + 0.3))
         shots.append(dict(file=f, tin=t, dur=d, seg=seg))
