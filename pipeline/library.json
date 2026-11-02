@@ -4826,7 +4826,45 @@
       "manual": false,
       "share": {
         "close": 1.0
-      }
+      },
+      "desc": "Low views along the old red crossmember show a rusty, flaking edge with a small hole, then the bar end near the hydraulic cylinder, then a cut red bar lying on the ground.",
+      "kw": [
+        "crossmember",
+        "trailer",
+        "rust",
+        "damaged",
+        "hole",
+        "undercarriage",
+        "hydraulic cylinder",
+        "cut bar"
+      ],
+      "stage": "damage",
+      "subject": "trailer crossmember",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 3.3,
+          "shows": "Low close-up of the old red crossmember with a rusty, flaking lower edge and a small hole in the side, yard behind",
+          "stage": "damage"
+        },
+        {
+          "from": 3.3,
+          "to": 5.7,
+          "shows": "Close-up of the crossmember end near the hydraulic cylinder and hoses, rusty brown steel with a dark area at the joint",
+          "stage": "damage"
+        },
+        {
+          "from": 5.7,
+          "to": 9.9,
+          "shows": "Red crossmember bar lying loose on the ground in front of the frame, with a rubber mat and tire behind; a seam or cut mark is visible near one end",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "21723792|1793632761",
+      "desc_note": "Repaired and reinforced the damaged trailer crossmember/support structure. Removed damaged sections, fabricated and installed replacement support components, and secured the assembly to restore structural integrity and provide proper support for the trailer’s undercarriage components. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793633644,
+      "desc_v": 2
     },
     "crossmemberrepair2.mp4": {
       "cats": [
@@ -4838,7 +4876,45 @@
       "manual": false,
       "share": {
         "close": 0.79
-      }
+      },
+      "desc": "The removed red bar lies on the ground by the mat with a grinder disc nearby, and low views show the empty crossmember area with scuffed ground and the cut ends.",
+      "kw": [
+        "grinder",
+        "cut off",
+        "crossmember",
+        "removed",
+        "rubber mat",
+        "trailer frame",
+        "strip",
+        "ground"
+      ],
+      "stage": "strip",
+      "subject": "removed crossmember",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 6.3,
+          "shows": "Top-down view from the worker's boots of the loose red bar on the ground, a rubber mat, the frame with a NO STEP crossmember and a tire, and a grinder disc at the left edge",
+          "stage": "strip"
+        },
+        {
+          "from": 6.3,
+          "to": 10.3,
+          "shows": "Low angle at ground level of the rusty crossmember and a red rail, with a strap on the gravel and a puddle in the background",
+          "stage": "strip"
+        },
+        {
+          "from": 10.3,
+          "to": 20.1,
+          "shows": "Low views of the frame with the grinder disc on the mat and scuffed tracks in the gravel, rusty bar above and no new bar in place",
+          "stage": "strip"
+        }
+      ],
+      "desc_sig": "43836037|1793632792",
+      "desc_note": "Repaired and reinforced the damaged trailer crossmember/support structure. Removed damaged sections, fabricated and installed replacement support components, and secured the assembly to restore structural integrity and provide proper support for the trailer’s undercarriage components. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793633644,
+      "desc_v": 2
     },
     "crossmemberrepair3.mp4": {
       "cats": [
@@ -4850,7 +4926,45 @@
       "manual": false,
       "share": {
         "close": 0.5
-      }
+      },
+      "desc": "Handheld walkaround of the frame, where a new bare grey steel bar now spans across between the red rails, with a loose jack foot on the gravel below.",
+      "kw": [
+        "new steel bar",
+        "crossmember",
+        "fit",
+        "bare steel",
+        "trailer frame",
+        "jack foot",
+        "no step",
+        "walkaround"
+      ],
+      "stage": "fit",
+      "subject": "new crossmember bar",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 4.3,
+          "shows": "Wide view of the frame with a raw grey steel bar across the red rails and a jack foot on the gravel; some motion blur",
+          "stage": "fit"
+        },
+        {
+          "from": 4.3,
+          "to": 7.0,
+          "shows": "Close, blurry view of the grey bar by the hoses and cylinder, with red diagonal rails in front",
+          "stage": "fit"
+        },
+        {
+          "from": 7.0,
+          "to": 13.4,
+          "shows": "Views along the grey bar across the frame with the red NO STEP rail in the foreground and the jack foot on the ground",
+          "stage": "fit"
+        }
+      ],
+      "desc_sig": "29190490|1793632920",
+      "desc_note": "Repaired and reinforced the damaged trailer crossmember/support structure. Removed damaged sections, fabricated and installed replacement support components, and secured the assembly to restore structural integrity and provide proper support for the trailer’s undercarriage components. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793633644,
+      "desc_v": 2
     },
     "crossmemberrepair4.mp4": {
       "cats": [],
@@ -4858,13 +4972,39 @@
       "enabled": true,
       "reason": "",
       "manual": true,
-      "share": {}
+      "share": {},
+      "desc": "Walkaround of the finished frame showing a bright red crossmember between the rails, with the NO STEP rail, cylinder and hoses at the side.",
+      "kw": [
+        "finished",
+        "red crossmember",
+        "trailer frame",
+        "no step",
+        "walkaround",
+        "hydraulic hoses",
+        "undercarriage"
+      ],
+      "stage": "done",
+      "subject": "finished crossmember",
+      "segments": [
+        {
+          "from": 0.0,
+          "to": 6.9,
+          "shows": "Wide view of the frame with a clean, bright red crossmember between the rails and the NO STEP rail, hoses and cylinder at the left, no damage visible",
+          "stage": "done"
+        }
+      ],
+      "desc_sig": "15101935|1793632804",
+      "desc_note": "Repaired and reinforced the damaged trailer crossmember/support structure. Removed damaged sections, fabricated and installed replacement support components, and secured the assembly to restore structural integrity and provide proper support for the trailer’s undercarriage components. The clips are numbered in the order the work was done.",
+      "desc_mode": "project",
+      "desc_at": 1793633644,
+      "desc_v": 2
     }
   },
   "stories": {
     "springlock": "The trailer's slide-out ramp extension had its old spring lock broken off under the beam end. The shop ground away the broken lock and the end stop (clips 5, 6, 7), welded the end stop back on (clip 4), then welded in a new ring-pull spring lock and tested the slide-out (clips 1, 2, 3). This order is inferred from the clips, since the file order is not the work order.",
     "rampwidening": "A loading ramp that was too narrow for the tires was widened by fitting square-tube side extensions, which were then welded on, as the shop describes it. Judged by the visible condition, the order looks like: ramp with chalk width marks (clips 1-2), extension on with fresh weld heat marks (clips 3-5), then grey and black finished-looking ramp (clips 6-7).",
     "sleevereplacement": "The job was replacing a damaged square-tube sleeve and spring lock assembly on a car-hauler trailer ramp cylinder, starting with the old rusty, worn sleeve and its latch hook. The old assembly was removed, leaving a bare ground hole in the side bracket. A new tube was made up on the bench with a red clevis plate welded on, then fitted, and finally the cylinder and coiled spring lock were back on the new sleeve.",
-    "rampextensionfabrication": "The shop cut flat-bar and plate pieces and welded hinge barrels onto perforated plates on a bench. They then fitted and welded the hinged extension flap onto the end of the trailer deck, and the clips end with walkarounds of the finished flap and deck. The clip numbers are taken as the work order, 1 to 13."
+    "rampextensionfabrication": "The shop cut flat-bar and plate pieces and welded hinge barrels onto perforated plates on a bench. They then fitted and welded the hinged extension flap onto the end of the trailer deck, and the clips end with walkarounds of the finished flap and deck. The clip numbers are taken as the work order, 1 to 13.",
+    "crossmemberrepair": "A rusty, pinholed trailer crossmember beside the hydraulic cylinders was cut out and lay loose on the ground, with the grinder and rubber mat nearby. A new bare steel bar was then fitted across the frame, and the last clip shows a bright red crossmember in place."
   }
 }
