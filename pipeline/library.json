@@ -4855,9 +4855,9 @@
     "crossmemberrepair4.mp4": {
       "cats": [],
       "dull": [],
-      "enabled": false,
-      "reason": "outdoor painting",
-      "manual": false,
+      "enabled": true,
+      "reason": "",
+      "manual": true,
       "share": {}
     }
   },
