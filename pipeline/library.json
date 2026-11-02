@@ -4815,6 +4815,50 @@
       "desc_mode": "project",
       "desc_at": 1793385670,
       "desc_v": 2
+    },
+    "crossmemberrepair1.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "crossmemberrepair2.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.79
+      }
+    },
+    "crossmemberrepair3.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.5
+      }
+    },
+    "crossmemberrepair4.mp4": {
+      "cats": [],
+      "dull": [],
+      "enabled": false,
+      "reason": "outdoor painting",
+      "manual": false,
+      "share": {}
     }
   },
   "stories": {
