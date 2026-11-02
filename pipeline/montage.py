@@ -32,7 +32,7 @@ import autoplan, build, picker, describe
 MODEL = "claude-sonnet-5-5"
 URL = "https://api.anthropic.com/v1/messages"
 FPS = build.FPS
-END = 4.0                         # end card, over the last shots
+END = 2.0                         # end card on black AFTER the last shot: it used to dim the last 4 s of work
 SHOT_MIN, SHOT_MAX = 2.0, 3.0     # boss: something new on screen every 2-3 seconds
 PHOTO_EXT = (".jpg", ".jpeg", ".png", ".webp")
 PHOTO_DUR = 2.0                   # a still is on screen 1.5-2 s; longer and it reads as a frozen video
@@ -54,7 +54,7 @@ Rules, in order of importance:
    anywhere, but not between two shots of the same later stage after the job has moved on.
 2. Start strong: the first shot is the clearest view of the damage — the viewer must see the problem at once.
    End on the finished result: the last three shots are [done] (or the latest stage there is), the best
-   looking ones; the end card with the address sits over them.
+   looking ones; the end card with the address follows on black after them.
 3. Prefer action and detail: sparks, welding, cutting, grinding, a hand fitting a part, a close-up of the
    damage or of the new weld. Skip empty, dull or repetitive stretches when there is better material.
 4. Variety: never the same clip in two shots in a row; a segment at most twice in the whole video, and only
@@ -426,7 +426,7 @@ def plan(prefix, cands, ordered, durs, note, key):
     sec = sum(durs)
     payload = (f"{len(durs)} shots, {sec:.0f} seconds in all. Shot lengths: " +
                ", ".join(f"{i}: {d:.1f}s" for i, d in enumerate(durs)) +
-               f"\nThe last {END:.0f} seconds carry the end card." +
+               f"\nAfter the last shot comes a {END:.0f} s black end card with the address." +
                (f"\n\nWhat the shop says this job is: {note}" if note else "") +
                ("\n\nTHE CLIPS ARE NUMBERED IN THE ORDER THE WORK WAS DONE. Here the clip number decides the "
                 "order, not the stage tags: list the shots in clip-number order (and by time inside a clip). Your "
@@ -549,9 +549,7 @@ def make_ass(path, total, title, sub):
     ev = [f"Dialogue: 2,{ts(0.15)},{ts(3.3)},TBrand,,0,0,0,,{{\\fad(300,350)}}CAR HAULER REPAIR HOUSTON",
           f"Dialogue: 2,{ts(0.25)},{ts(3.3)},{big_style},,0,0,0,,{{\\fad(300,350)}}{title}"]
     if sub: ev.append(f"Dialogue: 2,{ts(0.40)},{ts(3.3)},{sub_style},,0,0,0,,{{\\fad(300,350)}}{sub}")
-    ev += [f"Dialogue: 0,{ts(e0)},{ts(total + 0.1)},Box,,0,0,0,,{{\\fad(300,0)\\an7\\pos(0,0)"
-           f"\\1c&H000000&\\1a&H70&\\bord0\\shad0\\p1}}m 0 0 l 1080 0 1080 1920 0 1920{{\\p0}}",
-           f"Dialogue: 2,{ts(e0 + 0.1)},{ts(total + 0.1)},EndBig,,0,0,0,,{{\\fad(350,0)\\pos(540,860)}}CAR HAULER\\NREPAIR HOUSTON",
+    ev += [f"Dialogue: 2,{ts(e0 + 0.1)},{ts(total + 0.1)},EndBig,,0,0,0,,{{\\fad(350,0)\\pos(540,860)}}CAR HAULER\\NREPAIR HOUSTON",
            f"Dialogue: 2,{ts(e0 + 0.3)},{ts(total + 0.1)},EndSub,,0,0,0,,{{\\fad(350,0)\\pos(540,1075)}}CALL {build.PHONE}",
            f"Dialogue: 2,{ts(e0 + 0.5)},{ts(total + 0.1)},EndAddr,,0,0,0,,{{\\fad(350,0)\\pos(540,1160)}}{build.ADDRESS}",
            f"Dialogue: 3,{ts(0.0)},{ts(e0 + 0.2)},Phone,,0,0,0,,{{\\fad(400,300)}}CALL {build.PHONE}"]
@@ -620,8 +618,13 @@ def render(prefix, shots, title, sub):
         print(f"  shot {i + 1}/{len(shots)}  {s['file']} @{s['tin']:.2f} {s['dur']:.1f}s")
         render_shot(s, f"{d}/{i:02d}.mp4", f"{d}/{i:02d}.trf")
         names.append(f"{d}/{i:02d}.mp4")
+    # the end card's black: its own piece, encoded like the shots so the concat stays a straight copy
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", f"color=c=black:s=1080x1920:r={FPS}",
+                    "-frames:v", str(round(END * FPS)), "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                    "-pix_fmt", "yuv420p", "-g", "30", f"{d}/end.mp4"], check=True, cwd=build.WORK)
+    names.append(f"{d}/end.mp4")
     open(os.path.join(full, "list.txt"), "w", encoding="utf-8").write("".join(f"file '{n.split('/')[-1]}'\n" for n in names))
-    total = sum(round(s["dur"] * FPS) for s in shots) / FPS
+    total = (sum(round(s["dur"] * FPS) for s in shots) + round(END * FPS)) / FPS
     make_ass(os.path.join(full, "over.ass"), total, title, sub)
     # one pass over the joined shots: overlays + fades; relative paths, ffmpeg runs in work\ (a drive colon
     # breaks filter arguments on Windows)
@@ -685,7 +688,7 @@ def main():
     if "--ordered" in sys.argv: ordered = True
     if "--unordered" in sys.argv: ordered = False
     if not cands: sys.exit("no usable stretches in these clips")
-    durs = durations(seconds, prefix)
+    durs = durations(seconds - END, prefix)      # the black end card takes the last END seconds
     # Do not ask for more shots than the footage holds without showing the same picture again: a clip gives
     # at most MAX_PER_CLIP shots (fewer if it has fewer stretches, a short one gives one), a photo one. Three
     # clips cannot fill 30 s — padding them out was half a video of one scene. Shorter beats repeated.
