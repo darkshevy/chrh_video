@@ -29,6 +29,7 @@ URL = "https://api.anthropic.com/v1/messages"
 FPS = build.FPS
 END = 4.0                         # end card, over the last shots
 SHOT_MIN, SHOT_MAX = 2.0, 3.0     # boss: something new on screen every 2-3 seconds
+LENGTH_SLACK = 2.0                # the video may run this much under the length asked for (30 -> 28-32 is fine)
 ORDER = {"damage": 0, "strip": 1, "fit": 2, "weld": 3, "finish": 4, "done": 5}
 CURRENT = os.path.join(os.path.dirname(HERE), "work", "current.json")
 
@@ -145,44 +146,88 @@ def rank(c):
     return ORDER.get(c["stage"], None)
 
 
-def check(order, durs):
-    """[(shot, reason)] for what breaks the rules: stage order, repeats, too short a stretch."""
+def okey(c):
+    """Place in the job when the clips are numbered in work order: clip number, then time inside the clip."""
+    return (c["num"], c["clip"], c["a"])
+
+
+def fit_durations(order, durs):
+    """Same shot lengths, handed out so the longest go to the stretches with the longest runs. The total is
+    unchanged; in clip order the shot positions are fixed, so the lengths move instead."""
+    idx = sorted(range(len(order)), key=lambda i: -(order[i]["longest"] if order[i] else 0))
+    out = list(durs)
+    for i, d in zip(idx, sorted(durs, reverse=True)): out[i] = d
+    # a stretch still shorter than its shot: shorten the shot. The video may end up a second or two under the
+    # length asked for — 28-32 s for a 30 s request is fine, a frozen or repeated frame is not.
+    total, floor = sum(durs), sum(durs) - LENGTH_SLACK
+    for i, c in enumerate(order):
+        if c and c["longest"] < out[i]:
+            cut = min(out[i] - max(SHOT_MIN, round(c["longest"] * FPS) / FPS), total - floor)
+            if cut > 0: out[i] -= cut; total -= cut
+    return out
+
+
+def check(order, durs, ordered=False):
+    """[(shot, reason)] for what breaks the rules: work order, repeats, too short a stretch.
+
+    With the clips in work order the clip numbers decide, not the stage tags: the tags are one model's reading
+    of each stretch and disagree with the real order often enough (the welding clip tagged 'fit', the late
+    frame shots tagged 'fit') to scramble a montage that follows them."""
     out, reached, seen = [], -1, collections.Counter()
     for i, c in enumerate(order):
         if c is None:
             out.append((i, "no segment")); continue
-        r = rank(c)
-        if r is not None:
-            if r < reached: out.append((i, f"goes back to [{c['stage']}] after the job reached a later stage"))
-            reached = max(reached, r)
+        prev = order[i - 1] if i else None
+        if ordered:
+            if prev and okey(c) < okey(prev): out.append((i, f"goes back to {c['clip']} after {prev['clip']}"))
+            if prev and prev["id"] == c["id"]: out.append((i, f"same stretch twice in a row ({c['id']})"))
+        else:
+            r = rank(c)
+            if r is not None:
+                if r < reached: out.append((i, f"goes back to [{c['stage']}] after the job reached a later stage"))
+                reached = max(reached, r)
+            if prev and prev["clip"] == c["clip"]: out.append((i, f"same clip as the shot before ({c['clip']})"))
         seen[c["id"]] += 1
         if seen[c["id"]] > 2: out.append((i, f"{c['id']} used a third time"))
-        if i and order[i - 1] and order[i - 1]["clip"] == c["clip"]:
-            out.append((i, f"same clip as the shot before ({c['clip']})"))
-        if c["longest"] < durs[i]: out.append((i, f"{c['id']} longest run {c['longest']}s < shot {durs[i]:.1f}s"))
+        # in clip order the lengths are handed out afterwards (fit_durations), so only a stretch too short for
+        # any shot counts here
+        need = min(durs) if ordered else durs[i]
+        if c["longest"] < need: out.append((i, f"{c['id']} longest run {c['longest']}s < shot {need:.1f}s"))
     return out
 
 
-def repair(order, durs, cands):
-    """Fix what is still wrong, shot by shot, without asking: the least used segment that keeps the stage
-    order (between the stages of the neighbouring shots), is long enough and is not the neighbours' clip."""
+def repair(order, durs, cands, ordered=False):
+    """Fix what is still wrong, shot by shot, without asking: the least used segment that keeps the work order
+    (between the neighbouring shots), is long enough and is not used up."""
+    if ordered:      # the order itself is not the model's to choose here: sort what it picked
+        order = sorted(order, key=lambda c: okey(c) if c else (10 ** 6, "", 0))
     for _ in range(len(order) * 2):
-        bad = check(order, durs)
+        bad = check(order, durs, ordered)
         if not bad: break
         i, why = bad[0]
         used = collections.Counter(c["id"] for c in order if c)
-        prev_r = max([rank(c) for c in order[:i] if c and rank(c) is not None], default=-1)
-        next_r = min([rank(c) for c in order[i + 1:] if c and rank(c) is not None], default=99)
-        lo, hi = prev_r, max(prev_r, next_r)
-        nb = {order[j]["clip"] for j in (i - 1, i + 1) if 0 <= j < len(order) and order[j]}
-        pool = [x for x in cands if (rank(x) is None or lo <= rank(x) <= hi) and x["clip"] not in nb
-                and x["longest"] >= durs[i] and used[x["id"]] < 2]
-        if not pool:
-            pool = [x for x in cands if x["clip"] not in nb and x["longest"] >= durs[i]] or cands
-        dist = lambda x: abs((lo if rank(x) is None else rank(x)) - max(lo, 0))
-        pool.sort(key=lambda x: (used[x["id"]], rank(x) is None, dist(x), -x["longest"]))
+        if ordered:
+            lo = okey(order[i - 1]) if i and order[i - 1] else (-1, "", 0)
+            hi = next((okey(c) for c in order[i + 1:] if c), (10 ** 6, "", 0))
+            pool = [x for x in cands if lo <= okey(x) <= hi and x["longest"] >= min(durs) and used[x["id"]] < 2
+                    and not (i and order[i - 1] and order[i - 1]["id"] == x["id"])]
+            pool.sort(key=lambda x: (used[x["id"]], -x["longest"]))
+            if not pool:     # nothing fits between the neighbours: keep the order, accept a shorter stretch
+                pool = sorted((x for x in cands if lo <= okey(x) <= hi and x is not order[i]),
+                              key=lambda x: (used[x["id"]], -x["longest"]))
+        else:
+            prev_r = max([rank(c) for c in order[:i] if c and rank(c) is not None], default=-1)
+            next_r = min([rank(c) for c in order[i + 1:] if c and rank(c) is not None], default=99)
+            lo, hi = prev_r, max(prev_r, next_r)
+            nb = {order[j]["clip"] for j in (i - 1, i + 1) if 0 <= j < len(order) and order[j]}
+            pool = [x for x in cands if (rank(x) is None or lo <= rank(x) <= hi) and x["clip"] not in nb
+                    and x["longest"] >= durs[i] and used[x["id"]] < 2]
+            if not pool:
+                pool = [x for x in cands if x["clip"] not in nb and x["longest"] >= durs[i]] or cands
+            dist = lambda x: abs((lo if rank(x) is None else rank(x)) - max(lo, 0))
+            pool.sort(key=lambda x: (used[x["id"]], rank(x) is None, dist(x), -x["longest"]))
+        if not pool or order[i] is pool[0]: break
         new = pool[0]
-        if order[i] is new: break
         print(f"   shot {i}: {why} -> {new['id']} {new['clip']} [{new['stage']}]")
         order[i] = new
     return order
@@ -194,7 +239,11 @@ def plan(prefix, cands, ordered, durs, note, key):
                ", ".join(f"{i}: {d:.1f}s" for i, d in enumerate(durs)) +
                f"\nThe last {END:.0f} seconds carry the end card." +
                (f"\n\nWhat the shop says this job is: {note}" if note else "") +
-               ("\n\nThe clips are numbered in the order the work was done." if ordered else "") +
+               ("\n\nTHE CLIPS ARE NUMBERED IN THE ORDER THE WORK WAS DONE. Here the clip number decides the "
+                "order, not the stage tags: list the shots in clip-number order (and by time inside a clip). Your "
+                "job is to choose WHICH stretches — the best moments, spread over the whole job from the first "
+                "clip to the last. Two shots in a row from one clip are fine when they show different moments."
+                if ordered else "") +
                "\n\nFOOTAGE SEGMENTS (in clip order):\n" +
                "\n".join(f'  {c["id"]}  {c["clip"]} {c["a"]:.1f}-{c["b"]:.1f}s (longest run {c["longest"]}s) '
                          f'[{c["stage"]}]: {c["shows"]}' for c in cands))
@@ -210,7 +259,8 @@ def plan(prefix, cands, ordered, durs, note, key):
     res = ask(payload, key)
     order = read(res)
     print(res.get("why", ""))
-    bad = check(order, durs)
+    if ordered: order = sorted(order, key=lambda c: okey(c) if c else (10 ** 6, "", 0))
+    bad = check(order, durs, ordered)
     if bad:
         print(f"{len(bad)} shot(s) break the rules; asking for a correction…")
         for i, why in bad: print(f"   shot {i}: {why}")
@@ -220,15 +270,17 @@ def plan(prefix, cands, ordered, durs, note, key):
                        "\nIT BREAKS THESE RULES:\n" + "\n".join(f"  shot {i}: {w}" for i, w in bad) +
                        "\n\nGive the whole plan again, fixing exactly these. JSON only.", key)
             order2 = read(res2)
-            if len(check(order2, durs)) < len(bad):
+            if ordered: order2 = sorted(order2, key=lambda c: okey(c) if c else (10 ** 6, "", 0))
+            if len(check(order2, durs, ordered)) < len(bad):
                 order, res = order2, {**res, **{k: v for k, v in res2.items() if v}}
                 print("corrected")
         except Exception as e:
             print(f"no correction ({e}); fixing in code")
-    order = repair(order, durs, cands)
+    order = repair(order, durs, cands, ordered)
+    if ordered: durs = fit_durations(order, durs)
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
-    return order, title, sub
+    return order, title, sub, durs
 
 
 # ------------------------------------------------------------------ exact seconds
@@ -400,7 +452,7 @@ def main():
     print(f"{prefix}: {len(names)} clip(s), {len(cands)} usable stretch(es), {len(durs)} shots for {seconds:.0f} s"
           + (" — clip numbers give the order" if ordered else ""))
 
-    order, title, sub = plan(prefix, cands, ordered, durs, note, key)
+    order, title, sub, durs = plan(prefix, cands, ordered, durs, note, key)
     print(f"\ntitle: {title}" + (f" / {sub}" if sub else ""))
     t = 0.0
     for i, (c, d) in enumerate(zip(order, durs)):
