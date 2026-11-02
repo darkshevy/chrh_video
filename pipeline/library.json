@@ -5160,6 +5160,121 @@
       "desc_mode": "project",
       "desc_at": 1793635307,
       "desc_v": 2
+    },
+    "deckinginstallation1.mp4": {
+      "cats": [
+        "grind"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "grind": 0.58
+      }
+    },
+    "deckinginstallation2.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "deckinginstallation3.mp4": {
+      "cats": [
+        "weld"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "weld": 1.0
+      }
+    },
+    "deckinginstallation4.mp4": {
+      "cats": [
+        "close",
+        "hyd"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.8,
+        "hyd": 0.2
+      }
+    },
+    "deckinginstallation5.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "deckinginstallation6.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 1.0
+      }
+    },
+    "deckinginstallation7.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.82
+      }
+    },
+    "deckinginstallation8.mp4": {
+      "cats": [
+        "wide"
+      ],
+      "dull": [
+        [
+          7.8,
+          8.8
+        ]
+      ],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "wide": 0.9
+      }
+    },
+    "deckinginstallation9.mp4": {
+      "cats": [
+        "close"
+      ],
+      "dull": [],
+      "enabled": true,
+      "reason": "",
+      "manual": false,
+      "share": {
+        "close": 0.76
+      }
     }
   },
   "stories": {
