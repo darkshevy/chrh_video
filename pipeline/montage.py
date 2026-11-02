@@ -101,12 +101,20 @@ def segments(C, names):
     for n in sorted(names, key=lambda n: (num(n), n)):
         for s in C[n].get("segments", []):
             a, b = float(s["from"]), float(s["to"])
-            try: tot, longest = usable(n, C[n], a, b)
+            try:
+                tot, longest = usable(n, C[n], a, b)
+                dur = picker.windows(n)[0]
             except Exception: continue
-            if longest < SHOT_MIN: continue          # cannot carry even the shortest shot
+            short = None
+            if longest < SHOT_MIN:
+                # a clip under 2 s is still a shot, at its own length (from 1 s): the shop wants those moments.
+                # picker needs the shot + 0.3 s inside the file, hence the cap.
+                cap = int(min(longest, dur - 0.35) * FPS) / FPS
+                if cap < 1.0: continue
+                short = longest = cap
             out.append({"id": f"s{len(out) + 1}", "clip": n, "num": num(n), "a": a, "b": b,
-                        "stage": s.get("stage", "other"), "shows": s["shows"],
-                        "usable": round(tot, 1), "longest": round(longest, 1)})
+                        "stage": s.get("stage", "other"), "shows": s["shows"], "short": short,
+                        "usable": round(tot, 1), "longest": round(longest, 2) if short else round(longest, 1)})
     return out, ordered
 
 
@@ -263,6 +271,8 @@ def fit_durations(order, durs):
         if c and c["longest"] < out[i]:
             cut = min(out[i] - max(SHOT_MIN, round(c["longest"] * FPS) / FPS), total - floor)
             if cut > 0: out[i] -= cut; total -= cut
+    for i, c in enumerate(order):     # a short clip runs its own length, whatever the slack
+        if c and c.get("short"): out[i] = min(out[i], c["short"])
     return out
 
 
@@ -293,7 +303,7 @@ def check(order, durs, ordered=False):
             if sum(1 for x in order[:i + 1] if x and x.get("photo")) > max(1, (i + 1) // 3):
                 out.append((i, "too many photos so far — at most one in three shots"))
         # the lengths are handed out afterwards (fit_durations), so only a stretch too short for any shot counts
-        need = min(durs)
+        need = c["short"] if c.get("short") else min(durs)
         # 0.1 s of slack: the stretches are measured in half-second steps, the shots in frames; place() can
         # borrow a second next to the stretch anyway
         if c["longest"] + 0.1 < need: out.append((i, f"{c['id']} longest run {c['longest']}s < shot {need:.1f}s"))
