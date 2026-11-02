@@ -5605,30 +5605,30 @@
       "share": {
         "close": 1.0
       },
-      "desc": "Close-up of the perforated ramp plate along the hinge strap edge, showing a dark crack line running down the plate and rough, uneven weld along the strap edge.",
+      "desc": "Close-up pass over the perforated ramp surface beside the hinge strap, showing a dark crack line running through the grating and lumpy weld-like material along the strap edge.",
       "kw": [
         "trailer ramp",
         "crack",
+        "grating",
         "hinge strap",
-        "perforated plate",
         "before repair",
-        "damage",
-        "close-up"
+        "close-up",
+        "perforated steel"
       ],
       "stage": "damage",
-      "subject": "trailer ramp hinge",
+      "subject": "trailer ramp grating",
       "segments": [
         {
           "from": 0.0,
           "to": 6.6,
-          "shows": "close-up of the hinge strap edge and perforated plate with a visible crack line and ragged old weld along the strap",
+          "shows": "close-up of grating holes and hinge strap with bolt holes; a dark crack line runs down the grating and the strap edge has rough lumpy metal",
           "stage": "damage"
         }
       ],
       "desc_sig": "14728727|1793638175",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     },
     "minorramprepair2.mp4": {
@@ -5642,14 +5642,14 @@
       "share": {
         "close": 1.0
       },
-      "desc": "Angled close-up of the rusty hinge strap and pin tube on the ramp, with lumpy melted-looking residue around the holes and a crack line in the plate.",
+      "desc": "Angled close-up of the hinge strap and pipe on the ramp, with rough melted-looking metal around nearby grating holes and the crack line visible.",
       "kw": [
-        "hinge strap",
-        "pin tube",
-        "rust",
-        "crack",
-        "ragged weld",
         "ramp",
+        "hinge pipe",
+        "strap",
+        "crack",
+        "damaged grating",
+        "rough metal",
         "before repair"
       ],
       "stage": "damage",
@@ -5658,14 +5658,14 @@
         {
           "from": 0.0,
           "to": 4.4,
-          "shows": "close-up of the rusty strap and pin tube with lumpy rough weld around the plate holes and a crack line in the plate",
+          "shows": "close-up of strap with holes and round pipe lying on the grating, rough lumpy metal around the holes and a crack line across the surface",
           "stage": "damage"
         }
       ],
       "desc_sig": "9811287|1793638180",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     },
     "minorramprepair3.mp4": {
@@ -5679,36 +5679,42 @@
       "share": {
         "close": 0.82
       },
-      "desc": "The hinge strap with its pin tube is seen on the plate, then a gloved hand pulls it off and the area around the holes is exposed.",
+      "desc": "The strap with its pipe sits on the grating, then is moved and lifted by a gloved hand over the toothed grating holes.",
       "kw": [
-        "hinge strap",
-        "pin tube",
-        "removal",
+        "strap",
+        "hinge pipe",
         "gloved hand",
-        "perforated plate",
-        "strip",
-        "ramp"
+        "grating",
+        "positioning",
+        "ramp",
+        "close-up"
       ],
-      "stage": "strip",
-      "subject": "ramp hinge strap",
+      "stage": "fit",
+      "subject": "hinge strap and pipe",
       "segments": [
         {
           "from": 0.0,
           "to": 4.5,
-          "shows": "close view of the perforated strap and pin tube still attached across the plate, with a small area of rough weld",
-          "stage": "damage"
+          "shows": "strap with bolt holes and pipe lying across the grating, close-up of rows of holes, no weld beads visible",
+          "stage": "fit"
         },
         {
           "from": 4.5,
+          "to": 6.0,
+          "shows": "blurred moving shot of the grating with the strap lying at an angle",
+          "stage": "other"
+        },
+        {
+          "from": 6.0,
           "to": 11.5,
-          "shows": "blurry handheld shots of a gloved hand lifting the strap and tube off the plate, leaving bare holes and a cleared patch",
-          "stage": "strip"
+          "shows": "gloved hand holding and moving the strap and pipe over the grating",
+          "stage": "fit"
         }
       ],
       "desc_sig": "25289616|1793638192",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     },
     "minorramprepair4.mp4": {
@@ -5722,36 +5728,36 @@
       "share": {
         "close": 0.86
       },
-      "desc": "A gloved hand holds the loose strap and pin tube over the plate, then the strap lies positioned on the plate before welding.",
+      "desc": "A gloved hand holds the strap and pipe on the grating, then the strap rests on the surface while the camera moves around it.",
       "kw": [
-        "fitting",
-        "hinge strap",
-        "pin tube",
+        "strap",
+        "pipe",
         "gloved hand",
-        "perforated plate",
+        "grating",
         "ramp",
-        "positioning"
+        "positioning",
+        "close-up"
       ],
       "stage": "fit",
-      "subject": "ramp hinge strap",
+      "subject": "hinge strap and pipe",
       "segments": [
         {
           "from": 0.0,
           "to": 3.3,
-          "shows": "gloved hand holding the strap and tube against the plate holes, close-up",
+          "shows": "gloved hand holding the strap and pipe against the grating, close-up",
           "stage": "fit"
         },
         {
           "from": 3.3,
           "to": 6.7,
-          "shows": "strap with pin tube lying loose on the clean plate, no weld beads yet, angled close-up",
+          "shows": "strap with holes and pipe resting on the grating, angled view over the ramp holes",
           "stage": "fit"
         }
       ],
       "desc_sig": "14786155|1793638198",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     },
     "minorramprepair5.mp4": {
@@ -5765,30 +5771,30 @@
       "share": {
         "close": 1.0
       },
-      "desc": "Wide view of the ramp with fresh weld beads at the top hinge edge and in a few holes, a loose strap on the plate, and the welding cable and electrode holder lying nearby.",
+      "desc": "Wide view of the ramp with weld beads in grating holes at the top strap and in the lower area, a loose strap lying on the surface and the welding lead nearby.",
       "kw": [
-        "welding",
         "weld beads",
         "ramp",
-        "electrode holder",
-        "hinge strap",
-        "perforated plate",
-        "workshop"
+        "grating",
+        "strap",
+        "welding lead",
+        "wide view",
+        "repair"
       ],
       "stage": "weld",
-      "subject": "trailer ramp",
+      "subject": "ramp grating welds",
       "segments": [
         {
           "from": 0.0,
-          "to": 6.3,
-          "shows": "wide view of the ramp with bright fresh weld beads along the top hinge edge and filling several holes, a loose strap on the plate and the welding cable and clamp nearby",
+          "to": 6.8,
+          "shows": "wide view of the ramp: bright weld beads across holes along the top strap and in the lower grating, a strap with holes lying loose, welding lead and clamp beside it",
           "stage": "weld"
         }
       ],
       "desc_sig": "15101939|1793638202",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     },
     "minorramprepair6.mp4": {
@@ -5804,48 +5810,42 @@
         "close": 0.75,
         "weld": 0.25
       },
-      "desc": "Ground weld beads fill holes next to the hinge edge, a grinding disc sits on the plate, and the clip ends with the welder in a mask standing in the shop.",
+      "desc": "Views of the ramp with the strap along its edge and silver weld beads filling grating holes, with a grinding disc resting on the grating.",
       "kw": [
         "weld beads",
-        "ground welds",
+        "strap",
         "grinding disc",
-        "hinge edge",
         "ramp",
-        "welder",
-        "walkaround"
+        "grating",
+        "welding lead",
+        "ramp edge"
       ],
-      "stage": "done",
-      "subject": "ramp hinge edge",
+      "stage": "weld",
+      "subject": "ramp edge strap",
       "segments": [
         {
           "from": 0.0,
-          "to": 2.7,
-          "shows": "top-down view of the ramp edge with ground weld beads filling several holes beside the hinge, a grinding disc and the electrode holder",
-          "stage": "done"
-        },
-        {
-          "from": 2.7,
-          "to": 5.0,
-          "shows": "blurry view of the loose strap and a chisel lying on the plate, with welds visible in a few holes",
+          "to": 1.0,
+          "shows": "strap with holes along the ramp edge, shiny weld beads in a column of grating holes, red grinding disc and welding lead",
           "stage": "weld"
         },
         {
-          "from": 5.0,
-          "to": 6.2,
-          "shows": "ramp edge again with ground welds beside the hinge and the grinding disc on the plate",
-          "stage": "done"
+          "from": 1.0,
+          "to": 2.2,
+          "shows": "wide view of the grating with the strap at the left edge, a flat tool and a grinding disc on the surface",
+          "stage": "other"
         },
         {
-          "from": 6.2,
-          "to": 7.9,
-          "shows": "welder in a mask and camouflage shirt standing in the shop",
-          "stage": "other"
+          "from": 2.2,
+          "to": 3.5,
+          "shows": "strap standing up on the grating with weld beads in a few holes",
+          "stage": "weld"
         }
       ],
-      "desc_sig": "17423678|1793638210",
+      "desc_sig": "9694879|1793639009",
       "desc_note": "Performed minor welding repairs to the cracked trailer ramp to reinforce the damaged area and restore structural integrity. Clips 1-2 show the cracked ramp before the repair. Clips 3-6 show the welding repair and the finished result. The clips are numbered in the order the work was done.",
       "desc_mode": "project",
-      "desc_at": 1793638600,
+      "desc_at": 1793639109,
       "desc_v": 2
     }
   },
@@ -5857,7 +5857,7 @@
     "crossmemberrepair": "A rusty, pinholed trailer crossmember beside the hydraulic cylinders was cut out and lay loose on the ground, with the grinder and rubber mat nearby. A new bare steel bar was then fitted across the frame, and the last clip shows a bright red crossmember in place.",
     "supportbracketmountingpoint": "The trailer's support bracket mounting point had cracked welds along the frame, with a visible crack running through the weld area, and it was ground back to bright metal. A reinforcement plate was then welded over the repaired area, as seen in the finished clips with fresh weld beads around the plate.",
     "deckinginstallation": "The job was installing new perforated steel decking on a car hauler trailer. The shop cut and ground the plates at a bench, fitted them over the frame, welded them in place, and the clips end with the decking fully installed across the deck and ramp sections.",
-    "minorramprepair": "A trailer ramp with a crack line in the perforated plate beside its hinge strap was filmed first. The hinge strap and pin tube were then lifted off and set back on the plate, and weld beads were laid across the holes and along the hinge edge and ground, ending with a walkaround of the welder."
+    "minorramprepair": "A trailer ramp with a crack running through its perforated grating next to the hinge strap and pipe was filmed before the work (clips 1-2). Clips 3-4 show the strap and pipe being handled and positioned on the grating, and clips 5-6 show the weld beads in the grating holes and along the strap, with a grinding disc and welding lead nearby."
   },
   "photos": {
     "supportbracketmountingpoint2.jpg": {
