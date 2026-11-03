@@ -5,7 +5,12 @@ import sys, os, json, re, subprocess
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import VOICE, PIPE
 from scripts import S, norm, VO
-from pocketsphinx import Decoder
+# pocketsphinx is imported where it is used: it has no ready-made Windows build for every Python and fails to
+# compile without a C compiler, and the menu, the montage and the voicing of finished videos ([A], which gets word
+# timings from ElevenLabs) all import this module without ever aligning anything.
+def Decoder(*a, **k):
+    from pocketsphinx import Decoder as _D
+    return _D(*a, **k)
 
 AJ = os.path.join(PIPE, "align.json")
 EXTRA = os.path.join(PIPE, "extra_dict.txt")   # "word  PH ON EM ES" per line — words the dictionary lacks

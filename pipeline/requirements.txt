@@ -1,8 +1,10 @@
 # Runtime (Python 3.12, Windows). ffmpeg full build is separate: winget install Gyan.FFmpeg
-pocketsphinx==5.1.1
 onnxruntime==1.30.0
 opencv-python==5.0.0.93
 numpy==2.5.2
+# only for the voiced videos built from scripts (step 3 / [M]): word alignment. Not needed for [N] and [A];
+# on a PC where it fails to install (no build for that Python), leave it out.
+pocketsphinx==5.1.1
 # build the .exe
 pyinstaller==6.22.3
 # dev only: regenerate CLIP prompt embeddings (autotag.build_prompts), render the logo SVG, music beat grids
