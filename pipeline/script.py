@@ -133,6 +133,21 @@ def sentences(t):
     return [x.strip().lower() for x in re.split(r"(?<=[.!?])\s+", t.replace("[HOOK 2]", "")) if x.strip()]
 
 
+EX_DIR = os.path.join(ROOT, "scripts", "examples")
+
+
+def examples(limit=7000):
+    """Scripts the shop approved, from scripts\\examples\\, newest first, up to `limit` characters. The API keeps
+    nothing between calls; this folder is how the writer learns what a good script here sounds like."""
+    out, total = [], 0
+    for p in sorted(glob.glob(os.path.join(EX_DIR, "*.txt")), key=os.path.getmtime, reverse=True):
+        try: t = " ".join(open(p, encoding="utf-8-sig").read().split())
+        except Exception: continue
+        if not t or total + len(t) > limit: continue
+        out.append(t); total += len(t)
+    return out
+
+
 def recent_scripts(n=8):
     """The last n scripts written before, newest first — shown to the writer so a new one does not reuse the
     same opening, hook and call to action (two scripts in a row had come back with "This one was." and
@@ -227,7 +242,13 @@ else:
                        "shows — if no segment shows it, leave it out.")
 
 RECENT = recent_scripts()
+EXAMPLES = examples()
 payload = (task + "\n\nVERIFIED FACTS (use nothing outside these):\n" + facts() +
+           ("\n\nEXAMPLES OF SCRIPTS THE SHOP APPROVED — write like these: the same kind of opening, the same "
+            "plain spoken sentences, the same way of walking through the work and closing. They are about OTHER "
+            "jobs: never take a part, a defect, a step, a material or a number from them — the facts of this job "
+            "come only from the shop's note and the footage. Do not copy their sentences.\n" +
+            "\n".join(f"  - {x}" for x in EXAMPLES) if EXAMPLES else "") +
            ("\n\nRECENT SCRIPTS — do not reuse their opening pattern, hook question or call to action:\n" +
             "\n".join(f"  - {x}" for x in RECENT) if RECENT else "") +
            "\n\nKEYS ALREADY USED (do not reuse): " + ", ".join(used_keys()) +
@@ -240,6 +261,7 @@ if loose:
     print(f"note: {len(loose)} clip(s) have the quality gate lifted, so the usable figure is their full length;"
           f" run `python pipeline\\tune.py gate {only or '<prefix>'}` for the real number")
 
+print(f"approved examples: {len(EXAMPLES)}" + ("" if EXAMPLES else " — add good scripts with [T] in the menu"))
 if count == 1:
     why = "as asked" if fit >= want else f"the footage is the limit, not the {secs:.0f}s asked for"
     print(f"{len(names)} clip(s), {total:.0f}s usable footage -> {fit} words, about {fit / WPS:.0f}s ({why})")
