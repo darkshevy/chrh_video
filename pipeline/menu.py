@@ -906,7 +906,17 @@ def step_dub(st):
     except Exception: has = ""
     if not has:
         print(f"  {C.YE}текст пустой — ничего не делаю{C.OFF}"); hold(); return
-    run("dub.py", video, tpath)
+    extra = []
+    if "_montage_" not in os.path.basename(video).lower():
+        # a horizontal edit is usually posted horizontally; offer the 1920x1080 result, answer from the source
+        try:
+            import dub
+            w, h, _ = dub.probe(video)
+        except Exception:
+            w, h = 1080, 1920
+        if yes_no("сделать горизонтальный ролик 1920×1080 (нет — вертикальный 1080×1920)?", default=w > h):
+            extra = ["--landscape"]
+    run("dub.py", video, tpath, *extra)
 
 
 def step_montage(st):

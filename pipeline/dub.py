@@ -15,6 +15,7 @@
 #   -> output\<name>_voiced.mp4; the video it came from is kept
 #
 #   python pipeline\dub.py output\my_edit.mp4 work\dub\text.txt
+#   --landscape    a 1920x1080 result (horizontal posts), the overlays laid out for the wide frame
 import os, sys, re, json, time, base64, random, subprocess, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -184,18 +185,34 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
 
+# The same look laid out for a 1920x1080 frame (horizontal posts): captions low and wider, title top centre
+# under the phone bar, end card centred, the music credit small in the bottom-left corner.
+ASS_HEAD_LAND = ASS_HEAD.replace("PlayResX: 1080\nPlayResY: 1920", "PlayResX: 1920\nPlayResY: 1080")
+for _old, _new in [
+        ("Style: Cap,Arial,84,", "Style: Cap,Arial,72,"), (",2,70,70,540,1\nStyle: TBrand", ",2,120,120,70,1\nStyle: TBrand"),
+        (",8,60,60,560,1\nStyle: TPart,", ",8,60,60,120,1\nStyle: TPart,"), ("Style: TPart,Arial,104,", "Style: TPart,Arial,90,"),
+        (",8,60,60,610,1\nStyle: TName,", ",8,60,60,160,1\nStyle: TName,"), ("Style: TName,Arial,62,", "Style: TName,Arial,52,"),
+        (",8,60,60,740,1\nStyle: TPartS", ",8,60,60,270,1\nStyle: TPartS"), (",8,60,60,620,1\nStyle: TNameS", ",8,60,60,170,1\nStyle: TNameS"),
+        (",8,60,60,750,1\nStyle: EndBig", ",8,60,60,270,1\nStyle: EndBig"),
+        (",8,60,60,436,1\nStyle: Credit", ",8,60,60,30,1\nStyle: Credit"),
+        ("Style: Credit,Arial,34,&H40FFFFFF,&H40FFFFFF,&H60000000,&H80000000,0,0,0,0,100,100,1.5,0,1,1.5,1,2,60,60,440,1",
+         "Style: Credit,Arial,30,&H40FFFFFF,&H40FFFFFF,&H60000000,&H80000000,0,0,0,0,100,100,1.5,0,1,1.5,1,1,50,60,30,1")]:
+    assert _old in ASS_HEAD_LAND, _old
+    ASS_HEAD_LAND = ASS_HEAD_LAND.replace(_old, _new, 1)
+
+
 def ts(t):
     t = max(t, 0.0); return f"{int(t // 3600)}:{int(t % 3600 // 60):02d}:{t % 60:05.2f}"
 
 
-def captions(words):
+def captions(words, per_line=3):
     """Word-by-word captions as in build.make_ass: three words at a time, the spoken and past ones solid,
     the coming ones dimmed; a new group at punctuation or a pause."""
     groups, cur = [], []
     for i, (w, a, b) in enumerate(words):
         if cur:
             pw, pa, pb = words[cur[-1]]
-            if len(cur) >= 3 or re.search(r"[.,:;?!]$", pw) or a - pb > 0.25:
+            if len(cur) >= per_line or re.search(r"[.,:;?!]$", pw) or a - pb > 0.25:
                 groups.append(cur); cur = []
         cur.append(i)
     if cur: groups.append(cur)
@@ -214,15 +231,16 @@ def captions(words):
     return ev
 
 
-def overlays(total, title, sub, credit):
+def overlays(total, title, sub, credit, land=False):
     """Title, phone bar, end card and music credit — the voiced videos' layout (build.make_ass)."""
     e0 = total - END_CARD
+    cx, y1, y2, y3 = (960, 430, 600, 670) if land else (540, 860, 1075, 1160)     # end card lines
     ev = [f"Dialogue: 2,{ts(0.15)},{ts(3.3)},TBrand,,0,0,0,,{{\\fad(300,350)}}CAR HAULER REPAIR HOUSTON",
           f"Dialogue: 2,{ts(0.25)},{ts(3.3)},{'TPart' if len(title) <= 13 else 'TPartS'},,0,0,0,,{{\\fad(300,350)}}{title}"]
     if sub: ev.append(f"Dialogue: 2,{ts(0.40)},{ts(3.3)},{'TName' if len(sub) <= 22 else 'TNameS'},,0,0,0,,{{\\fad(300,350)}}{sub}")
-    ev += [f"Dialogue: 2,{ts(e0 + 0.1)},{ts(total + 0.1)},EndBig,,0,0,0,,{{\\fad(350,0)\\pos(540,860)}}CAR HAULER\\NREPAIR HOUSTON",
-           f"Dialogue: 2,{ts(e0 + 0.3)},{ts(total + 0.1)},EndSub,,0,0,0,,{{\\fad(350,0)\\pos(540,1075)}}CALL {PHONE_TXT}",
-           f"Dialogue: 2,{ts(e0 + 0.5)},{ts(total + 0.1)},EndAddr,,0,0,0,,{{\\fad(350,0)\\pos(540,1160)}}{ADDRESS}",
+    ev += [f"Dialogue: 2,{ts(e0 + 0.1)},{ts(total + 0.1)},EndBig,,0,0,0,,{{\\fad(350,0)\\pos({cx},{y1})}}CAR HAULER\\NREPAIR HOUSTON",
+           f"Dialogue: 2,{ts(e0 + 0.3)},{ts(total + 0.1)},EndSub,,0,0,0,,{{\\fad(350,0)\\pos({cx},{y2})}}CALL {PHONE_TXT}",
+           f"Dialogue: 2,{ts(e0 + 0.5)},{ts(total + 0.1)},EndAddr,,0,0,0,,{{\\fad(350,0)\\pos({cx},{y3})}}{ADDRESS}",
            f"Dialogue: 3,{ts(0.0)},{ts(e0 + 0.2)},Phone,,0,0,0,,{{\\fad(400,300)}}CALL {PHONE_TXT}"]
     if credit: ev.append(f"Dialogue: 2,{ts(0.8)},{ts(5.8)},Credit,,0,0,0,,{{\\fad(500,700)}}{credit}")
     return ev
@@ -257,6 +275,7 @@ def main():
     akey = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 
     montage = "_montage_" in os.path.basename(video).lower()   # title, phone bar and end card are already in it
+    land = "--landscape" in sys.argv and not montage            # 1920x1080 result for horizontal posts
     D0 = duration(video)
     D = D0 if montage else D0 + END_CARD                       # a hand edit gets the black end card added
     room = D - START - END_CARD - 0.2
@@ -293,8 +312,8 @@ def main():
     credit = f"DJ KOZ LOVE  ·  {tname}" if tname else ""
     d = os.path.join(WORK, "dub"); os.makedirs(d, exist_ok=True)
     ass = os.path.join(d, stem + ".ass")
-    open(ass, "w", encoding="utf-8").write(ASS_HEAD + "\n".join(
-        ([] if montage else overlays(D, title, sub, credit)) + captions(timed)) + "\n")
+    open(ass, "w", encoding="utf-8").write((ASS_HEAD_LAND if land else ASS_HEAD) + "\n".join(
+        ([] if montage else overlays(D, title, sub, credit, land)) + captions(timed, 5 if land else 3)) + "\n")
     if not montage: print(f"title: {title}" + (f" / {sub}" if sub else "") + (f"; music: {tname}" if tname else ""))
 
     w, h, has_audio = probe(video)
@@ -309,14 +328,21 @@ def main():
         cmd = ["-i", video, "-i", mp3]
     else:
         # the picture: 1080x1920 (a landscape edit whole over a blurred copy), then 2 s of black for the card
-        if w > h:
+        W_, H_ = (1920, 1080) if land else (1080, 1920)
+        if land and w >= h:
+            pic = "scale=1920:1080:flags=lanczos:force_original_aspect_ratio=increase,crop=1920:1080"
+        elif land:     # a vertical edit in a horizontal post: whole, over a blurred copy
+            pic = ("split=2[bg][fg];[bg]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,"
+                   "boxblur=28:2,eq=brightness=-0.10:saturation=0.9[b];[fg]scale=-2:1080:flags=lanczos[f];"
+                   "[b][f]overlay=(W-w)/2:(H-h)/2")
+        elif w > h:
             pic = ("split=2[bg][fg];[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
                    "boxblur=28:2,eq=brightness=-0.10:saturation=0.9[b];[fg]scale=1080:-2:flags=lanczos[f];"
                    "[b][f]overlay=(W-w)/2:(H-h)/2")
         else:
             pic = "scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920"
         fc = (f"[0:v]{pic},fps={FPS},format=yuv420p,setsar=1[p];"
-              f"color=c=black:s=1080x1920:r={FPS}:d={END_CARD},format=yuv420p,setsar=1[k];"
+              f"color=c=black:s={W_}x{H_}:r={FPS}:d={END_CARD},format=yuv420p,setsar=1[k];"
               f"[p][k]concat=n=2:v=1:a=0,ass={rel}[v];"
               f"[1:a]{vo},asplit=2[vo][vk];[vk]apad=whole_dur={D + 1:.2f}[key];")
         cmd = ["-i", video, "-i", mp3]
