@@ -76,6 +76,11 @@ for n in names:
     line.append(f"sharp min/med/max={min(sharps):.0f}/{sorted(sharps)[len(sharps)//2]:.0f}/{max(sharps):.0f}")
     line.append(f"motion max={max(motions):.0f} (base limit {mlim})")
     line.append(f"PASS@700={ok}/{len(win)} longest run={best_run:.1f}s")
+    try:
+        import motion
+        line.append("camera " + motion.strip(n, build.src(n)))   # · still → pan » whip ↔ back-forth ~ shaky
+    except Exception as e:
+        line.append(f"camera: {e}")
     print(" | ".join(line))
 
 print()

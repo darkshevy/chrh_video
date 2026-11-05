@@ -27,7 +27,7 @@ os.chdir(HERE)
 if not shutil.which("ffmpeg"):
     os.environ["PATH"] += os.pathsep + os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "WinGet", "Links")
 
-import autoplan, build, picker, describe
+import autoplan, build, picker, describe, motion
 
 MODEL = "claude-sonnet-5-5"
 URL = "https://api.anthropic.com/v1/messages"
@@ -92,7 +92,12 @@ def shaky(f):
     mo = sorted(m for (_, m, _) in w); mmed = mo[len(mo) // 2]
     # also relative to the clip: 2 s that shake far more than the other 8 are the shake, even under the limit
     local = lambda m: m > 0.6 * mlim and m > 2.5 * max(mmed, 1.0)
-    return [(t, t + 1.0) for (t, m, s) in w if m > SHAKE * mlim or local(m) or s < picker.JUNK_SHARP * med]
+    out = [(t, t + 1.0) for (t, m, s) in w if m > SHAKE * mlim or local(m) or s < picker.JUNK_SHARP * med]
+    # what the camera itself does (motion.py): swinging back and forth, shaking, whipping — the boss's
+    # "движение в одну сторону, а не в разные"
+    try: out += motion.bad_ranges(f, build.src(f))
+    except Exception as e: print(f"   (no camera-motion check for {f}: {e})")
+    return out
 
 
 def usable(f, rec, a, b):
@@ -475,14 +480,26 @@ def plan(prefix, cands, ordered, durs, note, key):
 
 
 # ------------------------------------------------------------------ exact seconds
+def steady(f, t, d):
+    """Does the camera keep one way through the whole shot? Each 1-s window can pass on its own while the shot
+    pans right and then left; this checks the shot as one stretch."""
+    try: lab, _ = motion.span(f, build.src(f), t, t + d)
+    except Exception: return True
+    return lab not in ("back-forth", "shaky", "whip")
+
+
 def window(c, d, own):
-    """Best unused window of length d inside segment c, widened by up to 2 s if it must be."""
+    """Best unused window of length d inside segment c, widened by up to 2 s if it must be — and steady as a
+    whole: a window whose shot would turn the camera around is ruled out and the next best is tried."""
     for grow in (0.0, 1.0, 2.0):
         forbid = collections.defaultdict(list)
         for f, r in own.items(): forbid[f] += r
         forbid[c["clip"]] += [(0.0, max(0.0, c["a"] - grow)), (c["b"] + grow, 1e9)] + shaky(c["clip"])
-        got = picker.best([c["clip"]], d, forbid, collections.defaultdict(list), 700, allow_slow=False)
-        if got: return got
+        for _ in range(6):
+            got = picker.best([c["clip"]], d, forbid, collections.defaultdict(list), 700, allow_slow=False)
+            if not got: break
+            if steady(got[0], got[1], d): return got
+            forbid[c["clip"]].append((got[1], got[1] + d))
     return None
 
 
@@ -584,11 +601,16 @@ def render_shot(s, out, trf):
     vf = []
     stab = not (f.startswith("DJI") or "DroneDirections" in build.src(f))     # boss rule 3: drones as they are
     if stab:
+        # a shot the camera holds still is locked like a tripod shot (no drift at all); a pan is smoothed and
+        # keeps going
+        try: still = motion.span(f, build.src(f), s["tin"], s["tin"] + s["dur"])[0] == "static"
+        except Exception: still = False
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(s["tin"]), "-t", f"{s['dur'] + 0.3:.3f}",
-                        "-i", build.src(f), "-vf", f"vidstabdetect=shakiness=6:accuracy=15:stepsize=6:result={trf}",
+                        "-i", build.src(f), "-vf", f"vidstabdetect=shakiness=6:accuracy=15:stepsize=6"
+                        f"{':tripod=1' if still else ''}:result={trf}",
                         "-f", "null", "-"], check=True, cwd=build.WORK)
-        vf.append(f"vidstabtransform=input={trf}:smoothing=14:optzoom=1:zoomspeed=0.2:interpol=bicubic"
-                  f":maxshift={max(8, int(0.04 * min(build.dims(f))))}:maxangle=0.05")
+        vf.append(f"vidstabtransform=input={trf}:{'tripod=1' if still else 'smoothing=14'}:optzoom=1:zoomspeed=0.2"
+                  f":interpol=bicubic:maxshift={max(8, int(0.04 * min(build.dims(f))))}:maxangle=0.05")
     w, h = build.dims(f)
     if build.fit_mode(f) or w > h:
         # a landscape clip shown whole over a blurred copy: a 9:16 slice of it keeps a third of the picture and
