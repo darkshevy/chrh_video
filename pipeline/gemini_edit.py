@@ -93,6 +93,8 @@ Rules, in order of importance:
 5. Variety: at most three shots from one clip, never the same moment twice; when two shots come from one clip
    they must show clearly different moments.
 6. A shot must fit inside one usable stretch: start + length <= end of that stretch.
+7. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
+   least once before using any clip a second time.
 """
 
 
@@ -171,6 +173,31 @@ def check(res, durs, names, photos, ordered):
     return shots, problems
 
 
+def cover(shots, names, ordered, log):
+    """Every clip with steady footage gets a shot: a cut of 4 clips out of 9 did not tell what the job was.
+    An unused clip takes the slot of a clip that has the most shots (its later duplicate), at the unused
+    clip's first steady moment that fits the slot's length."""
+    shots = list(shots)
+    for f in sorted(names, key=lambda n: (num(n), n)):
+        if any(s["file"] == f for s in shots) or not good_ranges(f): continue
+        per = collections.Counter(s["file"] for s in shots if not s.get("photo"))
+        if not per or per.most_common(1)[0][1] < 2: break       # nothing doubled left to give up
+        donor = per.most_common(1)[0][0]
+        j = max(i for i, s in enumerate(shots) if s["file"] == donor)
+        d = shots[j]["dur"]
+        used = collections.defaultdict(list)
+        for i, s in enumerate(shots):
+            if i != j and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
+        x = next((x for a, b in good_ranges(f) for x in [a + k * STEP for k in range(int((b - a) / STEP) + 1)]
+                  if x + d <= b + 0.01 and fits(f, x, d, used)), None)
+        if x is None: continue
+        log(f"   {f} was left out — it takes the second shot of {donor}")
+        shots[j] = dict(file=f, tin=round(x, 2), dur=d, why="covers this step of the work (added by code)",
+                        seg={"stage": "", "shows": ""})
+    if ordered: shots.sort(key=lambda s: (num(s["file"]), s["file"], s["tin"]))
+    return shots
+
+
 def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
     log(f"editing with Gemini ({gemini.model().split('/')[-1]}) — it watches the clips")
     durs = montage.durations(seconds - montage.END, prefix)
@@ -182,6 +209,9 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
     if not durs: sys.exit("no steady footage in these clips")
     log(f"{prefix}: {len(names)} clip(s), {len(photos)} photo(s), {len(durs)} shots"
         + (" — clip numbers give the order" if ordered else ""))
+    for f in sorted(names, key=lambda n: (num(n), n)):
+        g = good_ranges(f)
+        if not g: log(f"   {f}: no steady footage (shakes, swings or blurred) — cannot be used")
     parts, listing = clip_parts(names, photos, log)
 
     res = ask_plan(parts, durs, note, ordered)
@@ -202,6 +232,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
         if problems:
             shots, problems = fill(shots, problems, durs, names, ordered, log)
         if problems: log(f"   {len(problems)} slot(s) dropped — the video is that much shorter")
+    shots = cover(shots, names, ordered, log)
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
     show(shots, title, sub, log)
