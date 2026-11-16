@@ -8,7 +8,7 @@
 #
 # Clips are uploaded through the Files API as light 480p copies without sound (same timeline, so the seconds
 # Gemini names are the seconds of the original), and remembered for the two days Google keeps them.
-import threading, os, sys, re, json, time, base64, subprocess, datetime, urllib.request, urllib.error
+import os, sys, re, json, time, base64, subprocess, datetime, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -146,38 +146,73 @@ def image_part(jpeg_b64):
 
 
 # ------------------------------------------------------------------ asking
-# one answer over a dozen clips takes Flash about a minute; 5 minutes with no reply means the call is stuck,
-# and a second try is better than the old silent 15 min x 5 retries that looked like a frozen program
-GEN_TIMEOUT = 300
-def ask_json(parts, max_tokens=16000, temperature=0.4, log=print):
-    """One request, the reply parsed as JSON. A request the API refuses because of the per-video fps setting
-    is sent again without it."""
-    body = {"contents": [{"role": "user", "parts": parts}],
-            "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": max_tokens,
-                                 "temperature": temperature}}
-    m = model()
-    # a reply over several videos takes minutes with nothing printed — a heartbeat shows it is not hung
-    t0, done = time.time(), threading.Event()
-    def beat():
-        while not done.wait(30): log(f"   Gemini думает… {int(time.time() - t0)} с")
-    threading.Thread(target=beat, daemon=True).start()
+# Why streaming: a plain generateContent over several videos sends nothing back until the whole answer is
+# ready; on the shop PC that silent connection sat for 5 minutes and timed out (an idle link gets dropped by
+# routers/antivirus on the way). The streamed reply sends the model's thought summaries as it works, so bytes
+# keep flowing, a stall is noticed in STALL seconds, and the log shows real progress instead of a clock.
+STALL = 120
+# Gemini 3 thinks at "high" unless told otherwise — minutes per montage; "low" is Google's setting for fast
+# answers and is enough to pick shots. GEMINI_THINKING=high brings the deep thinking back.
+THINKING = os.environ.get("GEMINI_THINKING", "low").strip().lower()
+
+
+def _stream(m, body, log):
+    """POST streamGenerateContent?alt=sse -> (text, finishReason, usage). Raises RuntimeError on a stall."""
+    req = urllib.request.Request(f"{API}/v1beta/{m}:streamGenerateContent?alt=sse",
+                                 data=json.dumps(body).encode(), method="POST",
+                                 headers={"x-goog-api-key": key(), "Content-Type": "application/json"})
+    out, finish, usage, thought = [], None, {}, 0
+    t0 = last = time.time()
     try:
-        d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=GEN_TIMEOUT, tries=2)
-    except RuntimeError as e:
-        if "videoMetadata" in str(e) or "video_metadata" in str(e):
-            for p in parts: p.pop("videoMetadata", None)
-            d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=GEN_TIMEOUT, tries=2)
-        else:
+        with urllib.request.urlopen(req, timeout=STALL) as r:     # timeout = longest silence between chunks
+            for raw in r:
+                line = raw.decode("utf-8", "replace").strip()
+                if not line.startswith("data:"): continue
+                d = json.loads(line[5:])
+                usage = d.get("usageMetadata") or usage
+                c = (d.get("candidates") or [{}])[0]
+                finish = c.get("finishReason") or finish
+                for p in c.get("content", {}).get("parts", []):
+                    if p.get("thought"): thought += 1
+                    elif p.get("text"): out.append(p["text"])
+                if time.time() - last >= 20:
+                    last = time.time()
+                    log(f"   Gemini {'пишет ответ' if out else 'думает'}… {int(last - t0)} с")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Gemini HTTP {e.code}: {e.read().decode(errors='replace')[:600]}")
+    except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+        raise RuntimeError(f"Gemini stalled: no data for {STALL} s ({e})")
+    return "".join(out), finish, usage
+
+
+def ask_json(parts, max_tokens=16000, log=print):
+    """One streamed request, the reply parsed as JSON. Settings an older model refuses (per-video fps,
+    thinking level) are dropped and the request sent again; a stall or a 5xx is retried once."""
+    cfg = {"responseMimeType": "application/json", "maxOutputTokens": max_tokens}
+    # temperature stays at the default 1.0: Google warns that lower values make Gemini 3 loop or degrade
+    if THINKING in ("minimal", "low", "medium", "high"):
+        cfg["thinkingConfig"] = {"thinkingLevel": THINKING, "includeThoughts": True}
+    body = {"contents": [{"role": "user", "parts": parts}], "generationConfig": cfg}
+    m = model()
+    log(f"   Gemini смотрит клипы (думает: {THINKING})…")
+    for attempt in range(4):
+        try:
+            txt, finish, u = _stream(m, body, log); break
+        except RuntimeError as e:
+            msg = str(e)
+            if ("videoMetadata" in msg or "video_metadata" in msg) and any("videoMetadata" in p for p in parts):
+                for p in parts: p.pop("videoMetadata", None)
+                log("   модель не берёт fps для видео — без него"); continue
+            if ("thinking" in msg.lower()) and "thinkingConfig" in cfg and "HTTP 400" in msg:
+                cfg.pop("thinkingConfig"); log("   модель не берёт уровень обдумывания — без него"); continue
+            if attempt < 3 and ("stalled" in msg or re.search(r"HTTP (429|500|502|503|504)", msg)):
+                log(f"   {msg[:160]} — повторяю…"); time.sleep(5); continue
             raise
-    finally:
-        done.set()
-    cand = (d.get("candidates") or [{}])[0]
-    txt = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []) if not p.get("thought"))
-    u = d.get("usageMetadata", {})
-    log(f"   ({m.split('/')[-1]}: {u.get('promptTokenCount')} in / {u.get('candidatesTokenCount')} out)")
-    if cand.get("finishReason") == "MAX_TOKENS": raise RuntimeError("Gemini's reply was cut off")
+    log(f"   ({m.split('/')[-1]}: {u.get('promptTokenCount')} in / {u.get('candidatesTokenCount')} out"
+        f" + {u.get('thoughtsTokenCount', 0)} thinking)")
+    if finish == "MAX_TOKENS": raise RuntimeError("Gemini's reply was cut off")
     a, b = txt.find("{"), txt.rfind("}")
-    if a < 0: raise RuntimeError(f"Gemini replied without JSON: {txt[:300]!r} (finish: {cand.get('finishReason')})")
+    if a < 0: raise RuntimeError(f"Gemini replied without JSON: {txt[:300]!r} (finish: {finish})")
     return json.loads(txt[a:b + 1])
 
 
