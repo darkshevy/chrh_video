@@ -8,7 +8,7 @@
 #
 # Clips are uploaded through the Files API as light 480p copies without sound (same timeline, so the seconds
 # Gemini names are the seconds of the original), and remembered for the two days Google keeps them.
-import os, sys, re, json, time, base64, subprocess, datetime, urllib.request, urllib.error
+import threading, os, sys, re, json, time, base64, subprocess, datetime, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -150,6 +150,11 @@ def ask_json(parts, max_tokens=16000, temperature=0.4, log=print):
             "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": max_tokens,
                                  "temperature": temperature}}
     m = model()
+    # a reply over several videos takes minutes with nothing printed — a heartbeat shows it is not hung
+    t0, done = time.time(), threading.Event()
+    def beat():
+        while not done.wait(30): log(f"   Gemini думает… {int(time.time() - t0)} с")
+    threading.Thread(target=beat, daemon=True).start()
     try:
         d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=900)
     except RuntimeError as e:
@@ -158,6 +163,8 @@ def ask_json(parts, max_tokens=16000, temperature=0.4, log=print):
             d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=900)
         else:
             raise
+    finally:
+        done.set()
     cand = (d.get("candidates") or [{}])[0]
     txt = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []) if not p.get("thought"))
     u = d.get("usageMetadata", {})
