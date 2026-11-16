@@ -64,26 +64,53 @@ def nearest(f, t, d, used, reach=3.0):
     return best
 
 
+_CANDS = {}
+LEN = 3.0       # candidate length = the longest slot of this video (set in run), so every slot fits any id
+
+
+def candidates(f, L):
+    """Ready-made shots of this clip: L-second windows that pass every check (steady stretch, one camera
+    direction over the whole shot), not overlapping, earliest first. Gemini chooses among these by id instead
+    of guessing a start second: guessed seconds missed the checks for half the slots, and every miss cost a
+    second slow round trip."""
+    k = (f, round(L, 2))
+    if k in _CANDS: return _CANDS[k]
+    out, used = [], collections.defaultdict(list)
+    for a, b in good_ranges(f):
+        x = a
+        while x + L <= b + 0.01:
+            if fits(f, x, L, used):
+                out.append(round(x, 2)); used[f].append((x, x + L + 0.3)); x += L + 0.3
+            else:
+                x += STEP
+    _CANDS[k] = out
+    return out
+
+
+def cand_table(names, L):
+    """{"c3.2": (clip, start)} for every candidate of every clip."""
+    t = {}
+    for f in names:
+        for k, x in enumerate(candidates(f, L), 1): t[f"c{num(f)}.{k}"] = (f, x)
+    return t
+
+
 def capacity(names, photos):
     """Shots the footage holds without repeating itself: per clip one per 2.5 s of steady footage, at most
     montage.MAX_PER_CLIP (a short steady stretch still gives one); a photo one."""
-    n = 0
-    for f in names:
-        steady = sum(b - a for a, b in good_ranges(f))
-        n += min(montage.MAX_PER_CLIP, int(steady // 2.5) or (1 if steady >= 1.0 else 0))
-    return n + len(photos)
+    return sum(min(montage.MAX_PER_CLIP, len(candidates(f, LEN))) for f in names) + len(photos)
 
 
 RULES = """You are the editor of short vertical promo videos for a car hauler (car carrier trailer) repair shop.
 You can watch the footage. There is no voice-over yet; a voice and captions are added later, so the pictures
 alone have to tell the job — from the broken part to the finished repair — and look professional.
 
-Pick a shot for every slot. A shot is a clip and the second it starts at; its length is given per slot.
+Pick a shot for every slot. The shots you can use are listed under each clip as ids like c3.2 (clip 3,
+candidate 2) with their time in the clip; each one is already checked to be steady. Watch the clip at those
+times and choose the ids that show the work best. Use an id at most once.
 
 Rules, in order of importance:
-1. Only steady footage. Use only the "usable" stretches listed for each clip; within them prefer moments where
-   the camera holds still or moves smoothly ONE way. Never a camera that swings back and forth, shakes, or
-   whips — it looks amateur. Never a blurred or dark moment, never the phone being raised or lowered.
+1. Only listed ids. Among them avoid any that you see is blurred, dark, or the phone being raised or lowered.
 2. The order of the work. Damage first, then removal / cutting / grinding, fitting, welding, paint, and the
    finished result last. Never show a finished part before the work that made it.
 3. Start strong: the first shot is the clearest view of the damage (or of the job, if there is no damage).
@@ -92,21 +119,20 @@ Rules, in order of importance:
    the damage or of a fresh weld. Skip empty or repetitive moments, a wall, the floor, people standing.
 5. Variety: at most three shots from one clip, never the same moment twice; when two shots come from one clip
    they must show clearly different moments.
-6. A shot must fit inside one usable stretch: start + length <= end of that stretch.
-7. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
+6. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
    least once before using any clip a second time.
 """
 
 
 def clip_parts(names, photos, log):
+    L = LEN
     parts, listing = [], []
     for f in sorted(names, key=lambda n: (num(n), n)):
         d, _ = picker.windows(f)
-        g = good_ranges(f)
-        strip = motion.strip(f, build.src(f))
-        txt = (f"CLIP {f} — {d:.1f} s. Camera, one mark per half second from 0:00 "
-               f"(· still, → smooth pan, » too fast, ↔ swings back and forth, ~ shakes): {strip}\n"
-               f"Usable stretches (seconds): " + (", ".join(f"{a:.1f}-{b:.1f}" for a, b in g) or "none"))
+        c = candidates(f, L)
+        if not c: continue                  # nothing steady: Gemini need not watch it (and pays no tokens)
+        txt = (f"CLIP {num(f)} = {f} — {d:.1f} s. Shots you can use: " +
+               ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s" for k, x in enumerate(c, 1)))
         listing.append(txt)
         parts.append({"text": txt})
         parts.append(gemini.video_part(gemini.video(f, build.src(f), log=log)))
@@ -130,10 +156,20 @@ def ask_plan(parts, durs, note, ordered, extra=""):
             'Mark up to three key shots with "key": true — the clearest damage, the most striking moment of the '
             'work, the finished result; they get a slow push-in, so pick shots where the camera holds still.\n'
             + extra +
-            '\nReply with JSON only: {"shots": [{"slot": 0, "clip": "<file name>", "start": 12.5, '
+            '\nReply with JSON only: {"shots": [{"slot": 0, "id": "c3.2", '
             '"why": "a few words", "key": false}], "title": "2-4 words, max 22 characters, capitals, the repair", '
             '"sub": "max 30 characters, capitals, the gist", "note": "one sentence about the cut"}')
     return gemini.ask_json(parts + [{"text": task}])
+
+
+def resolve(r, lower, table):
+    """(file, start) of one picked shot: by candidate id, or by clip name + start as before."""
+    cid = str(r.get("id", "")).strip().lower()
+    if cid in table: return table[cid]
+    f = lower.get(str(r.get("clip", "")).lower())
+    try: t = float(r.get("start", 0))
+    except Exception: t = 0.0
+    return (f, t) if f else (None, 0.0)
 
 
 def check(res, durs, names, photos, ordered):
@@ -145,9 +181,11 @@ def check(res, durs, names, photos, ordered):
         except Exception: continue
     used, per, shots, problems = collections.defaultdict(list), collections.Counter(), [], []
     lower = {n.lower(): n for n in list(names) + list(photos)}
+    lower.update({f"p{num(n)}": n for n in photos})
+    table = cand_table(names, LEN)
     for i, d in enumerate(durs):
         r = by.get(i)
-        f = lower.get(str((r or {}).get("clip", "")).lower()) if r else None
+        f, t = resolve(r, lower, table) if r else (None, 0.0)
         if not f:
             problems.append((i, "no shot, or a clip name that does not exist")); continue
         if f in photos:
@@ -159,8 +197,6 @@ def check(res, durs, names, photos, ordered):
             continue
         if per[f] >= montage.MAX_PER_CLIP:
             problems.append((i, f"a fourth shot from {f}")); continue
-        try: t = float(r.get("start", 0))
-        except Exception: t = 0.0
         x = t if fits(f, t, d, used) else nearest(f, t, d, used)
         if x is None:
             problems.append((i, f"{f} at {t:.1f}s is not steady (shake, swing or blur) or already shown, and "
@@ -200,7 +236,9 @@ def cover(shots, names, ordered, log):
 
 def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
     log(f"editing with Gemini ({gemini.model().split('/')[-1]}) — it watches the clips")
+    global LEN
     durs = montage.durations(seconds - montage.END, prefix)
+    LEN = max(durs)
     cap = capacity(names, photos)
     if cap < len(durs):
         durs = durs[:cap]
@@ -252,6 +290,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
                             f"SAYS THESE SHOTS ARE WEAK:\n{fix}\nKeep every other slot exactly as it is and give "
                             "these slots different, better moments.\n")
             s3, changed = replace(shots, bad, res3, names, photos, ordered)
+            if changed: s3 = cover(s3, names, ordered, log)     # a swap must not drop a step of the job
             if changed:
                 log(f"   replaced shot(s) {', '.join(map(str, changed))}")
                 draft = out
@@ -305,10 +344,12 @@ def replace(shots, bad, res, names, photos, ordered):
         try: by[int(r.get("slot", r.get("shot")))] = r
         except Exception: continue
     lower = {n.lower(): n for n in list(names) + list(photos)}
+    lower.update({f"p{num(n)}": n for n in photos})
+    table = cand_table(names, LEN)
     out = list(shots)
     for i in bad:
         r, d = by.get(i), shots[i]["dur"]
-        f = lower.get(str((r or {}).get("clip", "")).lower()) if r else None
+        f, t = resolve(r, lower, table) if r else (None, 0.0)
         if not f: continue
         if f in photos:
             if (i and out[i - 1].get("photo")) or (i + 1 < len(out) and out[i + 1].get("photo")): continue
@@ -319,8 +360,6 @@ def replace(shots, bad, res, names, photos, ordered):
         for j, s in enumerate(out):
             if j != i and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
         if sum(1 for j, s in enumerate(out) if j != i and s["file"] == f) >= montage.MAX_PER_CLIP: continue
-        try: t = float(r.get("start", 0))
-        except Exception: continue
         x = t if fits(f, t, d, used) else nearest(f, t, d, used)
         if x is None: continue
         out[i] = dict(file=f, tin=round(x, 2), dur=d, why=r.get("why", ""), moved=abs(x - t) > 0.05,

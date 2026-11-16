@@ -152,9 +152,9 @@ def image_part(jpeg_b64):
 # keep flowing, a stall is noticed in STALL seconds, and the log shows real progress instead of a clock.
 STALL = 120
 # Gemini 3 thinks at "high" unless told otherwise — minutes per montage and the answer cut off; at "low" Flash
-# did not think at all and half its shots missed the steady stretches. "medium" sits between;
-# GEMINI_THINKING=low|high overrides.
-THINKING = os.environ.get("GEMINI_THINKING", "medium").strip().lower()
+# did not think at all, "medium" spent 30k thinking tokens and 3.5 min. Since the shots come as checked ids
+# (gemini_edit.candidates) there is little to reason about, so "low"; GEMINI_THINKING=medium|high overrides.
+THINKING = os.environ.get("GEMINI_THINKING", "low").strip().lower()
 
 
 def _stream(m, body, log):
