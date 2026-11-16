@@ -23,23 +23,26 @@ def key():
     return (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
 
 
-def _req(url, data=None, headers=None, method=None, timeout=600, raw=False):
+def _req(url, data=None, headers=None, method=None, timeout=600, raw=False, tries=5):
     h = {"x-goog-api-key": key()}
     h.update(headers or {})
     body = data if isinstance(data, (bytes, type(None))) else json.dumps(data).encode()
     if body is not None and "content-type" not in {k.lower() for k in h}: h["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=body, headers=h, method=method)
-    for attempt in range(5):
+    for attempt in range(tries):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r if raw else json.load(r)
         except urllib.error.HTTPError as e:
             msg = e.read().decode(errors="replace")[:600]
-            if e.code in (429, 500, 502, 503, 504) and attempt < 4:
+            if e.code in (429, 500, 502, 503, 504) and attempt < tries - 1:
+                print(f"   Gemini HTTP {e.code}, повторяю…", flush=True)
                 time.sleep(5 * (attempt + 1)); continue
             raise RuntimeError(f"Gemini HTTP {e.code}: {msg}")
         except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-            if attempt < 4: time.sleep(3 * (attempt + 1)); continue
+            if attempt < tries - 1:
+                print(f"   Gemini не ответил ({e}), повторяю…", flush=True)
+                time.sleep(3 * (attempt + 1)); continue
             raise RuntimeError(f"Gemini unreachable: {e}")
 
 
@@ -143,6 +146,9 @@ def image_part(jpeg_b64):
 
 
 # ------------------------------------------------------------------ asking
+# one answer over a dozen clips takes Flash about a minute; 5 minutes with no reply means the call is stuck,
+# and a second try is better than the old silent 15 min x 5 retries that looked like a frozen program
+GEN_TIMEOUT = 300
 def ask_json(parts, max_tokens=16000, temperature=0.4, log=print):
     """One request, the reply parsed as JSON. A request the API refuses because of the per-video fps setting
     is sent again without it."""
@@ -156,11 +162,11 @@ def ask_json(parts, max_tokens=16000, temperature=0.4, log=print):
         while not done.wait(30): log(f"   Gemini думает… {int(time.time() - t0)} с")
     threading.Thread(target=beat, daemon=True).start()
     try:
-        d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=900)
+        d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=GEN_TIMEOUT, tries=2)
     except RuntimeError as e:
         if "videoMetadata" in str(e) or "video_metadata" in str(e):
             for p in parts: p.pop("videoMetadata", None)
-            d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=900)
+            d = _req(f"{API}/v1beta/{m}:generateContent", body, timeout=GEN_TIMEOUT, tries=2)
         else:
             raise
     finally:
