@@ -124,9 +124,12 @@ def ask_plan(parts, durs, note, ordered, extra=""):
              "(and by time inside a clip).\n" if ordered else "") +
             f"\n{len(durs)} slots, lengths in seconds: " + ", ".join(f"{i}: {d:.1f}" for i, d in enumerate(durs)) +
             "\nA photo fills a slot of any length (it is held about two seconds); use photos only where they show "
-            "something the video does not, never two in a row.\n" + extra +
+            "something the video does not, never two in a row.\n"
+            'Mark up to three key shots with "key": true — the clearest damage, the most striking moment of the '
+            'work, the finished result; they get a slow push-in, so pick shots where the camera holds still.\n'
+            + extra +
             '\nReply with JSON only: {"shots": [{"slot": 0, "clip": "<file name>", "start": 12.5, '
-            '"why": "a few words"}], "title": "2-4 words, max 22 characters, capitals, the repair", '
+            '"why": "a few words", "key": false}], "title": "2-4 words, max 22 characters, capitals, the repair", '
             '"sub": "max 30 characters, capitals, the gist", "note": "one sentence about the cut"}')
     return gemini.ask_json(parts + [{"text": task}])
 
@@ -149,6 +152,7 @@ def check(res, durs, names, photos, ordered):
             if shots and shots[-1].get("photo"):
                 problems.append((i, "two photos in a row")); continue
             shots.append(dict(file=f, path=photos[f], tin=0.0, dur=d, photo=True, why=r.get("why", ""),
+                              push=bool(r.get("key")) and sum(1 for s in shots if s.get("push")) < 3,
                               seg={"stage": "photo", "shows": r.get("why", "")}))
             continue
         if per[f] >= montage.MAX_PER_CLIP:
@@ -161,6 +165,7 @@ def check(res, durs, names, photos, ordered):
                                 f"there is no steady moment within 3 s")); continue
         used[f].append((x, x + d + 0.3)); per[f] += 1
         shots.append(dict(file=f, tin=round(x, 2), dur=d, why=r.get("why", ""), moved=abs(x - t) > 0.05,
+                          push=bool(r.get("key")) and sum(1 for s in shots if s.get("push")) < 3,
                           seg={"stage": "", "shows": r.get("why", "")}))
     if ordered: shots.sort(key=lambda s: (num(s["file"]), s["file"], s["tin"]))
     return shots, problems

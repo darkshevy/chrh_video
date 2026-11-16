@@ -576,6 +576,18 @@ def make_ass(path, total, title, sub):
     open(path, "w", encoding="utf-8").write(ASS_HEAD + "\n".join(ev) + "\n")
 
 
+PUSH = 0.07        # a slow push-in on key shots: 7 % closer over the shot
+
+
+def push_in(n):
+    """Filters for a smooth push-in over n frames on a 1080x1920 picture. zoompan crops whole pixels (a visible
+    stutter — the earlier photo zoom shook); perspective resamples with sub-pixel precision, so the picture
+    grows evenly frame by frame."""
+    a = f"(1-1/(1+{PUSH}*on/{max(1, n - 1)}))/2"          # the share of the frame trimmed on each side
+    return [f"perspective=x0='W*{a}':y0='H*{a}':x1='W*(1-{a})':y1='H*{a}':x2='W*{a}':y2='H*(1-{a})'"
+            f":x3='W*(1-{a})':y3='H*(1-{a})':interpolation=cubic:eval=frame"]
+
+
 def render_photo(s, out):
     """A still, held: cover-cropped if portrait, whole over a blurred copy if landscape, graded like the
     video. No zoom — ffmpeg's zoompan steps whole pixels per frame and the picture visibly shook. The photo
@@ -589,6 +601,7 @@ def render_photo(s, out):
     h, w = img.shape[:2]
     vf = (build.fit_filters() if w > h else
           ["scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase,crop=1080:1920"])
+    if s.get("push"): vf += push_in(n)
     vf += [build.GRADE, "fps=30", "setpts=PTS-STARTPTS", "format=yuv420p"]
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-loop", "1", "-framerate", str(FPS), "-t", f"{s['dur'] + 0.2:.3f}",
                     "-i", tmp, "-an", "-vf", ",".join(vf), "-frames:v", str(n),
@@ -623,6 +636,11 @@ def render_shot(s, out, trf):
         z, cx, cy = (1.0, 0.5, 0.5)
         vf += [f"scale=1080:1920:flags=lanczos:force_original_aspect_ratio=increase",
                f"crop=1080:1920:'min(max(iw*{cx}-540,0),iw-1080)':'min(max(ih*{cy}-960,0),ih-1920)'"]
+    if s.get("push"):
+        # only where the camera holds still: a push on a pan stacks two movements and looks restless
+        try: hold = motion.span(f, build.src(f), s["tin"], s["tin"] + s["dur"])[0] == "static"
+        except Exception: hold = False
+        if hold: vf += push_in(n)
     vf += [build.GRADE, "unsharp=5:5:0.5:5:5:0.2" if min(build.dims(f)) < 720 else "null",
            "fps=30", "setpts=PTS-STARTPTS", "format=yuv420p"]
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(s["tin"]), "-t", f"{s['dur'] + 0.3:.3f}",
@@ -631,7 +649,36 @@ def render_shot(s, out, trf):
                    check=True, cwd=build.WORK)
 
 
+def beat_grid(prefix):
+    """(track name, offset, [beat times in the video]) — the boss's track the voice-over will carry
+    (dub.find_track, same choice for the same project) and its beats as seconds from the video's start."""
+    try:
+        import dub
+        f, name, off = dub.find_track(prefix)
+        if not name: return None, 0.0, []
+        bt = json.load(open(os.path.join(HERE, "beats", name + ".json")))
+        return name, off, [round(b - off, 3) for b in bt if b - off > 0.5]
+    except Exception:
+        return None, 0.0, []
+
+
+def on_beats(shots, beats):
+    """Move every cut to the nearest beat (at most a quarter second away) so the cuts land on the music the
+    voice-over will lay under them. A shot is never made shorter than 1 s."""
+    t = 0.0
+    for s in shots:
+        end = t + s["dur"]
+        if beats:
+            b = min(beats, key=lambda x: abs(x - end))
+            if abs(b - end) <= 0.26 and b - t >= 1.0: end = b
+        s["dur"] = round((round(end * FPS) - round(t * FPS)) / FPS, 4)
+        t = round(end * FPS) / FPS
+    return shots
+
+
 def render(prefix, shots, title, sub):
+    track, toff, beats = beat_grid(prefix)
+    on_beats(shots, beats)
     tag = 1
     while os.path.exists(os.path.join(build.OUT, f"CHRH_{prefix.capitalize()}_montage_v{tag}.mp4")): tag += 1
     out = os.path.join(build.OUT, f"CHRH_{prefix.capitalize()}_montage_v{tag}.mp4")
@@ -658,6 +705,8 @@ def render(prefix, shots, title, sub):
                     "-an", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
                     "-movflags", "+faststart", out], check=True, cwd=build.WORK)
     shutil.rmtree(full, ignore_errors=True)       # several hundred MB of pieces; the video is what counts
+    if track:     # for [A]: the same track from the same second, so the cuts fall on its beats
+        json.dump({"track": track, "offset": toff}, open(os.path.splitext(out)[0] + ".music.json", "w"))
     try:
         import contact
         contact.sheet(out, build.OUT, 6, 4)
@@ -748,6 +797,7 @@ def main():
     if dry: return
 
     shots = place(order, durs, cands)
+    if shots: shots[0]["push"] = shots[-1]["push"] = True      # the damage and the result, slowly closer
     out, total = render(prefix, shots, title, sub)
     rp = os.path.splitext(out)[0] + "_plan.txt"
     with open(rp, "w", encoding="utf-8") as fh:

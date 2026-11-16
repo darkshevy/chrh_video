@@ -308,11 +308,26 @@ def main():
     timed = [(w, START + a / tempo, START + b / tempo) for (w, a, b) in timed]
 
     title, sub = ("", "") if montage else title_of(text, akey)
-    track, tname, toff = (None, None, 0.0) if montage else find_track(stem)
+    if montage:
+        # the track the montage cut its shots to (montage.render writes it next to the video), from the same
+        # second, so the cuts land on the beats; an older montage without it gets one picked as for any video
+        side = os.path.splitext(video)[0] + ".music.json"
+        try:
+            sm = json.load(open(side))
+            track, tname, toff = find_track(stem)
+            if sm.get("track") in TRACKS:
+                for fn in os.listdir(MUSIC):
+                    if re.sub(r"[^a-z]", "", os.path.splitext(fn)[0].lower()) == re.sub(r"[^a-z]", "", sm["track"].lower()):
+                        track, tname, toff = os.path.join(MUSIC, fn), sm["track"], float(sm.get("offset", 0.0))
+        except Exception:
+            track, tname, toff = find_track(stem)
+    else:
+        track, tname, toff = find_track(stem)
     credit = f"DJ KOZ LOVE  ·  {tname}" if tname else ""
     d = os.path.join(WORK, "dub"); os.makedirs(d, exist_ok=True)
     ass = os.path.join(d, stem + ".ass")
     open(ass, "w", encoding="utf-8").write((ASS_HEAD_LAND if land else ASS_HEAD) + "\n".join(
+        ([f"Dialogue: 2,{ts(0.8)},{ts(5.8)},Credit,,0,0,0,,{{\\fad(500,700)}}{credit}"] if montage and credit else []) +
         ([] if montage else overlays(D, title, sub, credit, land)) + captions(timed, 5 if land else 3)) + "\n")
     if not montage: print(f"title: {title}" + (f" / {sub}" if sub else "") + (f"; music: {tname}" if tname else ""))
 
@@ -323,7 +338,15 @@ def main():
     vo = (("atempo=%.4f," % tempo if tempo != 1.0 else "") +
           f"adelay={ms}|{ms},aresample=48000,aformat=channel_layouts=stereo,highpass=f=80,"
           "acompressor=threshold=0.09:ratio=3:attack=10:release=220,equalizer=f=3200:t=q:w=1.4:g=2,volume=1.5")
-    if montage:
+    if montage and track:
+        # the montage is silent: voice, and the music ducked under it, from the second the cuts were set to
+        fc = (f"[0:v]ass={rel}[v];[1:a]{vo},asplit=2[vo][vk];[vk]apad=whole_dur={D + 1:.2f}[key];"
+              f"[2:a]aresample=48000,aformat=channel_layouts=stereo,volume=0.225,afade=t=in:st=0:d=0.4,"
+              f"afade=t=out:st={D - 1.6:.2f}:d=1.6[mus];"
+              "[mus][key]sidechaincompress=threshold=0.05:ratio=4:attack=25:release=400[md];"
+              "[vo][md]amix=inputs=2:duration=longest:normalize=0,apad,loudnorm=I=-14:TP=-1.5:LRA=11[a]")
+        cmd = ["-i", video, "-i", mp3, "-ss", f"{toff:.3f}", "-t", f"{D + 0.5:.3f}", "-i", track]
+    elif montage:
         fc = f"[0:v]ass={rel}[v];[1:a]{vo},apad[vo];[vo]loudnorm=I=-14:TP=-1.5[a]"
         cmd = ["-i", video, "-i", mp3]
     else:
