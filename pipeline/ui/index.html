@@ -78,6 +78,19 @@ a{color:var(--accent2)}
 #log{flex:1;overflow:auto;background:#0b0d11;border-radius:10px;padding:10px 12px;font:12.5px/1.5 ui-monospace,Consolas,monospace;color:#c6cbd4;white-space:pre-wrap;min-height:120px}
 #result{display:none;flex-direction:column;gap:8px;align-items:flex-start}
 #result video{max-height:38vh;border-radius:10px;background:#000}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin:6px 0 4px;max-height:46vh;overflow:auto;padding-right:4px}
+.fc{background:var(--panel2);border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid transparent;transition:.15s}
+.fc:hover{border-color:var(--accent)}
+.fc .im{aspect-ratio:9/16;background:#0b0c10 center/cover no-repeat;position:relative}
+.fc .im span{position:absolute;bottom:5px;right:5px;font-size:11px;background:rgba(0,0,0,.7);padding:1px 6px;border-radius:6px}
+.fc .im i{position:absolute;top:5px;left:5px;font-style:normal;font-size:11px;font-weight:700;background:var(--accent);color:#1a1200;padding:1px 6px;border-radius:6px}
+.fc .cap{padding:6px 8px;font-size:11.5px;line-height:1.35}
+.fc .cap b{display:block;font-weight:600;word-break:break-all}
+.fc .cap small{color:var(--muted)}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:30;flex-direction:column;gap:10px;padding:20px}
+#ov.on{display:flex}
+#ov video,#ov img{max-width:94vw;max-height:82vh;border-radius:10px;background:#000}
+#ov .t{color:var(--muted);font-size:13px;text-align:center}
 .toast{position:fixed;top:70px;right:24px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:.2s;z-index:20}
 .toast.on{opacity:1}
 </style>
@@ -142,12 +155,26 @@ a{color:var(--accent2)}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div id="ov" onclick="if(event.target.id==='ov')closeOv()"><div id="ovbody"></div><div class="t" id="ovt"></div>
+  <button class="btn" onclick="closeOv()">Закрыть (Esc)</button></div>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let projects = [], vids = [], selP = null, selV = null, jobN = 0, wasRunning = false;
 
+const fmtDate = t => t ? new Date(t*1000).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}) : "";
+const fmtDur = d => d ? (d>=60 ? `${Math.floor(d/60)}:${String(Math.round(d%60)).padStart(2,"0")}` : `${d.toFixed(0)} с`) : "";
+function dateRange(a,b){ const x=fmtDate(a), y=fmtDate(b); return !a ? "" : x===y ? x : `${x} – ${y}`; }
+function closeOv(){ $("#ov").classList.remove("on"); $("#ovbody").innerHTML=""; }
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeOv(); });
+function openFile(f){
+  const src = "/footage/" + encodeURIComponent(f.name);
+  $("#ovbody").innerHTML = f.kind==="photo" ? `<img src="${src}">` :
+    `<video src="${src}" controls autoplay muted onerror="this.outerHTML='<div class=empty>Браузер не может показать этот файл — открой папку footage</div>'"></video>`;
+  $("#ovt").textContent = `${f.name} · ${fmtDate(f.date)}${f.camera_date?"":" (дата файла)"}${f.dur?" · "+fmtDur(f.dur):""}${f.w?` · ${f.w}×${f.h}`:""}${f.folder&&f.folder!=="."?" · папка "+f.folder:""}`;
+  $("#ov").classList.add("on");
+}
 function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2600); }
 async function get(u){ return (await fetch(u)).json(); }
 async function post(u, body){
@@ -179,7 +206,8 @@ function drawProjects(){
   const list = projects.filter(p => p.name.toLowerCase().includes(q));
   $("#plist").innerHTML = list.map(p => `<div class="item ${selP===p.name?"on":""}" data-p="${esc(p.name)}">
       <div><div class="name">${esc(p.name)}</div>
-      <div class="meta">${p.clips} клип(ов)${p.photos?` · ${p.photos} фото`:""}${p.note?` · <span class="badge acc">есть описание</span>`:""}</div></div></div>`).join("")
+      <div class="meta">${p.clips} клип(ов)${p.photos?` · ${p.photos} фото`:""}${p.note?` · <span class="badge acc">есть описание</span>`:""}</div>
+      <div class="meta">${dateRange(p.first,p.last)}</div></div></div>`).join("")
     || `<div class="empty">В footage нет клипов</div>`;
   document.querySelectorAll("#plist .item").forEach(e => e.onclick = () => { selP = e.dataset.p; drawProjects(); drawPForm(); });
 }
@@ -187,7 +215,8 @@ function drawPForm(){
   const p = projects.find(x => x.name===selP); if(!p) return;
   $("#pform").innerHTML = `
     <h2>${esc(p.name)}</h2>
-    <p class="sub">${p.clips} клип(ов)${p.photos?`, ${p.photos} фото`:""}. Кадры каждые 2–3 секунды, от повреждения к готовому, без звука.</p>
+    <p class="sub">${p.clips} клип(ов)${p.photos?`, ${p.photos} фото`:""} · снято <span id="pdate">${dateRange(p.first,p.last)}</span> · нажми на кадр — откроется клип</p>
+    <div class="files" id="files"><div class="hint">загружаю превью…</div></div>
     <label class="f">Описание работы от цеха</label>
     <textarea id="note" placeholder="Например: Replaced the damaged sleeve and spring lock assembly. Before: the old sleeve was bent.">${esc(p.note)}</textarea>
     <div class="hint">Как прислал цех. Помогает отличить «до» от «после».</div>
@@ -196,9 +225,21 @@ function drawPForm(){
     <div class="row"><input type="range" id="secs" min="15" max="60" step="1" value="30"><span class="len" id="secsv">30 с</span>
       <span class="hint">Если ровного материала меньше — выйдет короче, без повторов.</span></div>
     <div style="margin-top:22px"><button class="btn primary big" id="go">Собрать монтаж</button></div>`;
+  loadFiles(p);
   $("#ord").onclick = e => e.currentTarget.classList.toggle("on");
   $("#secs").oninput = e => $("#secsv").textContent = e.target.value + " с";
   $("#go").onclick = () => post("/api/montage",{project:p.name, note:$("#note").value, ordered:$("#ord").classList.contains("on"), seconds:+$("#secs").value});
+}
+async function loadFiles(p){
+  const fs = await get("/api/project?name=" + encodeURIComponent(p.name));
+  if(selP !== p.name) return;
+  $("#files").innerHTML = fs.map((f,i) => `<div class="fc" data-i="${i}">
+      <div class="im" style="background-image:url('/thumb/${encodeURIComponent(f.name)}')">${f.kind==="photo"?"<i>фото</i>":""}<span>${f.kind==="photo"?"":fmtDur(f.dur)}</span></div>
+      <div class="cap"><b>${esc(f.name)}</b><small title="${f.camera_date?"дата съёмки с камеры":"дата файла — камера её не записала"}">${fmtDate(f.date)}${f.camera_date?"":" *"}</small></div></div>`).join("")
+    || `<div class="hint">нет файлов</div>`;
+  document.querySelectorAll("#files .fc").forEach(e => e.onclick = () => openFile(fs[+e.dataset.i]));
+  if(fs.length){ const ds = fs.map(f=>f.date); $("#pdate").textContent = dateRange(Math.min(...ds), Math.max(...ds));
+    p.first = Math.min(...ds); p.last = Math.max(...ds); }
 }
 $("#psearch").oninput = drawProjects;
 

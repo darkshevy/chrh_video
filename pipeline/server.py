@@ -38,6 +38,104 @@ def project_of(name):
     return stem.rstrip("0123456789") or stem
 
 
+# ------------------------------------------------------------------ footage files: date, length, thumbnail
+META = os.path.join(WORK, "footage_meta.json")
+THUMBS = os.path.join(WORK, "thumbs")
+_meta = None
+_meta_lock = threading.Lock()
+
+
+def footage_files():
+    """name -> full path of every clip/photo in footage/ (names are unique there: the library keys on them)."""
+    out = {}
+    for dp, _, fs in os.walk(FOOTAGE):
+        if "_contact" in dp: continue
+        for f in fs:
+            if f.lower().endswith(VIDEO_EXT + PHOTO_EXT): out.setdefault(f, os.path.join(dp, f))
+    return out
+
+
+def file_meta(path):
+    """Shooting date, length and size of one file, cached by (size, mtime) in work/footage_meta.json.
+    The date comes from the camera's creation_time tag when there is one: files saved from a messenger or
+    copied to the PC get a fresh modified time, and the operator needs the day it was filmed."""
+    global _meta
+    st = os.stat(path); sig = f"{st.st_size}:{int(st.st_mtime)}"
+    name = os.path.basename(path)
+    with _meta_lock:
+        if _meta is None: _meta = jload(META, {})
+        m = _meta.get(name)
+        if m and m.get("sig") == sig: return m
+    m = {"sig": sig, "date": st.st_mtime, "dur": 0, "w": 0, "h": 0, "camera_date": False}
+    try:
+        p = subprocess.run(["ffprobe", "-v", "error", "-print_format", "json", "-show_format", "-show_streams", path],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
+        d = json.loads(p.stdout or "{}")
+        fmt = d.get("format", {})
+        vs = next((x for x in d.get("streams", []) if x.get("codec_type") == "video"), {})
+        m["dur"] = round(float(fmt.get("duration") or 0), 1) if name.lower().endswith(VIDEO_EXT) else 0
+        w, h = int(vs.get("width") or 0), int(vs.get("height") or 0)
+        rot = (vs.get("tags") or {}).get("rotate") or next((str(x.get("rotation")) for x in vs.get("side_data_list", [])
+                                                             if "rotation" in x), "0")
+        if str(rot).lstrip("-") in ("90", "270"): w, h = h, w
+        m["w"], m["h"] = w, h
+        tags = {k.lower(): v for k, v in {**(fmt.get("tags") or {}), **(vs.get("tags") or {})}.items()}
+        ct = tags.get("com.apple.quicktime.creationdate") or tags.get("creation_time")
+        if ct:
+            import datetime
+            t = datetime.datetime.fromisoformat(ct.replace("Z", "+00:00")).timestamp()
+            if t > 946684800: m["date"], m["camera_date"] = t, True     # 1970/2000 placeholders are not dates
+    except Exception:
+        pass
+    with _meta_lock:
+        _meta[name] = m
+        jsave(META, _meta)
+    return m
+
+
+def project_files(proj):
+    """The project's clips and photos for the preview grid, in clip-number order."""
+    out = []
+    for name, path in footage_files().items():
+        if project_of(name) != proj: continue
+        m = file_meta(path)
+        num = re.search(r"(\d+)$", os.path.splitext(name)[0])
+        out.append({"name": name, "kind": "clip" if name.lower().endswith(VIDEO_EXT) else "photo",
+                    "date": m["date"], "camera_date": m["camera_date"], "dur": m["dur"], "w": m["w"], "h": m["h"],
+                    "folder": os.path.relpath(os.path.dirname(path), FOOTAGE).replace("\\", "/"),
+                    "_n": int(num[1]) if num else 10 ** 6})
+    out.sort(key=lambda f: (f["_n"], f["name"]))
+    for f in out: del f["_n"]
+    return out
+
+
+def thumb(name):
+    """A small jpg of one file (a frame ~1 s in for clips), made once into work/thumbs."""
+    path = footage_files().get(os.path.basename(name))
+    if not path: return None
+    st = os.stat(path)
+    out = os.path.join(THUMBS, f"{os.path.splitext(os.path.basename(path))[0]}_{st.st_size}_{int(st.st_mtime)}.jpg")
+    if os.path.exists(out): return out
+    os.makedirs(THUMBS, exist_ok=True)
+    if path.lower().endswith(PHOTO_EXT):
+        try:     # OpenCV turns phone photos upright by their EXIF orientation; ffmpeg would leave them sideways
+            import cv2
+            im = cv2.imread(path)
+            if im is not None:
+                k = 360 / max(im.shape[:2])
+                cv2.imwrite(out, cv2.resize(im, None, fx=k, fy=k, interpolation=cv2.INTER_AREA))
+                return out
+        except Exception:
+            pass
+    dur = file_meta(path)["dur"]
+    for ss in ([min(1.0, dur / 2)] if dur else []) + [0]:
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{ss:.2f}", "-i", path, "-frames:v", "1",
+                        "-vf", "scale='if(gt(iw,ih),360,-2)':'if(gt(iw,ih),-2,360)'", "-q:v", "5", out],
+                       capture_output=True, timeout=60)
+        if os.path.exists(out): return out
+    return None
+
+
 # ------------------------------------------------------------------ what is there
 def projects():
     """Projects from the files actually in footage\\ — clips and photos — with what the library knows."""
@@ -54,6 +152,10 @@ def projects():
             g = out.setdefault(p, {"name": p, "clips": 0, "photos": 0, "described": 0, "mtime": 0})
             g[kind] += 1
             g["mtime"] = max(g["mtime"], os.path.getmtime(os.path.join(dp, f)))
+            # the filming date once the preview grid has read it; modified time until then
+            m = (_meta or {}).get(f)
+            t = m["date"] if m else os.path.getmtime(os.path.join(dp, f))
+            g["first"] = min(g.get("first", t), t); g["last"] = max(g.get("last", 0), t)
             if kind == "clips" and lib.get(f, {}).get("segments"): g["described"] += 1
     for p, g in out.items():
         n = notes.get(p, "")
@@ -208,18 +310,32 @@ class H(BaseHTTPRequestHandler):
         if p == "/api/status": return self.send(200, status())
         if p == "/api/projects": return self.send(200, projects())
         if p == "/api/videos": return self.send(200, videos())
+        if p == "/api/project":
+            m = re.search(r"name=([^&]*)", u.query or "")
+            return self.send(200, project_files(unquote(m[1]) if m else ""))
+        if p.startswith("/thumb/"):
+            t = thumb(p[len("/thumb/"):])
+            if not t: return self.send(404, {"error": "no thumb"})
+            b = open(t, "rb").read()
+            self.send_response(200); self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(b))); self.send_header("Cache-Control", "max-age=86400")
+            self.end_headers(); return self.wfile.write(b)
+        if p.startswith("/footage/"):
+            f = footage_files().get(os.path.basename(p[len("/footage/"):]))
+            return self.media(f, root=FOOTAGE) if f else self.send(404, {"error": "no file"})
         if p == "/api/job":
             since = int((re.search(r"since=(\d+)", u.query or "") or [0, 0])[1])
             return self.send(200, JOB.view(since))
         if p.startswith("/media/"): return self.media(p[len("/media/"):])
         self.send(404, {"error": "not found"})
 
-    def media(self, name):
-        """A file from output\\ only, with Range support so the browser's player can seek."""
-        f = os.path.realpath(os.path.join(OUT, os.path.basename(name)))
-        if not f.startswith(os.path.realpath(OUT)) or not os.path.isfile(f): return self.send(404, {"error": "no file"})
+    def media(self, name, root=OUT):
+        """A file from output\\ (or footage\\ for the previews) only, with Range support so the player can seek."""
+        f = os.path.realpath(name if root != OUT else os.path.join(OUT, os.path.basename(name)))
+        if not f.startswith(os.path.realpath(root)) or not os.path.isfile(f): return self.send(404, {"error": "no file"})
         size = os.path.getsize(f)
         ctype = mimetypes.guess_type(f)[0] or "application/octet-stream"
+        if f.lower().endswith(".mov"): ctype = "video/mp4"     # Chrome plays iPhone .mov as mp4, not as quicktime
         if ctype == "text/plain": ctype += "; charset=utf-8"
         rng = re.match(r"bytes=(\d*)-(\d*)", self.headers.get("Range", ""))
         a, b = 0, size - 1
@@ -239,7 +355,7 @@ class H(BaseHTTPRequestHandler):
                     chunk = fh.read(min(1 << 20, left))
                     if not chunk: break
                     self.wfile.write(chunk); left -= len(chunk)
-            except (ConnectionResetError, BrokenPipeError):
+            except ConnectionError:     # reset/aborted/broken pipe: the player seeks or closes mid-file — normal
                 pass
 
     def do_POST(self):
@@ -287,9 +403,19 @@ class H(BaseHTTPRequestHandler):
         self.send(404, {"error": "not found"})
 
 
+class Server(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        # the browser drops video and thumbnail requests whenever the user scrolls or seeks (WinError 10053);
+        # a traceback for each of those buried the real messages in the server window
+        if isinstance(sys.exc_info()[1], ConnectionError): return
+        super().handle_error(request, client_address)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), H)
+    srv = Server(("127.0.0.1", PORT), H)
     url = f"http://localhost:{PORT}"
     print(f"CHRH Video — {url}   (закрой это окно, чтобы остановить)")
     if "--no-browser" not in sys.argv:

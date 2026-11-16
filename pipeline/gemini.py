@@ -2,8 +2,9 @@
 # second of it, so it sees the shake, the camera turning, the spark, the hand on the part.
 #
 #   key      GEMINI_API_KEY (or GOOGLE_API_KEY) — Google AI Studio, aistudio.google.com -> Get API key
-#   model    the newest Pro the key can use, found by asking Google's model list (names change too often to
-#            hard-code); GEMINI_MODEL overrides it, e.g. setx GEMINI_MODEL "gemini-3.1-pro"
+#   model    the newest Flash the key can use, found by asking Google's model list (names change too often to
+#            hard-code). Flash watches video well at a fraction of Pro's price; for Pro set it by hand:
+#            setx GEMINI_MODEL "gemini-3.1-pro-preview"
 #
 # Clips are uploaded through the Files API as light 480p copies without sound (same timeline, so the seconds
 # Gemini names are the seconds of the original), and remembered for the two days Google keeps them.
@@ -48,8 +49,8 @@ SKIP = ("lite", "image", "tts", "audio", "live", "embed", "robot", "computer", "
 
 
 def model():
-    """The strongest model this key can use for video: GEMINI_MODEL if set, else the newest Pro (a Flash only
-    when no Pro is offered). Stable versions before previews of the same number."""
+    """GEMINI_MODEL if set, else the newest Flash (Pro only when no Flash is offered) — Pro picked by default
+    cost several times more per video for a montage that Flash edits well. Stable before preview."""
     global _model
     if _model: return _model
     forced = os.environ.get("GEMINI_MODEL", "").strip()
@@ -68,9 +69,9 @@ def model():
         low = n.lower()
         m = re.match(r"models/gemini-(\d+(?:\.\d+)?)-(pro|flash)\b", low)
         if not m or any(s in low for s in SKIP): continue
-        score = (m.group(2) == "pro", float(m.group(1)), "preview" not in low and "exp" not in low, -len(low))
+        score = (m.group(2) == "flash", float(m.group(1)), "preview" not in low and "exp" not in low, -len(low))
         if best is None or score > best[0]: best = (score, n)
-    if not best: raise RuntimeError("no Gemini Pro or Flash model is available to this key: " + ", ".join(names[:20]))
+    if not best: raise RuntimeError("no Gemini Flash or Pro model is available to this key: " + ", ".join(names[:20]))
     _model = best[1]
     return _model
 
