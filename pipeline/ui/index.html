@@ -224,11 +224,14 @@ function drawPForm(){
     <label class="f">Длина ролика</label>
     <div class="row"><input type="range" id="secs" min="15" max="60" step="1" value="30"><span class="len" id="secsv">30 с</span>
       <span class="hint">Если ровного материала меньше — выйдет короче, без повторов.</span></div>
-    <div style="margin-top:22px"><button class="btn primary big" id="go">Собрать монтаж</button></div>`;
+    <div class="row" style="margin-top:22px"><button class="btn primary big" id="go">Собрать монтаж</button>
+      <button class="btn big" id="fresh" title="Gemini заново смотрит клипы и выбирает другие моменты">Другой вариант</button></div>
+    <div class="hint">Если клипы, описание и длина те же — берётся прошлый план, без Gemini и без оплаты.</div>`;
   loadFiles(p);
   $("#ord").onclick = e => e.currentTarget.classList.toggle("on");
   $("#secs").oninput = e => $("#secsv").textContent = e.target.value + " с";
-  $("#go").onclick = () => post("/api/montage",{project:p.name, note:$("#note").value, ordered:$("#ord").classList.contains("on"), seconds:+$("#secs").value});
+  const go = fresh => post("/api/montage",{project:p.name, note:$("#note").value, ordered:$("#ord").classList.contains("on"), seconds:+$("#secs").value, fresh});
+  $("#go").onclick = () => go(false); $("#fresh").onclick = () => go(true);
 }
 async function loadFiles(p){
   const fs = await get("/api/project?name=" + encodeURIComponent(p.name));

@@ -12,7 +12,7 @@
 #      again — the draft is removed, the _plan.txt says what changed and why
 #
 # Used by montage.py when GEMINI_API_KEY is set (--claude forces the older path).
-import os, sys, re, json, collections
+import os, sys, re, json, hashlib, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -234,7 +234,36 @@ def cover(shots, names, ordered, log):
     return shots
 
 
-def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
+PLANS = os.path.join(os.path.dirname(HERE), "work", "gemini_plans.json")
+
+
+def plan_sig(prefix, names, photos, seconds, ordered, note):
+    """What the plan depends on: the files (size + modified time), the note, order, length and model. Same
+    signature -> the same cut, so a rebuild needs no Gemini at all."""
+    files = []
+    for f in sorted(names): st = os.stat(build.src(f)); files.append([f, st.st_size, int(st.st_mtime)])
+    for n, pth in sorted(photos.items()): st = os.stat(pth); files.append([n, st.st_size, int(st.st_mtime)])
+    raw = json.dumps([prefix, files, round(seconds, 1), bool(ordered), note.strip(), gemini.model()])
+    return hashlib.sha1(raw.encode()).hexdigest()[:16]
+
+
+def load_plans():
+    try: return json.load(open(PLANS, encoding="utf-8"))
+    except Exception: return {}
+
+
+def save_plan(prefix, sig, shots, title, sub, res, notes):
+    plans = load_plans()
+    old = plans.get(prefix, {})
+    seen = old.get("seen", []) if old.get("sig") == sig else []
+    seen.append([f"{s['file']}@{s['tin']}" for s in shots])
+    plans[prefix] = {"sig": sig, "shots": shots, "title": title, "sub": sub, "note": res.get("note", ""),
+                     "notes": notes, "seen": seen[-5:]}
+    os.makedirs(os.path.dirname(PLANS), exist_ok=True)
+    json.dump(plans, open(PLANS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
+
+def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fresh=False):
     log(f"editing with Gemini ({gemini.model().split('/')[-1]}) — it watches the clips")
     global LEN
     durs = montage.durations(seconds - montage.END, prefix)
@@ -250,9 +279,32 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
     for f in sorted(names, key=lambda n: (num(n), n)):
         g = good_ranges(f)
         if not g: log(f"   {f}: no steady footage (shakes, swings or blurred) — cannot be used")
+
+    sig = plan_sig(prefix, names, photos, seconds, ordered, note)
+    prev = load_plans().get(prefix, {})
+    same = prev.get("sig") == sig
+    if same and not fresh and prev.get("shots"):
+        # nothing changed since the last cut: render that plan again — no upload, no request, no review
+        log("клипы и описание не менялись — беру прошлый план, Gemini не спрашиваю "
+            "(«Другой вариант» — новый план)")
+        shots, title, sub = prev["shots"], prev["title"], prev.get("sub", "")
+        show(shots, title, sub, log)
+        if dry: return None
+        out, total = montage.render(prefix, shots, title, sub)
+        write_plan(out, shots, title, sub, {"note": prev.get("note", "") + " (the previous plan, reused)"},
+                   prev.get("notes", []))
+        return out, total
+    other = ""
+    if fresh and same and prev.get("seen"):
+        # a new variant: show Gemini what was already used so it picks other moments, not the same cut again
+        other = ("\nTHE OWNER WANTS A DIFFERENT VERSION. Earlier cuts used (clip@start): " +
+                 " | ".join(", ".join(c) for c in prev["seen"]) +
+                 "\nTell the same job, but choose other ids wherever an equally good one exists, and a different "
+                 "opening shot.\n")
+        log("другой вариант: прошу Gemini взять другие моменты")
     parts, listing = clip_parts(names, photos, log)
 
-    res = ask_plan(parts, durs, note, ordered)
+    res = ask_plan(parts, durs, note, ordered, other)
     shots, problems = check(res, durs, names, photos, ordered)
     if problems:
         log(f"{len(problems)} shot(s) do not hold up; asking again for those…")
@@ -304,6 +356,8 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
         except Exception as e:
             log(f"   no replacement ({e}); keeping the first cut")
     write_plan(out, shots, title, sub, res, notes)
+    try: save_plan(prefix, sig, shots, title, sub, res, notes)
+    except Exception as e: log(f"(plan not saved for reuse: {e})")
     return out, total
 
 

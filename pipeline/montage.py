@@ -754,7 +754,8 @@ def main():
         if "--ordered" in sys.argv: ordered = True
         if "--unordered" in sys.argv: ordered = False
         import gemini_edit
-        r = gemini_edit.run(prefix, names, find_photos(prefix), seconds, ordered, note, dry=dry)
+        r = gemini_edit.run(prefix, names, find_photos(prefix), seconds, ordered, note, dry=dry,
+                            fresh="--fresh" in sys.argv)
         if r: print(f"\ndone: output\\{os.path.basename(r[0])}  ({r[1]:.1f} s, no sound)")
         return
     missing = [n for n in names if not C[n].get("segments")]

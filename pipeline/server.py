@@ -370,7 +370,8 @@ class H(BaseHTTPRequestHandler):
             steps = [["chrh.py", "scan"]]
             if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
                 steps.append(["describe.py", proj, "--note", note])
-            steps.append(["montage.py", proj, "--seconds", f"{secs:g}", "--ordered" if d.get("ordered") else "--unordered"])
+            steps.append(["montage.py", proj, "--seconds", f"{secs:g}", "--ordered" if d.get("ordered") else "--unordered"]
+                         + (["--fresh"] if d.get("fresh") else []))
             ok = JOB.start("montage", f"Монтаж: {proj}", steps)
             return self.send(200 if ok else 409, {"ok": ok, "error": None if ok else "уже идёт другая задача"})
         if p == "/api/dub":
