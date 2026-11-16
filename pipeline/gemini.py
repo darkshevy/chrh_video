@@ -185,9 +185,11 @@ def _stream(m, body, log):
     return "".join(out), finish, usage
 
 
-def ask_json(parts, max_tokens=16000, log=print):
+def ask_json(parts, max_tokens=32000, log=print):
     """One streamed request, the reply parsed as JSON. Settings an older model refuses (per-video fps,
     thinking level) are dropped and the request sent again; a stall or a 5xx is retried once."""
+    # thinking tokens count against maxOutputTokens: at "high" Flash spent ~15k of 16k thinking and the JSON
+    # was cut off after 632 tokens, so the cap is the model's whole budget rather than the answer's size
     cfg = {"responseMimeType": "application/json", "maxOutputTokens": max_tokens}
     # temperature stays at the default 1.0: Google warns that lower values make Gemini 3 loop or degrade
     if THINKING in ("minimal", "low", "medium", "high"):

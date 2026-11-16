@@ -283,7 +283,7 @@ def review(out, shots, log):
                "standing), the same moment twice. The text overlays and the black card at the end are fine.\n"
                "Shots: " + "; ".join(table) + "\nList only real problems. Reply with JSON only: "
                '{"problems": [{"shot": 3, "issue": "what is wrong", "replace": true}], "verdict": "one sentence"}')
-        d = gemini.ask_json([gemini.video_part(rec, fps=4), {"text": ask}], max_tokens=8000)
+        d = gemini.ask_json([gemini.video_part(rec, fps=4), {"text": ask}], max_tokens=16000)
         log(f"review: {d.get('verdict', '')}")
         for n in d.get("problems", []): log(f"   shot {n.get('shot')}: {n.get('issue')}")
         return d.get("problems", [])
