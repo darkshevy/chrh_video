@@ -250,6 +250,9 @@ def cover(shots, names, ordered, log):
 
 
 PLANS = os.path.join(os.path.dirname(HERE), "work", "gemini_plans.json")
+# bump when the way shots are chosen changes: a plan made by older code must not be reused (a 4-shot plan
+# from the 3-s candidates came back after the fix)
+PLAN_VERSION = 2
 
 
 def plan_sig(prefix, names, photos, seconds, ordered, note):
@@ -258,7 +261,7 @@ def plan_sig(prefix, names, photos, seconds, ordered, note):
     files = []
     for f in sorted(names): st = os.stat(build.src(f)); files.append([f, st.st_size, int(st.st_mtime)])
     for n, pth in sorted(photos.items()): st = os.stat(pth); files.append([n, st.st_size, int(st.st_mtime)])
-    raw = json.dumps([prefix, files, round(seconds, 1), bool(ordered), note.strip(), gemini.model()])
+    raw = json.dumps([PLAN_VERSION, prefix, files, round(seconds, 1), bool(ordered), note.strip(), gemini.model()])
     return hashlib.sha1(raw.encode()).hexdigest()[:16]
 
 
@@ -296,7 +299,9 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
     sig = plan_sig(prefix, names, photos, seconds, ordered, note)
     prev = load_plans().get(prefix, {})
     same = prev.get("sig") == sig
-    if same and not fresh and prev.get("shots"):
+    # a saved plan far shorter than asked is a failed one, not one to repeat
+    full = sum(s["dur"] for s in prev.get("shots", [])) >= 0.8 * min(seconds - montage.END, sum(durs))
+    if same and not fresh and prev.get("shots") and full:
         # nothing changed since the last cut: render that plan again — no upload, no request, no review
         log("клипы и описание не менялись — беру прошлый план, Gemini не спрашиваю "
             "(«Другой вариант» — новый план)")
