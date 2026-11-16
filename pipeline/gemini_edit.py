@@ -125,12 +125,15 @@ candidate 2) with their time in the clip; each one is already checked to be stea
 times and choose the ids that show the work best. Use an id at most once.
 
 Rules, in order of importance:
-1. Only listed ids. Among them avoid any that you see is blurred, dark, or the phone being raised or lowered.
+1. Only listed ids. What the shot SHOWS matters most: the work itself — welding, cutting, fitting, fastening —
+   beats a calm view of a wall or of someone standing. "(handheld)" ids move with the hand and are stabilised;
+   use them freely when they show the work. Avoid any id that you see is blurred, dark, or the phone being
+   raised or lowered.
 2. The order of the work. Damage first, then removal / cutting / grinding, fitting, welding, paint, and the
    finished result last. Never show a finished part before the work that made it.
 3. Start strong: the first shot is the clearest view of the damage (or of the job, if there is no damage).
    End on the best-looking finished result.
-4. Action and detail win: sparks, the welding arc, a cut, grinding, a hand fitting a part, a sharp close-up of
+4. Action and detail win (even handheld): sparks, the welding arc, a cut, grinding, a hand fitting a part, a sharp close-up of
    the damage or of a fresh weld. Skip empty or repetitive moments, a wall, the floor, people standing.
 5. Variety: at most three shots from one clip, never the same moment twice; when two shots come from one clip
    they must show clearly different moments.
@@ -146,7 +149,9 @@ def clip_parts(names, photos, log):
         c = candidates(f)
         if not c: continue                  # nothing steady: Gemini need not watch it (and pays no tokens)
         txt = (f"CLIP {num(f)} = {f} — {d:.1f} s. Shots you can use: " +
-               ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s" for k, (x, L) in enumerate(c, 1)))
+               ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s"
+                         + (" (handheld)" if motion.handheld(f, build.src(f), x, x + L) else "")
+                         for k, (x, L) in enumerate(c, 1)))
         listing.append(txt)
         parts.append({"text": txt})
         parts.append(gemini.video_part(gemini.video(f, build.src(f), log=log)))
@@ -252,7 +257,7 @@ def cover(shots, names, ordered, log):
 PLANS = os.path.join(os.path.dirname(HERE), "work", "gemini_plans.json")
 # bump when the way shots are chosen changes: a plan made by older code must not be reused (a 4-shot plan
 # from the 3-s candidates came back after the fix)
-PLAN_VERSION = 2
+PLAN_VERSION = 3     # 3: handheld shots allowed (only strong shake is out)
 
 
 def plan_sig(prefix, names, photos, seconds, ordered, note):
@@ -294,7 +299,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         + (" — clip numbers give the order" if ordered else ""))
     for f in sorted(names, key=lambda n: (num(n), n)):
         g = good_ranges(f)
-        if not g: log(f"   {f}: no steady footage (shakes, swings or blurred) — cannot be used")
+        if not g: log(f"   {f}: shakes hard or blurred everywhere — cannot be used")
 
     sig = plan_sig(prefix, names, photos, seconds, ordered, note)
     prev = load_plans().get(prefix, {})
@@ -457,7 +462,8 @@ def review(out, shots, log, ordered=False):
             table.append(f"shot {i}: {t:.1f}-{t + s['dur']:.1f}s ({'photo' if s.get('photo') else 'video'})")
             t += s["dur"]
         ask = ("You are reviewing a finished vertical promo cut for a car hauler repair shop before it goes to "
-               "the owner. He rejects: shaky footage, a camera swinging back and forth, blurred or dark shots, "
+               "the owner. He rejects: strong shaking or fast swinging (light handheld movement is fine when the shot "
+               "shows the work), blurred or dark shots, "
                + ("the shots are already in the order the clips were filmed — do not judge the order; " if ordered else
                   "the order of the work broken (finished parts before the work), ") +
                "dull shots (walls, floor, people "

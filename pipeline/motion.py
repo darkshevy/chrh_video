@@ -27,6 +27,14 @@ BACK_FORTH = 0.45      # consistency under this, while moving, is a swing back a
 MOVING_SPEED = 0.10    # "moving" for the back-and-forth test
 SHAKE = 0.010          # jitter (RMS of the shift left after smoothing) over this is shake
 
+# What the montage throws out. Owner 2026-11-16: "похуй на тряску если кадр информативный, убираем только если
+# прям сильно трясется" — the strict rule cut every moment of actual work (the phone moves with the worker) and
+# left walls and people standing. Handheld shake is stabilised at render; only the extremes go:
+STRONG_SHAKE = 0.025       # jitter 2.5x the shake mark: stabilisation leaves wobble and smear
+STRONG_WHIP = 1.5          # a frame and a half per second: nothing readable
+STRONG_SWING = (0.30, 0.30)  # (speed, consistency): a fast swing back and forth, not a drift while framing
+STRICT = os.environ.get("CHRH_SHAKE", "").strip().lower() == "strict"     # the old rule, if ever wanted
+
 CACHE = os.path.join(os.path.dirname(HERE), "work", "motion_cache.json")
 _cache = None
 LETTER = {"static": "·", "pan": "→", "whip": "»", "back-forth": "↔", "shaky": "~"}
@@ -142,9 +150,25 @@ def windows(name, path):
     return out
 
 
+def too_much(lab, m):
+    """Is this camera movement too strong to use even stabilised?"""
+    if STRICT: return lab in ("back-forth", "shaky", "whip")
+    m = m or {}
+    if lab == "shaky": return m.get("jitter", 0) > STRONG_SHAKE
+    if lab == "whip": return m.get("speed", 0) > STRONG_WHIP
+    if lab == "back-forth": return m.get("speed", 0) >= STRONG_SWING[0] and m.get("cons", 1) < STRONG_SWING[1]
+    return False
+
+
 def bad_ranges(name, path):
-    """[(t0, t1)] the montage never uses: back-and-forth, shake, whip pans."""
-    return [(t, t + WIN) for t, lab, _ in windows(name, path) if lab in ("back-forth", "shaky", "whip")]
+    """[(t0, t1)] the montage never uses: strong shake, a fast swing back and forth, a smeared whip."""
+    return [(t, t + WIN) for t, lab, m in windows(name, path) if too_much(lab, m)]
+
+
+def handheld(name, path, t0, t1):
+    """Does this stretch move with the hand (usable, but stabilised harder and named so in the plan)?"""
+    try: return span(name, path, t0, t1)[0] in ("shaky", "back-forth", "whip")
+    except Exception: return False
 
 
 def span(name, path, t0, t1):

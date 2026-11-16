@@ -94,8 +94,10 @@ def shaky(f):
     sh = sorted(s for (_, _, s) in w); med = sh[len(sh) // 2]
     mo = sorted(m for (_, m, _) in w); mmed = mo[len(mo) // 2]
     # also relative to the clip: 2 s that shake far more than the other 8 are the shake, even under the limit
-    local = lambda m: m > 0.6 * mlim and m > 2.5 * max(mmed, 1.0)
-    out = [(t, t + 1.0) for (t, m, s) in w if m > SHAKE * mlim or local(m) or s < picker.JUNK_SHARP * med]
+    local = lambda m: motion.STRICT and m > 0.6 * mlim and m > 2.5 * max(mmed, 1.0)
+    # blur stays out always (nothing to see); motion only when it is extreme — see motion.too_much
+    lim = SHAKE * mlim if motion.STRICT else 2.5 * mlim
+    out = [(t, t + 1.0) for (t, m, s) in w if m > lim or local(m) or s < picker.JUNK_SHARP * med]
     # what the camera itself does (motion.py): swinging back and forth, shaking, whipping — the boss's
     # "движение в одну сторону, а не в разные"
     try: out += motion.bad_ranges(f, build.src(f))
@@ -486,9 +488,9 @@ def plan(prefix, cands, ordered, durs, note, key):
 def steady(f, t, d):
     """Does the camera keep one way through the whole shot? Each 1-s window can pass on its own while the shot
     pans right and then left; this checks the shot as one stretch."""
-    try: lab, _ = motion.span(f, build.src(f), t, t + d)
+    try: lab, m = motion.span(f, build.src(f), t, t + d)
     except Exception: return True
-    return lab not in ("back-forth", "shaky", "whip")
+    return not motion.too_much(lab, m)
 
 
 def window(c, d, own):
@@ -621,12 +623,17 @@ def render_shot(s, out, trf):
         # keeps going
         try: still = motion.span(f, build.src(f), s["tin"], s["tin"] + s["dur"])[0] == "static"
         except Exception: still = False
+        # a handheld shot kept for what it shows: harder detection, a longer smoothing window and more room to
+        # move the picture (optzoom crops the edges that come in)
+        hand = not still and motion.handheld(f, build.src(f), s["tin"], s["tin"] + s["dur"])
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(s["tin"]), "-t", f"{s['dur'] + 0.3:.3f}",
-                        "-i", build.src(f), "-vf", f"vidstabdetect=shakiness=6:accuracy=15:stepsize=6"
+                        "-i", build.src(f), "-vf", f"vidstabdetect=shakiness={10 if hand else 6}:accuracy=15:stepsize=6"
                         f"{':tripod=1' if still else ''}:result={trf}",
                         "-f", "null", "-"], check=True, cwd=build.WORK)
-        vf.append(f"vidstabtransform=input={trf}:{'tripod=1' if still else 'smoothing=14'}:optzoom=1:zoomspeed=0.2"
-                  f":interpol=bicubic:maxshift={max(8, int(0.04 * min(build.dims(f))))}:maxangle=0.05")
+        shift = 0.08 if hand else 0.04
+        vf.append(f"vidstabtransform=input={trf}:{'tripod=1' if still else 'smoothing=30' if hand else 'smoothing=14'}"
+                  f":optzoom=1:zoomspeed=0.2:interpol=bicubic:maxshift={max(8, int(shift * min(build.dims(f))))}"
+                  f":maxangle={0.08 if hand else 0.05}")
     w, h = build.dims(f)
     if build.fit_mode(f) or w > h:
         # a landscape clip shown whole over a blurred copy: a 9:16 slice of it keeps a third of the picture and
