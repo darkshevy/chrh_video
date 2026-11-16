@@ -5,6 +5,9 @@
 #   python pipeline\montage.py springlock                 ~30 s, title invented from the footage
 #   python pipeline\montage.py springlock --seconds 40
 #   python pipeline\montage.py springlock --dry           show the plan, render nothing
+#   --claude     the older path (Claude plans from text descriptions) even when GEMINI_API_KEY is set
+#
+# With GEMINI_API_KEY set the montage is edited by Gemini, which watches the clips (gemini_edit.py).
 #   --ordered / --unordered   the clips are / are not numbered in work order (overrides the note from step 1)
 #
 # Photos: put them in footage\ named like the clips, springlock5.jpg (JPG or PNG; an iPhone HEIC has to be
@@ -673,8 +676,11 @@ def main():
         try: seconds = float(sys.argv[sys.argv.index("--seconds") + 1])
         except Exception: sys.exit("--seconds wants a number")
     dry = "--dry" in sys.argv
+    import gemini
+    use_gemini = bool(gemini.key()) and "--claude" not in sys.argv     # the model that watches the video
     key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-    if not key: sys.exit('no API key. In PowerShell:  $env:ANTHROPIC_API_KEY = "sk-ant-..."')
+    if not key and not use_gemini:
+        sys.exit('no API key. In PowerShell:  setx GEMINI_API_KEY "..."  (or ANTHROPIC_API_KEY for the older path)')
 
     L = autoplan.apply_lib(); autoplan.refresh_footage()
     C = L["clips"]
@@ -693,6 +699,15 @@ def main():
     note = ""
     try: note = json.load(open(CURRENT, encoding="utf-8")).get("notes", {}).get(prefix, "")
     except Exception: pass
+    if use_gemini:
+        # Gemini watches the clips themselves: no text descriptions, no Claude
+        ordered = "numbered in the order" in note.lower()
+        if "--ordered" in sys.argv: ordered = True
+        if "--unordered" in sys.argv: ordered = False
+        import gemini_edit
+        r = gemini_edit.run(prefix, names, find_photos(prefix), seconds, ordered, note, dry=dry)
+        if r: print(f"\ndone: output\\{os.path.basename(r[0])}  ({r[1]:.1f} s, no sound)")
+        return
     missing = [n for n in names if not C[n].get("segments")]
     if missing:
         print(f"{len(missing)} clip(s) not described yet, describing the project…")

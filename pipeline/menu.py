@@ -968,9 +968,10 @@ def step_montage(st):
     cur["prefix"] = prefix
     cur.setdefault("notes", {})[prefix] = note
     jsave(CURRENT, cur)
-    # describes only what is new or was described with another note; costs nothing for a known project
-    if run("describe.py", prefix, "--note", note, pause=False) != 0:
-        print(f"  {C.RE}описание не получилось — монтаж не собирал{C.OFF}"); hold(); return
+    # with Gemini the clips are watched, not described; the older path describes what is new first
+    if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
+        if run("describe.py", prefix, "--note", note, pause=False) != 0:
+            print(f"  {C.RE}описание не получилось — монтаж не собирал{C.OFF}"); hold(); return
     run("montage.py", prefix, "--seconds", secs, "--ordered" if ordered else "--unordered")
 
 
@@ -1024,6 +1025,8 @@ if path is None:
 warn = []
 if not os.environ.get("ANTHROPIC_API_KEY", "").strip():
     warn.append("ANTHROPIC_API_KEY не задан — описание и подбор кадров работать не будут")
+if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip():
+    warn.append("GEMINI_API_KEY не задан — монтаж [N] без просмотра видео (старый способ)")
 if not os.environ.get("ELEVENLABS_API_KEY", "").strip():
     warn.append("ELEVENLABS_API_KEY не задан — озвучки не будет")
 
