@@ -199,6 +199,8 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
             if len(p2) < len(problems): res, shots, problems = res2, s2, p2; log("   corrected")
         except Exception as e:
             log(f"   no correction ({e})")
+        if problems:
+            shots, problems = fill(shots, problems, durs, names, ordered, log)
         if problems: log(f"   {len(problems)} slot(s) dropped — the video is that much shorter")
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
@@ -233,6 +235,35 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print):
             log(f"   no replacement ({e}); keeping the first cut")
     write_plan(out, shots, title, sub, res, notes)
     return out, total
+
+
+def fill(shots, problems, durs, names, ordered, log):
+    """Slots the model could not place twice are filled by code rather than dropped (a 30 s order came out
+    16 s): each takes a steady, unused stretch from the clip with the fewest shots so far — the later clip
+    on a tie when the clips are ordered, so the gap is not filled with the start of the job."""
+    used, per = collections.defaultdict(list), collections.Counter()
+    for s in shots:
+        if not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3)); per[s["file"]] += 1
+    left, n = [], 0
+    for i, why in problems:
+        d, got = durs[i], None
+        for f in sorted(names, key=lambda f: (per[f], -num(f) if ordered else 0, f)):
+            if per[f] >= montage.MAX_PER_CLIP: continue
+            for a, b in good_ranges(f):
+                x = a
+                while x + d <= b + 0.01 and not got:
+                    if fits(f, x, d, used): got = (f, x)
+                    x += STEP
+                if got: break
+            if got: break
+        if not got: left.append((i, why)); continue
+        f, x = got
+        used[f].append((x, x + d + 0.3)); per[f] += 1; n += 1
+        shots.append(dict(file=f, tin=round(x, 2), dur=d, why="steady filler (picked by code)",
+                          seg={"stage": "", "shows": ""}))
+    if ordered: shots.sort(key=lambda s: (num(s["file"]), s["file"], s["tin"]))
+    if n: log(f"   {n} slot(s) filled by code from steady footage")
+    return shots, left
 
 
 def replace(shots, bad, res, names, photos, ordered):

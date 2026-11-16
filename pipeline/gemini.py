@@ -151,9 +151,10 @@ def image_part(jpeg_b64):
 # routers/antivirus on the way). The streamed reply sends the model's thought summaries as it works, so bytes
 # keep flowing, a stall is noticed in STALL seconds, and the log shows real progress instead of a clock.
 STALL = 120
-# Gemini 3 thinks at "high" unless told otherwise — minutes per montage; "low" is Google's setting for fast
-# answers and is enough to pick shots. GEMINI_THINKING=high brings the deep thinking back.
-THINKING = os.environ.get("GEMINI_THINKING", "low").strip().lower()
+# Gemini 3 thinks at "high" unless told otherwise — minutes per montage and the answer cut off; at "low" Flash
+# did not think at all and half its shots missed the steady stretches. "medium" sits between;
+# GEMINI_THINKING=low|high overrides.
+THINKING = os.environ.get("GEMINI_THINKING", "medium").strip().lower()
 
 
 def _stream(m, body, log):
@@ -213,9 +214,12 @@ def ask_json(parts, max_tokens=32000, log=print):
     log(f"   ({m.split('/')[-1]}: {u.get('promptTokenCount')} in / {u.get('candidatesTokenCount')} out"
         f" + {u.get('thoughtsTokenCount', 0)} thinking)")
     if finish == "MAX_TOKENS": raise RuntimeError("Gemini's reply was cut off")
-    a, b = txt.find("{"), txt.rfind("}")
+    # the first JSON value only: Flash sometimes adds a second object or sends the shots as a bare list,
+    # and slicing first "{" to last "}" then failed with "Extra data"
+    a = min([i for i in (txt.find("{"), txt.find("[")) if i >= 0], default=-1)
     if a < 0: raise RuntimeError(f"Gemini replied without JSON: {txt[:300]!r} (finish: {finish})")
-    return json.loads(txt[a:b + 1])
+    v, _ = json.JSONDecoder().raw_decode(txt[a:])
+    return {"shots": v} if isinstance(v, list) else v
 
 
 if __name__ == "__main__":
