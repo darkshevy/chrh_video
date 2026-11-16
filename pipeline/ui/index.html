@@ -77,7 +77,7 @@ a{color:var(--accent2)}
 .jobbody{display:flex;gap:18px;padding:0 24px 16px;overflow:hidden;flex:1;min-height:0}
 #log{flex:1;overflow:auto;background:#0b0d11;border-radius:10px;padding:10px 12px;font:12.5px/1.5 ui-monospace,Consolas,monospace;color:#c6cbd4;white-space:pre-wrap;min-height:120px}
 #result{display:none;flex-direction:column;gap:8px;align-items:flex-start}
-#result video{max-height:38vh;border-radius:10px;background:#000}
+#result video{max-height:30vh;max-width:40vw;border-radius:10px;background:#000;cursor:zoom-in}
 .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin:6px 0 4px;max-height:46vh;overflow:auto;padding-right:4px}
 .fc{background:var(--panel2);border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid transparent;transition:.15s}
 .fc:hover{border-color:var(--accent)}
@@ -310,12 +310,18 @@ async function pollJob(force){
   $("#jdot").className = "dot" + (j.running ? "" : j.code===0 ? " ok" : " bad");
   $("#jcancel").style.display = j.running ? "" : "none";
   const res = $("#result");
-  if(!j.running && j.result){
+  // drawn once per result: re-inserting the player on every 1-s poll restarted it, the video looped its first second
+  if(!j.running && j.result && res.dataset.shown !== j.result){
+    res.dataset.shown = j.result;
     res.style.display = "flex";
-    res.innerHTML = `<video src="${media(j.result)}" controls autoplay muted></video>
-      <div class="row"><b>${esc(j.result)}</b>${j.kind==="montage"?`<button class="btn primary" id="todub">Озвучить этот ролик</button>`:""}</div>`;
+    res.innerHTML = `<video src="${media(j.result)}" controls muted title="нажми — откроется крупно"></video>
+      <div class="row"><b>${esc(j.result)}</b></div>
+      <div class="row"><button class="btn" id="big">Смотреть крупно</button>${j.kind==="montage"?`<button class="btn primary" id="todub">Озвучить этот ролик</button>`:""}</div>`;
+    const big = () => { res.querySelector("video").pause(); $("#ovbody").innerHTML = `<video src="${media(j.result)}" controls autoplay></video>`;
+      $("#ovt").textContent = j.result; $("#ov").classList.add("on"); };
+    $("#big").onclick = big; res.querySelector("video").onclick = e => { e.preventDefault(); big(); };
     if($("#todub")) $("#todub").onclick = () => { selV = j.result; document.querySelector('nav button[data-t="dub"]').click(); setTimeout(drawVForm, 300); };
-  } else if(j.running) { res.style.display = "none"; res.innerHTML = ""; }
+  } else if(j.running && res.dataset.shown) { res.style.display = "none"; res.innerHTML = ""; res.dataset.shown = ""; }
   if(wasRunning && !j.running){ loadVideos(); loadProjects(); }
   wasRunning = j.running;
 }
