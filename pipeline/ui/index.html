@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHRH Video</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a; --text:#e8eaef; --muted:#8b93a3;
+  --accent:#f5a623; --accent2:#ffbf4d; --ok:#3ecf8e; --bad:#ff5d5d; --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(15,17,21,.92);backdrop-filter:blur(8px);z-index:5;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:.5px;font-size:18px}
+.logo b{color:var(--accent)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.pill.ok{color:var(--ok);border-color:rgba(62,207,142,.35)}
+.pill.bad{color:var(--bad);border-color:rgba(255,93,93,.4)}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel2);padding:8px 14px;border-radius:10px;cursor:pointer;transition:.15s}
+.btn:hover{border-color:#3a4150;background:#252a35}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1a1200;font-weight:700}
+.btn.primary:hover{background:var(--accent2)}
+.btn.big{padding:13px 22px;font-size:16px;border-radius:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+nav{display:flex;gap:4px;padding:14px 24px 0}
+nav button{border:0;background:none;padding:10px 16px;border-radius:10px 10px 0 0;color:var(--muted);cursor:pointer;font-weight:600}
+nav button.on{color:var(--text);background:var(--panel)}
+main{padding:0 24px 220px}
+.tab{display:none;background:var(--panel);border-radius:0 var(--radius) var(--radius) var(--radius);padding:22px}
+.tab.on{display:block}
+.cols{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:22px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.list{display:flex;flex-direction:column;gap:6px;max-height:68vh;overflow:auto;padding-right:4px}
+.search{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);margin-bottom:10px}
+.item{padding:11px 13px;border-radius:11px;border:1px solid transparent;background:var(--panel2);cursor:pointer;display:flex;gap:10px;align-items:center}
+.item:hover{border-color:var(--line)}
+.item.on{border-color:var(--accent);background:#2a2416}
+.item .name{font-weight:600;word-break:break-all}
+.item .meta{font-size:12.5px;color:var(--muted)}
+.thumb{width:44px;height:78px;border-radius:7px;background:#0b0c10 center/cover no-repeat;flex:none}
+.thumb.wide{width:78px;height:44px}
+.badge{font-size:11px;padding:1px 7px;border-radius:99px;background:#2a2f3a;color:var(--muted);margin-left:4px}
+.badge.acc{background:rgba(245,166,35,.15);color:var(--accent)}
+.badge.ok{background:rgba(62,207,142,.13);color:var(--ok)}
+h2{margin:0 0 4px;font-size:22px}
+.sub{color:var(--muted);margin:0 0 18px}
+label.f{display:block;font-weight:600;margin:16px 0 6px}
+textarea{width:100%;min-height:130px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);resize:vertical}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin-top:14px}
+.sw{width:42px;height:24px;border-radius:99px;background:#343a46;position:relative;transition:.15s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#cfd3db;transition:.15s}
+.toggle.on .sw{background:var(--accent)}
+.toggle.on .sw::after{left:21px;background:#1a1200}
+input[type=range]{width:240px;accent-color:var(--accent)}
+.len{font-weight:700;color:var(--accent);min-width:56px}
+.empty{color:var(--muted);padding:40px 10px;text-align:center}
+.preview{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+video.pv{max-height:420px;max-width:100%;border-radius:12px;background:#000}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:var(--panel2);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.card video{width:100%;border-radius:9px;background:#000;max-height:360px}
+.card .name{font-size:13px;font-weight:600;word-break:break-all}
+.card .links{display:flex;gap:10px;font-size:12.5px;flex-wrap:wrap}
+a{color:var(--accent2)}
+#job{position:fixed;left:0;right:0;bottom:0;background:#12151b;border-top:1px solid var(--line);display:none;z-index:9;max-height:52vh}
+#job.on{display:flex;flex-direction:column}
+.jobhead{display:flex;align-items:center;gap:12px;padding:12px 24px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(245,166,35,.6);animation:p 1.4s infinite}
+.dot.ok{background:var(--ok);animation:none}.dot.bad{background:var(--bad);animation:none}
+@keyframes p{70%{box-shadow:0 0 0 10px rgba(245,166,35,0)}100%{box-shadow:0 0 0 0 rgba(245,166,35,0)}}
+.jobbody{display:flex;gap:18px;padding:0 24px 16px;overflow:hidden;flex:1;min-height:0}
+#log{flex:1;overflow:auto;background:#0b0d11;border-radius:10px;padding:10px 12px;font:12.5px/1.5 ui-monospace,Consolas,monospace;color:#c6cbd4;white-space:pre-wrap;min-height:120px}
+#result{display:none;flex-direction:column;gap:8px;align-items:flex-start}
+#result video{max-height:38vh;border-radius:10px;background:#000}
+.toast{position:fixed;top:70px;right:24px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:.2s;z-index:20}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">CHRH <b>Video</b></div>
+  <div class="pills" id="pills"></div>
+  <div class="spacer"></div>
+  <button class="btn" onclick="post('/api/scan')">Найти новые клипы</button>
+  <button class="btn" onclick="post('/api/open',{what:'footage'})">Папка footage</button>
+  <button class="btn" onclick="post('/api/backup')">Сохранить в облако</button>
+</header>
+
+<nav>
+  <button data-t="montage" class="on">Монтаж</button>
+  <button data-t="dub">Озвучка</button>
+  <button data-t="videos">Ролики</button>
+</nav>
+
+<main>
+  <section class="tab on" id="t-montage">
+    <div class="cols">
+      <div>
+        <input class="search" id="psearch" placeholder="Найти проект…">
+        <div class="list" id="plist"></div>
+      </div>
+      <div id="pform"><div class="empty">Выбери проект слева.<br>Клипы называются по проекту и номеру: <b>проект1.mp4</b>, <b>проект2.mp4</b>…</div></div>
+    </div>
+  </section>
+
+  <section class="tab" id="t-dub">
+    <div class="cols">
+      <div>
+        <input class="search" id="vsearch" placeholder="Найти ролик…">
+        <div class="list" id="vlist"></div>
+      </div>
+      <div id="vform"><div class="empty">Выбери ролик слева.<br>Свой ролик положи в папку <b>output</b> — он появится в списке.</div></div>
+    </div>
+  </section>
+
+  <section class="tab" id="t-videos">
+    <div class="row" style="margin-bottom:16px">
+      <h2 style="margin:0">Готовые ролики</h2><div class="spacer"></div>
+      <button class="btn" onclick="post('/api/open',{what:'output'})">Открыть папку output</button>
+    </div>
+    <div class="grid" id="vgrid"></div>
+  </section>
+</main>
+
+<div id="job">
+  <div class="jobhead">
+    <div class="dot" id="jdot"></div>
+    <b id="jtitle"></b><span class="hint" id="jtime"></span>
+    <div class="spacer"></div>
+    <button class="btn" id="jcancel" onclick="post('/api/cancel')">Остановить</button>
+    <button class="btn" onclick="document.getElementById('job').classList.remove('on')">Скрыть</button>
+  </div>
+  <div class="jobbody">
+    <div id="log"></div>
+    <div id="result"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let projects = [], vids = [], selP = null, selV = null, jobN = 0, wasRunning = false;
+
+function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2600); }
+async function get(u){ return (await fetch(u)).json(); }
+async function post(u, body){
+  const r = await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) toast(d.error || "не получилось"); else if(u!=="/api/open") pollJob(true);
+  return d;
+}
+
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x===b));
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x.id==="t-"+b.dataset.t));
+  if(b.dataset.t!=="montage") loadVideos();
+});
+
+/* ---------- status ---------- */
+async function loadStatus(){
+  const s = await get("/api/status");
+  const p = (ok,t,why) => `<span class="pill ${ok?"ok":"bad"}" title="${esc(why)}">${ok?"✓":"✗"} ${t}</span>`;
+  $("#pills").innerHTML = p(s.keys.gemini,"Gemini","смотрит клипы и монтирует; без ключа — старый способ") +
+    p(s.keys.eleven,"ElevenLabs","озвучка") + p(s.keys.claude,"Claude","тексты, сокращение, запасной монтаж") +
+    p(s.ffmpeg,"ffmpeg","сборка видео");
+}
+
+/* ---------- montage ---------- */
+async function loadProjects(){ projects = await get("/api/projects"); drawProjects(); }
+function drawProjects(){
+  const q = $("#psearch").value.toLowerCase();
+  const list = projects.filter(p => p.name.toLowerCase().includes(q));
+  $("#plist").innerHTML = list.map(p => `<div class="item ${selP===p.name?"on":""}" data-p="${esc(p.name)}">
+      <div><div class="name">${esc(p.name)}</div>
+      <div class="meta">${p.clips} клип(ов)${p.photos?` · ${p.photos} фото`:""}${p.note?` · <span class="badge acc">есть описание</span>`:""}</div></div></div>`).join("")
+    || `<div class="empty">В footage нет клипов</div>`;
+  document.querySelectorAll("#plist .item").forEach(e => e.onclick = () => { selP = e.dataset.p; drawProjects(); drawPForm(); });
+}
+function drawPForm(){
+  const p = projects.find(x => x.name===selP); if(!p) return;
+  $("#pform").innerHTML = `
+    <h2>${esc(p.name)}</h2>
+    <p class="sub">${p.clips} клип(ов)${p.photos?`, ${p.photos} фото`:""}. Кадры каждые 2–3 секунды, от повреждения к готовому, без звука.</p>
+    <label class="f">Описание работы от цеха</label>
+    <textarea id="note" placeholder="Например: Replaced the damaged sleeve and spring lock assembly. Before: the old sleeve was bent.">${esc(p.note)}</textarea>
+    <div class="hint">Как прислал цех. Помогает отличить «до» от «после».</div>
+    <div class="toggle ${p.ordered?"on":""}" id="ord"><div class="sw"></div><div>Клипы пронумерованы по порядку работы <span class="hint">(1 — начало, последний — готово)</span></div></div>
+    <label class="f">Длина ролика</label>
+    <div class="row"><input type="range" id="secs" min="15" max="60" step="1" value="30"><span class="len" id="secsv">30 с</span>
+      <span class="hint">Если ровного материала меньше — выйдет короче, без повторов.</span></div>
+    <div style="margin-top:22px"><button class="btn primary big" id="go">Собрать монтаж</button></div>`;
+  $("#ord").onclick = e => e.currentTarget.classList.toggle("on");
+  $("#secs").oninput = e => $("#secsv").textContent = e.target.value + " с";
+  $("#go").onclick = () => post("/api/montage",{project:p.name, note:$("#note").value, ordered:$("#ord").classList.contains("on"), seconds:+$("#secs").value});
+}
+$("#psearch").oninput = drawProjects;
+
+/* ---------- voice-over ---------- */
+async function loadVideos(){ vids = await get("/api/videos"); drawVideos(); drawGrid(); }
+const media = n => "/media/" + encodeURIComponent(n);
+function drawVideos(){
+  const q = $("#vsearch").value.toLowerCase();
+  const list = vids.filter(v => !v.voiced && v.name.toLowerCase().includes(q));
+  $("#vlist").innerHTML = list.map(v => `<div class="item ${selV===v.name?"on":""}" data-v="${esc(v.name)}">
+      <div class="thumb ${v.w>v.h?"wide":""}" style="${v.sheet?`background-image:url('${media(v.sheet)}')`:""}"></div>
+      <div><div class="name">${esc(v.name)}</div>
+      <div class="meta">${v.montage?'<span class="badge">монтаж</span>':'<span class="badge acc">свой</span>'}${v.has_voiced?'<span class="badge ok">озвучен</span>':""}${v.w>v.h?'<span class="badge">гориз.</span>':""}</div></div></div>`).join("")
+    || `<div class="empty">В output нет роликов</div>`;
+  document.querySelectorAll("#vlist .item").forEach(e => e.onclick = () => { selV = e.dataset.v; drawVideos(); drawVForm(); });
+}
+function drawVForm(){
+  const v = vids.find(x => x.name===selV); if(!v) return;
+  const wide = v.w > v.h;
+  $("#vform").innerHTML = `
+    <h2>${esc(v.name)}</h2>
+    <p class="sub">${v.montage?"Монтаж: добавятся голос, субтитры и музыка в такт склейкам.":"Свой ролик: добавятся голос, субтитры, музыка, телефон, название и карточка с адресом."}</p>
+    <div class="preview"><video class="pv" id="pv" src="${media(v.name)}#t=1" controls preload="metadata"></video>
+    <div style="flex:1;min-width:260px">
+      <label class="f" style="margin-top:0">Текст для озвучки</label>
+      <textarea id="txt" placeholder="Вставь текст шефа как есть — с телефоном и абзацами"></textarea>
+      <div class="hint" id="fit">—</div>
+      ${v.montage?"":`<div class="toggle ${wide?"on":""}" id="land"><div class="sw"></div><div>Горизонтальный ролик 1920×1080</div></div>`}
+      <div style="margin-top:20px"><button class="btn primary big" id="dgo">Озвучить</button></div>
+    </div></div>`;
+  const fit = () => {
+    const d = $("#pv").duration || 0, words = $("#txt").value.trim().split(/\s+/).filter(Boolean).length;
+    const room = Math.max(0, (v.montage ? d : d + 2) - 2.8);
+    const need = words / 2.6;
+    $("#fit").innerHTML = !words ? "Около 2,5 слова на секунду ролика." :
+      `${words} слов ≈ ${need.toFixed(0)} с голоса, места ≈ ${room.toFixed(0)} с — ` +
+      (need <= room ? '<span style="color:var(--ok)">влезает</span>' : need <= room*1.12 ? '<span style="color:var(--accent)">голос чуть ускорится</span>' : '<span style="color:var(--bad)">Claude сократит текст</span>');
+  };
+  $("#txt").oninput = fit; $("#pv").onloadedmetadata = fit;
+  if($("#land")) $("#land").onclick = e => e.currentTarget.classList.toggle("on");
+  $("#dgo").onclick = () => post("/api/dub",{video:v.name, text:$("#txt").value, landscape: !!($("#land") && $("#land").classList.contains("on"))});
+}
+$("#vsearch").oninput = drawVideos;
+
+/* ---------- finished videos ---------- */
+function drawGrid(){
+  $("#vgrid").innerHTML = vids.map(v => `<div class="card">
+      <video src="${media(v.name)}#t=1" controls preload="metadata"></video>
+      <div class="name">${esc(v.name)}</div>
+      <div class="links">${v.voiced?'<span class="badge ok">с голосом</span>':v.montage?'<span class="badge">монтаж</span>':'<span class="badge acc">свой</span>'}
+        <a href="${media(v.name)}" download>скачать</a>${v.plan?`<a href="${media(v.plan)}" target="_blank">план</a>`:""}${v.sheet?`<a href="${media(v.sheet)}" target="_blank">кадры</a>`:""}</div></div>`).join("")
+    || `<div class="empty">Пока пусто</div>`;
+}
+
+/* ---------- the running job ---------- */
+async function pollJob(force){
+  const j = await get("/api/job?since=" + (force ? 0 : jobN));
+  if(force){ jobN = 0; $("#log").textContent = ""; }
+  if(!j.kind) return;
+  if(j.running || force) $("#job").classList.add("on");
+  $("#jtitle").textContent = j.title;
+  $("#jtime").textContent = j.elapsed ? `${Math.floor(j.elapsed/60)}:${String(j.elapsed%60).padStart(2,"0")}` : "";
+  if(j.lines.length){
+    const log = $("#log"), atEnd = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
+    log.textContent += (log.textContent ? "\n" : "") + j.lines.join("\n");
+    jobN = j.n; if(atEnd) log.scrollTop = log.scrollHeight;
+  }
+  $("#jdot").className = "dot" + (j.running ? "" : j.code===0 ? " ok" : " bad");
+  $("#jcancel").style.display = j.running ? "" : "none";
+  const res = $("#result");
+  if(!j.running && j.result){
+    res.style.display = "flex";
+    res.innerHTML = `<video src="${media(j.result)}" controls autoplay muted></video>
+      <div class="row"><b>${esc(j.result)}</b>${j.kind==="montage"?`<button class="btn primary" id="todub">Озвучить этот ролик</button>`:""}</div>`;
+    if($("#todub")) $("#todub").onclick = () => { selV = j.result; document.querySelector('nav button[data-t="dub"]').click(); setTimeout(drawVForm, 300); };
+  } else if(j.running) { res.style.display = "none"; res.innerHTML = ""; }
+  if(wasRunning && !j.running){ loadVideos(); loadProjects(); }
+  wasRunning = j.running;
+}
+
+loadStatus(); loadProjects(); loadVideos(); pollJob(true);
+setInterval(() => pollJob(false), 1000);
+setInterval(loadStatus, 8000);
+</script>
+</body>
+</html>
