@@ -65,40 +65,55 @@ def nearest(f, t, d, used, reach=3.0):
 
 
 _CANDS = {}
-LEN = 3.0       # candidate length = the longest slot of this video (set in run), so every slot fits any id
+MIN_SHOT = 2.0  # montage shots are 2-3 s; a candidate needs 2 s steady, longer ones give longer shots
+MAX_SHOT = 3.0
 
 
-def candidates(f, L):
-    """Ready-made shots of this clip: L-second windows that pass every check (steady stretch, one camera
-    direction over the whole shot), not overlapping, earliest first. Gemini chooses among these by id instead
-    of guessing a start second: guessed seconds missed the checks for half the slots, and every miss cost a
-    second slow round trip."""
-    k = (f, round(L, 2))
-    if k in _CANDS: return _CANDS[k]
+def candidates(f):
+    """Ready-made shots of this clip: [(start, steady length)] — windows of at least 2 s that pass every check
+    (steady stretch, one camera direction over the whole shot), each stretched up to 3 s while it stays steady,
+    not overlapping. Gemini chooses among these by id instead of guessing a start second: guessed seconds
+    missed the checks for half the slots. (Fixed 3-s candidates found almost nothing in handheld clips.)"""
+    if f in _CANDS: return _CANDS[f]
     out, used = [], collections.defaultdict(list)
     for a, b in good_ranges(f):
         x = a
-        while x + L <= b + 0.01:
-            if fits(f, x, L, used):
-                out.append(round(x, 2)); used[f].append((x, x + L + 0.3)); x += L + 0.3
+        while x + MIN_SHOT <= b + 0.01:
+            if fits(f, x, MIN_SHOT, used):
+                L = MIN_SHOT
+                while L + STEP <= MAX_SHOT + 0.01 and fits(f, x, L + STEP, used): L += STEP
+                out.append((round(x, 2), round(L, 2))); used[f].append((x, x + L + 0.3)); x += L + 0.3
             else:
                 x += STEP
-    _CANDS[k] = out
+    _CANDS[f] = out
     return out
 
 
-def cand_table(names, L):
-    """{"c3.2": (clip, start)} for every candidate of every clip."""
+def cand_table(names):
+    """{"c3.2": (clip, start, steady length)} for every candidate of every clip."""
     t = {}
     for f in names:
-        for k, x in enumerate(candidates(f, L), 1): t[f"c{num(f)}.{k}"] = (f, x)
+        for k, (x, L) in enumerate(candidates(f), 1): t[f"c{num(f)}.{k}"] = (f, x, L)
     return t
+
+
+def place(f, t, d, used, L=None):
+    """(start, length) for a shot of clip f wanted at t for d seconds: the length is cut to what stays steady
+    (never under 2 s); at t if it fits, else the nearest steady second. None if nothing fits."""
+    d0 = min(d, L) if L else d
+    k = int(round(d0 / STEP))
+    while k * STEP >= MIN_SHOT - 0.01:
+        dd = round(k * STEP, 2)
+        x = t if fits(f, t, dd, used) else nearest(f, t, dd, used)
+        if x is not None: return x, dd
+        k -= 1
+    return None
 
 
 def capacity(names, photos):
     """Shots the footage holds without repeating itself: per clip one per 2.5 s of steady footage, at most
     montage.MAX_PER_CLIP (a short steady stretch still gives one); a photo one."""
-    return sum(min(montage.MAX_PER_CLIP, len(candidates(f, LEN))) for f in names) + len(photos)
+    return sum(min(montage.MAX_PER_CLIP, len(candidates(f))) for f in names) + len(photos)
 
 
 RULES = """You are the editor of short vertical promo videos for a car hauler (car carrier trailer) repair shop.
@@ -125,14 +140,13 @@ Rules, in order of importance:
 
 
 def clip_parts(names, photos, log):
-    L = LEN
     parts, listing = [], []
     for f in sorted(names, key=lambda n: (num(n), n)):
         d, _ = picker.windows(f)
-        c = candidates(f, L)
+        c = candidates(f)
         if not c: continue                  # nothing steady: Gemini need not watch it (and pays no tokens)
         txt = (f"CLIP {num(f)} = {f} — {d:.1f} s. Shots you can use: " +
-               ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s" for k, x in enumerate(c, 1)))
+               ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s" for k, (x, L) in enumerate(c, 1)))
         listing.append(txt)
         parts.append({"text": txt})
         parts.append(gemini.video_part(gemini.video(f, build.src(f), log=log)))
@@ -169,7 +183,7 @@ def resolve(r, lower, table):
     f = lower.get(str(r.get("clip", "")).lower())
     try: t = float(r.get("start", 0))
     except Exception: t = 0.0
-    return (f, t) if f else (None, 0.0)
+    return (f, t, None) if f else (None, 0.0, None)
 
 
 def check(res, durs, names, photos, ordered):
@@ -182,10 +196,10 @@ def check(res, durs, names, photos, ordered):
     used, per, shots, problems = collections.defaultdict(list), collections.Counter(), [], []
     lower = {n.lower(): n for n in list(names) + list(photos)}
     lower.update({f"p{num(n)}": n for n in photos})
-    table = cand_table(names, LEN)
+    table = cand_table(names)
     for i, d in enumerate(durs):
         r = by.get(i)
-        f, t = resolve(r, lower, table) if r else (None, 0.0)
+        f, t, L = resolve(r, lower, table) if r else (None, 0.0, None)
         if not f:
             problems.append((i, "no shot, or a clip name that does not exist")); continue
         if f in photos:
@@ -197,10 +211,11 @@ def check(res, durs, names, photos, ordered):
             continue
         if per[f] >= montage.MAX_PER_CLIP:
             problems.append((i, f"a fourth shot from {f}")); continue
-        x = t if fits(f, t, d, used) else nearest(f, t, d, used)
-        if x is None:
+        got = place(f, t, d, used, L)
+        if got is None:
             problems.append((i, f"{f} at {t:.1f}s is not steady (shake, swing or blur) or already shown, and "
                                 f"there is no steady moment within 3 s")); continue
+        x, d = got
         used[f].append((x, x + d + 0.3)); per[f] += 1
         shots.append(dict(file=f, tin=round(x, 2), dur=d, why=r.get("why", ""), moved=abs(x - t) > 0.05,
                           push=bool(r.get("key")) and sum(1 for s in shots if s.get("push")) < 3,
@@ -224,9 +239,9 @@ def cover(shots, names, ordered, log):
         used = collections.defaultdict(list)
         for i, s in enumerate(shots):
             if i != j and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
-        x = next((x for a, b in good_ranges(f) for x in [a + k * STEP for k in range(int((b - a) / STEP) + 1)]
-                  if x + d <= b + 0.01 and fits(f, x, d, used)), None)
-        if x is None: continue
+        got = next((g for x, L in candidates(f) if (g := place(f, x, d, used, L))), None)
+        if got is None: continue
+        x, d = got
         log(f"   {f} was left out — it takes the second shot of {donor}")
         shots[j] = dict(file=f, tin=round(x, 2), dur=d, why="covers this step of the work (added by code)",
                         seg={"stage": "", "shows": ""})
@@ -265,9 +280,7 @@ def save_plan(prefix, sig, shots, title, sub, res, notes):
 
 def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fresh=False):
     log(f"editing with Gemini ({gemini.model().split('/')[-1]}) — it watches the clips")
-    global LEN
     durs = montage.durations(seconds - montage.END, prefix)
-    LEN = max(durs)
     cap = capacity(names, photos)
     if cap < len(durs):
         durs = durs[:cap]
@@ -323,13 +336,20 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
             shots, problems = fill(shots, problems, durs, names, ordered, log)
         if problems: log(f"   {len(problems)} slot(s) dropped — the video is that much shorter")
     shots = cover(shots, names, ordered, log)
+    # shots cut to their steady length leave the video short of what was asked: top it up from unused
+    # steady footage (it stays shorter only when there is none)
+    short = (seconds - montage.END) - sum(s["dur"] for s in shots)
+    if short >= MIN_SHOT + 0.5 and len(shots) < capacity(names, photos):
+        extra = [2.5] * int(short // 2.5)
+        shots, _ = fill(shots, [(len(durs) + k, "top-up") for k in range(len(extra))], durs + extra, names,
+                        ordered, log)
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
     show(shots, title, sub, log)
     if dry or not shots: return None
 
     out, total = montage.render(prefix, shots, title, sub)
-    notes = review(out, shots, log)
+    notes = review(out, shots, log, ordered)
     bad = sorted({n["shot"] for n in notes if n.get("replace") and isinstance(n.get("shot"), int)
                   and 0 <= n["shot"] < len(shots)})
     if bad:
@@ -373,15 +393,12 @@ def fill(shots, problems, durs, names, ordered, log):
         d, got = durs[i], None
         for f in sorted(names, key=lambda f: (per[f], -num(f) if ordered else 0, f)):
             if per[f] >= montage.MAX_PER_CLIP: continue
-            for a, b in good_ranges(f):
-                x = a
-                while x + d <= b + 0.01 and not got:
-                    if fits(f, x, d, used): got = (f, x)
-                    x += STEP
-                if got: break
+            for x0, L in candidates(f):
+                g = place(f, x0, d, used, L)
+                if g: got = (f, g[0], g[1]); break
             if got: break
         if not got: left.append((i, why)); continue
-        f, x = got
+        f, x, d = got
         used[f].append((x, x + d + 0.3)); per[f] += 1; n += 1
         shots.append(dict(file=f, tin=round(x, 2), dur=d, why="steady filler (picked by code)",
                           seg={"stage": "", "shows": ""}))
@@ -399,11 +416,11 @@ def replace(shots, bad, res, names, photos, ordered):
         except Exception: continue
     lower = {n.lower(): n for n in list(names) + list(photos)}
     lower.update({f"p{num(n)}": n for n in photos})
-    table = cand_table(names, LEN)
+    table = cand_table(names)
     out = list(shots)
     for i in bad:
         r, d = by.get(i), shots[i]["dur"]
-        f, t = resolve(r, lower, table) if r else (None, 0.0)
+        f, t, L = resolve(r, lower, table) if r else (None, 0.0, None)
         if not f: continue
         if f in photos:
             if (i and out[i - 1].get("photo")) or (i + 1 < len(out) and out[i + 1].get("photo")): continue
@@ -414,8 +431,10 @@ def replace(shots, bad, res, names, photos, ordered):
         for j, s in enumerate(out):
             if j != i and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
         if sum(1 for j, s in enumerate(out) if j != i and s["file"] == f) >= montage.MAX_PER_CLIP: continue
-        x = t if fits(f, t, d, used) else nearest(f, t, d, used)
-        if x is None: continue
+        got = place(f, t, d, used, L)
+        if got is None: continue
+        x, d = got
+        if (f, round(x, 2)) == (shots[i]["file"], shots[i]["tin"]): continue      # the same shot again
         out[i] = dict(file=f, tin=round(x, 2), dur=d, why=r.get("why", ""), moved=abs(x - t) > 0.05,
                       seg={"stage": "", "shows": r.get("why", "")})
     changed = [i for i in bad if out[i] is not shots[i]]
@@ -424,7 +443,7 @@ def replace(shots, bad, res, names, photos, ordered):
     return out, changed
 
 
-def review(out, shots, log):
+def review(out, shots, log, ordered=False):
     """Gemini watches the rendered cut: [{"shot", "issue", "replace"}]."""
     try:
         rec = gemini.video("review_" + os.path.basename(out), out, log=log)
@@ -434,7 +453,9 @@ def review(out, shots, log):
             t += s["dur"]
         ask = ("You are reviewing a finished vertical promo cut for a car hauler repair shop before it goes to "
                "the owner. He rejects: shaky footage, a camera swinging back and forth, blurred or dark shots, "
-               "the order of the work broken (finished parts before the work), dull shots (walls, floor, people "
+               + ("the shots are already in the order the clips were filmed — do not judge the order; " if ordered else
+                  "the order of the work broken (finished parts before the work), ") +
+               "dull shots (walls, floor, people "
                "standing), the same moment twice. The text overlays and the black card at the end are fine.\n"
                "Shots: " + "; ".join(table) + "\nList only real problems. Reply with JSON only: "
                '{"problems": [{"shot": 3, "issue": "what is wrong", "replace": true}], "verdict": "one sentence"}')
