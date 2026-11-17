@@ -274,7 +274,9 @@ def balance(shots, names, ordered, log):
                                   if not s.get("photo") and STAGES.get(s["file"], "process") == "process")
         donors = [f for f, c in per.most_common() if c >= 2]
         if not donors: break
-        j = max(i for i, s in enumerate(shots) if s["file"] == donors[0])
+        js = [i for i, s in enumerate(shots) if s["file"] == donors[0] and not s.get("pinned")]
+        if not js: break
+        j = max(js)
         d = shots[j]["dur"]
         used = collections.defaultdict(list)
         for i, s in enumerate(shots):
@@ -307,7 +309,9 @@ def cover(shots, names, ordered, log):
         per = collections.Counter(s["file"] for s in shots if not s.get("photo") and STAGES.get(s["file"]) != "result")
         if not per or per.most_common(1)[0][1] < 2: break       # nothing doubled left to give up
         donor = per.most_common(1)[0][0]
-        j = max(i for i, s in enumerate(shots) if s["file"] == donor)
+        js = [i for i, s in enumerate(shots) if s["file"] == donor and not s.get("pinned")]
+        if not js: continue
+        j = max(js)
         d = shots[j]["dur"]
         used = collections.defaultdict(list)
         for i, s in enumerate(shots):
@@ -354,7 +358,43 @@ def save_plan(prefix, sig, shots, title, sub, res, notes):
     json.dump(plans, open(PLANS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
-def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fresh=False):
+def apply_pins(shots, pins, names, ordered, log):
+    """The owner's ★ moments go in whatever the model picked: a pinned moment already in the cut (same clip,
+    within 1.5 s) is just marked; otherwise it replaces the nearest shot of its clip, else a repeated shot of
+    the work. Pinned shots are kept through the review and are not re-checked for shake — the owner chose them."""
+    shots = list(shots)
+    for clip, t in pins:
+        f = next((n for n in names if n.lower() == str(clip).lower()), None)
+        if not f: log(f"   ★ {clip}: no such clip in the project"); continue
+        dur = picker.windows(f)[0]
+        hit = next((s for s in shots if s["file"] == f and abs(s["tin"] - (t - 0.5)) <= 1.5), None)
+        if hit: hit["pinned"] = True; continue
+        d = 2.5
+        x = round(min(max(0.3, t - 0.5), max(0.3, dur - 0.35 - d)), 2)
+        d = round(min(d, dur - 0.35 - x), 2)
+        if d < 1.5: log(f"   ★ {f} @{t:.1f}: too close to the end of the clip"); continue
+        same = [i for i, s in enumerate(shots) if s["file"] == f and not s.get("pinned")]
+        clash = [i for i in same if shots[i]["tin"] < x + d + 0.3 and x < shots[i]["tin"] + shots[i]["dur"] + 0.3]
+        if clash or same:
+            j = min(clash or same, key=lambda i: abs(shots[i]["tin"] - x))
+        else:
+            per = collections.Counter(s["file"] for s in shots if not s.get("pinned") and not s.get("photo"))
+            donors = [g for g, c in per.most_common() if c >= 2 and STAGES.get(g) != "result"] or \
+                     [g for g, c in per.most_common() if c >= 2]
+            j = (max(i for i, s in enumerate(shots) if s["file"] == donors[0] and not s.get("pinned"))
+                 if donors else None)
+        new = dict(file=f, tin=x, dur=d, why="your ★ moment", pinned=True, seg={"stage": "", "shows": ""})
+        if j is None: shots.append(new)
+        else: shots[j] = new
+        # a second shot of the same clip may now overlap it
+        shots = [s for s in shots if s is new or s["file"] != f or s.get("pinned")
+                 or not (s["tin"] < x + d + 0.3 and x < s["tin"] + s["dur"] + 0.3)]
+        log(f"   ★ {f} @{x:.1f} — your moment is in")
+    if ordered: shots.sort(key=lambda s: (num(s["file"]), s["file"], s["tin"]))
+    return shots
+
+
+def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fresh=False, pins=()):
     log(f"editing with Gemini ({gemini.model().split('/')[-1]}) — it watches the clips")
     durs = montage.durations(seconds - montage.END, prefix)
     cap = capacity(names, photos)
@@ -369,7 +409,8 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         g = good_ranges(f)
         if not g: log(f"   {f}: shakes hard or blurred everywhere — cannot be used")
 
-    sig = plan_sig(prefix, names, photos, seconds, ordered, note)
+    pins = [tuple(p) for p in (pins or [])]
+    sig = plan_sig(prefix, names, photos, seconds, ordered, note + json.dumps(sorted(pins)))
     prev = load_plans().get(prefix, {})
     same = prev.get("sig") == sig
     # a saved plan far shorter than asked is a failed one, not one to repeat
@@ -395,6 +436,10 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         log("другой вариант: прошу Gemini взять другие моменты")
     parts, listing = clip_parts(names, photos, log)
 
+    if pins:
+        other += ("\nTHE OWNER HAS CHOSEN THESE MOMENTS, they will be in the cut anyway (clip @ second): " +
+                  ", ".join(f"{c} @{t:.1f}" for c, t in pins) + " — build the story around them and do not "
+                  "pick another shot of the same moment.\n")
     res = ask_plan(parts, durs, note, ordered, other)
     set_stages(res, names, ordered, log)
     shots, problems = check(res, durs, names, photos, ordered)
@@ -423,6 +468,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         shots, _ = fill(shots, [(len(durs) + k, "top-up") for k in range(len(extra))], durs + extra, names,
                         ordered, log)
     shots = balance(shots, names, ordered, log)
+    if pins: shots = apply_pins(shots, pins, names, ordered, log)
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
     show(shots, title, sub, log)
@@ -499,6 +545,7 @@ def replace(shots, bad, res, names, photos, ordered):
     table = cand_table(names)
     out = list(shots)
     for i in bad:
+        if shots[i].get("pinned"): continue                  # the owner chose it
         r, d = by.get(i), shots[i]["dur"]
         f, t, L = resolve(r, lower, table) if r else (None, 0.0, None)
         if not f: continue

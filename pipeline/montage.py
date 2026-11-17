@@ -752,8 +752,10 @@ def main():
         autoplan.save_lib(L); L = autoplan.apply_lib(); C = L["clips"]
     names = [n for n in sorted(C) if n.lower().startswith(prefix) and C[n].get("enabled") and n in build.FILES]
     if not names: sys.exit(f"no enabled clips starting with '{prefix}' — scan and describe them first (menu step 1)")
-    note = ""
-    try: note = json.load(open(CURRENT, encoding="utf-8")).get("notes", {}).get(prefix, "")
+    note, pins = "", []
+    try:
+        cur = json.load(open(CURRENT, encoding="utf-8"))
+        note = cur.get("notes", {}).get(prefix, ""); pins = cur.get("pins", {}).get(prefix, [])
     except Exception: pass
     if use_gemini:
         # Gemini watches the clips themselves: no text descriptions, no Claude
@@ -762,7 +764,7 @@ def main():
         if "--unordered" in sys.argv: ordered = False
         import gemini_edit
         r = gemini_edit.run(prefix, names, find_photos(prefix), seconds, ordered, note, dry=dry,
-                            fresh="--fresh" in sys.argv)
+                            fresh="--fresh" in sys.argv, pins=pins)
         if r: print(f"\ndone: output\\{os.path.basename(r[0])}  ({r[1]:.1f} s, no sound)")
         return
     missing = [n for n in names if not C[n].get("segments")]

@@ -91,6 +91,10 @@ a{color:var(--accent2)}
 #ov.on{display:flex}
 #ov video,#ov img{max-width:94vw;max-height:82vh;border-radius:10px;background:#000}
 #ov .t{color:var(--muted);font-size:13px;text-align:center}
+#ovpins{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.chip{background:rgba(245,166,35,.15);color:var(--accent);border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer}
+.chip b{margin-left:6px;color:var(--muted)}
+.fc .im em{position:absolute;top:5px;right:5px;font-style:normal;font-size:11px;font-weight:700;background:var(--accent);color:#1a1200;padding:1px 6px;border-radius:6px}
 .toast{position:fixed;top:70px;right:24px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:.2s;z-index:20}
 .toast.on{opacity:1}
 </style>
@@ -156,6 +160,7 @@ a{color:var(--accent2)}
 </div>
 <div class="toast" id="toast"></div>
 <div id="ov" onclick="if(event.target.id==='ov')closeOv()"><div id="ovbody"></div><div class="t" id="ovt"></div>
+  <div id="ovpins"></div>
   <button class="btn" onclick="closeOv()">Закрыть (Esc)</button></div>
 
 <script>
@@ -166,7 +171,25 @@ let projects = [], vids = [], selP = null, selV = null, jobN = 0, wasRunning = f
 const fmtDate = t => t ? new Date(t*1000).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}) : "";
 const fmtDur = d => d ? (d>=60 ? `${Math.floor(d/60)}:${String(Math.round(d%60)).padStart(2,"0")}` : `${d.toFixed(0)} с`) : "";
 function dateRange(a,b){ const x=fmtDate(a), y=fmtDate(b); return !a ? "" : x===y ? x : `${x} – ${y}`; }
-function closeOv(){ $("#ov").classList.remove("on"); $("#ovbody").innerHTML=""; }
+function closeOv(){ $("#ov").classList.remove("on"); $("#ovbody").innerHTML=""; $("#ovpins").innerHTML="";
+  if(pinsChanged && selP){ pinsChanged=false; const p=projects.find(x=>x.name===selP); if(p) loadFiles(p); } }
+let pinsChanged = false;
+function drawPins(f){
+  const v = $("#ovbody video");
+  $("#ovpins").innerHTML = `<button class="btn primary" id="pinbtn">★ Взять этот момент</button>` +
+    (f.pins||[]).map(t => `<span class="chip" data-t="${t}">★ ${t.toFixed(1)} с<b data-x="${t}" title="убрать">✕</b></span>`).join("") +
+    `<span class="hint">Останови видео на нужном месте и нажми — этот момент обязательно будет в монтаже.</span>`;
+  $("#pinbtn").onclick = async () => {
+    const r = await post("/api/pin",{project:selP, clip:f.name, t:v.currentTime});
+    if(r.pins){ f.pins = r.pins.filter(p=>p[0]===f.name).map(p=>p[1]); pinsChanged=true; drawPins(f); toast("Момент закреплён"); }
+  };
+  document.querySelectorAll("#ovpins .chip").forEach(c => c.onclick = async e => {
+    if(e.target.dataset.x){
+      const r = await post("/api/pin",{project:selP, clip:f.name, t:+e.target.dataset.x, remove:true});
+      if(r.pins){ f.pins = r.pins.filter(p=>p[0]===f.name).map(p=>p[1]); pinsChanged=true; drawPins(f); }
+    } else { v.currentTime = +c.dataset.t; v.pause(); }
+  });
+}
 document.addEventListener("keydown", e => { if(e.key==="Escape") closeOv(); });
 function openFile(f){
   const src = "/footage/" + encodeURIComponent(f.name);
@@ -174,13 +197,14 @@ function openFile(f){
     `<video src="${src}" controls autoplay muted onerror="this.outerHTML='<div class=empty>Браузер не может показать этот файл — открой папку footage</div>'"></video>`;
   $("#ovt").textContent = `${f.name} · ${fmtDate(f.date)}${f.camera_date?"":" (дата файла)"}${f.dur?" · "+fmtDur(f.dur):""}${f.w?` · ${f.w}×${f.h}`:""}${f.folder&&f.folder!=="."?" · папка "+f.folder:""}`;
   $("#ov").classList.add("on");
+  if(f.kind==="clip" && selP) drawPins(f);
 }
 function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2600); }
 async function get(u){ return (await fetch(u)).json(); }
 async function post(u, body){
   const r = await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});
   const d = await r.json().catch(()=>({}));
-  if(!r.ok) toast(d.error || "не получилось"); else if(u!=="/api/open") pollJob(true);
+  if(!r.ok) toast(d.error || "не получилось"); else if(u!=="/api/open" && u!=="/api/pin") pollJob(true);
   return d;
 }
 
@@ -237,7 +261,7 @@ async function loadFiles(p){
   const fs = await get("/api/project?name=" + encodeURIComponent(p.name));
   if(selP !== p.name) return;
   $("#files").innerHTML = fs.map((f,i) => `<div class="fc" data-i="${i}">
-      <div class="im" style="background-image:url('/thumb/${encodeURIComponent(f.name)}')">${f.kind==="photo"?"<i>фото</i>":""}<span>${f.kind==="photo"?"":fmtDur(f.dur)}</span></div>
+      <div class="im" style="background-image:url('/thumb/${encodeURIComponent(f.name)}')">${f.kind==="photo"?"<i>фото</i>":""}${(f.pins||[]).length?`<em>★ ${f.pins.length}</em>`:""}<span>${f.kind==="photo"?"":fmtDur(f.dur)}</span></div>
       <div class="cap"><b>${esc(f.name)}</b><small title="${f.camera_date?"дата съёмки с камеры":"дата файла — камера её не записала"}">${fmtDate(f.date)}${f.camera_date?"":" *"}</small></div></div>`).join("")
     || `<div class="hint">нет файлов</div>`;
   document.querySelectorAll("#files .fc").forEach(e => e.onclick = () => openFile(fs[+e.dataset.i]));

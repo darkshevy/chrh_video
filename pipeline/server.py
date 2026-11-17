@@ -96,6 +96,7 @@ def file_meta(path):
 def project_files(proj):
     """The project's clips and photos for the preview grid, in clip-number order."""
     out = []
+    pins = jload(CURRENT, {}).get("pins", {}).get(proj, [])
     for name, path in footage_files().items():
         if project_of(name) != proj: continue
         m = file_meta(path)
@@ -103,6 +104,7 @@ def project_files(proj):
         out.append({"name": name, "kind": "clip" if name.lower().endswith(VIDEO_EXT) else "photo",
                     "date": m["date"], "camera_date": m["camera_date"], "dur": m["dur"], "w": m["w"], "h": m["h"],
                     "folder": os.path.relpath(os.path.dirname(path), FOOTAGE).replace("\\", "/"),
+                    "pins": sorted(t for c, t in pins if c == name),
                     "_n": int(num[1]) if num else 10 ** 6})
     out.sort(key=lambda f: (f["_n"], f["name"]))
     for f in out: del f["_n"]
@@ -254,6 +256,16 @@ class Job:
 JOB = Job()
 
 
+def pin(project, clip, t, remove=False):
+    """A moment the owner wants in the cut (★ in the preview): montage puts it in whatever Gemini picks."""
+    cur = jload(CURRENT, {})
+    lst = [p for p in cur.setdefault("pins", {}).get(project, []) if not (p[0] == clip and abs(p[1] - t) < 0.75)]
+    if not remove: lst.append([clip, round(t, 2)])
+    cur["pins"][project] = sorted(lst)
+    jsave(CURRENT, cur)
+    return cur["pins"][project]
+
+
 def save_note(project, note, ordered):
     cur = jload(CURRENT, {})
     n = note.strip().rstrip(" .")
@@ -385,6 +397,13 @@ class H(BaseHTTPRequestHandler):
             args = ["dub.py", src, tp] + (["--landscape"] if d.get("landscape") else [])
             ok = JOB.start("dub", f"Озвучка: {name}", [args])
             return self.send(200 if ok else 409, {"ok": ok, "error": None if ok else "уже идёт другая задача"})
+        if p == "/api/pin":
+            proj = re.sub(r"[^A-Za-z0-9_\-]", "", str(d.get("project", "")))
+            clip = os.path.basename(str(d.get("clip", "")))
+            try: t = float(d.get("t", 0))
+            except Exception: return self.send(400, {"error": "bad time"})
+            if not proj or not clip: return self.send(400, {"error": "нет клипа"})
+            return self.send(200, {"pins": pin(proj, clip, t, bool(d.get("remove")))})
         if p == "/api/scan":
             ok = JOB.start("scan", "Поиск новых клипов", [["chrh.py", "scan"]])
             return self.send(200 if ok else 409, {"ok": ok})
