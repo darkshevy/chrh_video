@@ -792,7 +792,7 @@ def wiz_act(ident, st):
         hold()
 
 
-BACKUP = ["pipeline/library.json", "scripts"]
+BACKUP = ["pipeline/library.json", "pipeline/taste.json", "scripts"]
 EX_DIR = os.path.join(ROOT, "scripts", "examples")
 
 

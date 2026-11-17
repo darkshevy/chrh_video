@@ -16,7 +16,7 @@ import os, sys, re, json, hashlib, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import build, picker, motion, gemini, montage
+import build, picker, motion, gemini, montage, taste
 
 STEP = 0.25
 
@@ -79,7 +79,7 @@ def candidates(f):
     for a, b in good_ranges(f):
         x = a
         while x + MIN_SHOT <= b + 0.01:
-            if fits(f, x, MIN_SHOT, used):
+            if fits(f, x, MIN_SHOT, used) and not taste.disliked(f, x, x + MIN_SHOT):
                 L = MIN_SHOT
                 while L + STEP <= MAX_SHOT + 0.01 and fits(f, x, L + STEP, used): L += STEP
                 out.append((round(x, 2), round(L, 2))); used[f].append((x, x + L + 0.3)); x += L + 0.3
@@ -87,6 +87,27 @@ def candidates(f):
                 x += STEP
     _CANDS[f] = out
     return out
+
+
+_TASTE = {}
+
+
+def taste_of(f, x, L):
+    """The owner-taste score of a candidate (0..1), or None while there are too few examples."""
+    if not taste.ready(): return None
+    k = (f, x, L)
+    if k not in _TASTE:
+        try: _TASTE[k] = taste.score(build.src(f), x, x + L)
+        except Exception: _TASTE[k] = None
+    return _TASTE[k]
+
+
+def ranked(f, latest_first=False):
+    """The clip's candidates, best for the owner's taste first (or in time order while it knows nothing)."""
+    c = list(candidates(f))
+    if latest_first: c.reverse()
+    if taste.ready(): c.sort(key=lambda xl: -(taste_of(f, *xl) or 0.5))
+    return c
 
 
 def cand_table(names):
@@ -136,11 +157,14 @@ Rules, in order of importance:
    three to five of its best moments, not one). Never show a finished part before the work that made it.
 3. Start strong: the first shot is the clearest view of the beginning (the damage, or the job if there is
    none). End on the best-looking shot of the result.
-4. Action and detail win (even handheld): sparks, the welding arc, a cut, grinding, a hand fitting a part, a sharp close-up of
+4. "taste" next to an id (when shown) is how much that moment looks like shots the owner kept before and
+   unlike the ones he threw out — 1 = very much his kind of shot. Between moments that tell the same step,
+   take the higher taste; never let taste break the story order.
+5. Action and detail win (even handheld): sparks, the welding arc, a cut, grinding, a hand fitting a part, a sharp close-up of
    the damage or of a fresh weld. Skip empty or repetitive moments, a wall, the floor, people standing.
-5. Variety: at most three shots from one clip (five from a RESULT clip), never the same moment twice; when two shots come from one clip
+6. Variety: at most three shots from one clip (five from a RESULT clip), never the same moment twice; when two shots come from one clip
    they must show clearly different moments.
-6. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
+7. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
    least once before using any clip a second time.
 """
 
@@ -154,6 +178,7 @@ def clip_parts(names, photos, log):
         txt = (f"CLIP {num(f)} = {f} — {d:.1f} s. Shots you can use: " +
                ", ".join(f"c{num(f)}.{k} at {x:.1f}-{x + L:.1f}s"
                          + (" (handheld)" if motion.handheld(f, build.src(f), x, x + L) else "")
+                         + (f" taste {t:.2f}" if (t := taste_of(f, x, L)) is not None else "")
                          for k, (x, L) in enumerate(c, 1)))
         listing.append(txt)
         parts.append({"text": txt})
@@ -285,7 +310,7 @@ def balance(shots, names, ordered, log):
         for f in res_clips:
             if sum(1 for s in shots if s["file"] == f) >= cap(f): continue
             # later moments of the finished work first: the end of a result clip is usually the best look
-            for x, L in reversed(candidates(f)):
+            for x, L in ranked(f, latest_first=True):
                 g = place(f, x, max(d, 2.5), used, L)
                 if g: got = (f, g); break
             if got: break
@@ -316,7 +341,7 @@ def cover(shots, names, ordered, log):
         used = collections.defaultdict(list)
         for i, s in enumerate(shots):
             if i != j and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
-        got = next((g for x, L in candidates(f) if (g := place(f, x, d, used, L))), None)
+        got = next((g for x, L in ranked(f) if (g := place(f, x, d, used, L))), None)
         if got is None: continue
         x, d = got
         log(f"   {f} was left out — it takes the second shot of {donor}")
@@ -329,7 +354,7 @@ def cover(shots, names, ordered, log):
 PLANS = os.path.join(os.path.dirname(HERE), "work", "gemini_plans.json")
 # bump when the way shots are chosen changes: a plan made by older code must not be reused (a 4-shot plan
 # from the 3-s candidates came back after the fix)
-PLAN_VERSION = 4     # 3: handheld shots allowed; 4: beginning-process-result story, result gets 25%+
+PLAN_VERSION = 5     # 3: handheld allowed; 4: begin-process-result story; 5: owner taste
 
 
 def plan_sig(prefix, names, photos, seconds, ordered, note):
@@ -410,7 +435,15 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         if not g: log(f"   {f}: shakes hard or blurred everywhere — cannot be used")
 
     pins = [tuple(p) for p in (pins or [])]
-    sig = plan_sig(prefix, names, photos, seconds, ordered, note + json.dumps(sorted(pins)))
+    for c, t in pins:     # a pinned moment is the clearest "this is good" there is
+        f = next((n for n in names if n.lower() == str(c).lower()), None)
+        if f and not any(r["clip"] == f and abs(r["t0"] - (t - 0.5)) < 1.0 for r in taste._load()["likes"]):
+            taste.add("likes", prefix, f, build.src(f), max(0.0, t - 0.5), t + 2.0, "pin", 1.0, log)
+    taste.backfill(lambda c: build.src(c) if c in build.FILES else None, log)
+    if taste.ready(): log(f"   taste: {taste.revision()} examples (likes/dislikes) guide the choice")
+    elif not taste.available(): log("   taste: CLIP model not found — the owner's examples are not used")
+    sig = plan_sig(prefix, names, photos, seconds, ordered,
+                   note + json.dumps(sorted(pins)) + taste.revision())
     prev = load_plans().get(prefix, {})
     same = prev.get("sig") == sig
     # a saved plan far shorter than asked is a failed one, not one to repeat
@@ -519,7 +552,7 @@ def fill(shots, problems, durs, names, ordered, log):
         d, got = durs[i], None
         for f in sorted(names, key=lambda f: (per[f], -num(f) if ordered else 0, f)):
             if per[f] >= cap(f): continue
-            for x0, L in candidates(f):
+            for x0, L in ranked(f):
                 g = place(f, x0, d, used, L)
                 if g: got = (f, g[0], g[1]); break
             if got: break

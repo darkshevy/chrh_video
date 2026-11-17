@@ -256,6 +256,51 @@ class Job:
 JOB = Job()
 
 
+def montage_project(video):
+    """CHRH_Deckinginstallation_montage_v10.mp4 -> deckinginstallation"""
+    m = re.match(r"CHRH_(.+?)_montage_v\d+", os.path.basename(video), re.I)
+    return m.group(1).lower() if m else ""
+
+
+def shots_of(video):
+    """The montage's shots with where each sits in the video, and the owner's verdict on each so far."""
+    import taste
+    stem = os.path.splitext(os.path.basename(video))[0].replace("_voiced", "")
+    plan = os.path.join(OUT, stem + "_plan.txt")
+    st = taste._load()
+    out, at = [], 0.0
+    for i, (clip, tin, dur) in enumerate(taste.plan_shots(plan)):
+        verdict = next((k[:-1] for k in ("likes", "dislikes") for r in st[k]
+                        if r["clip"] == clip and abs(r["t0"] - tin) < 1.0 and r.get("src") != "voiced"), None)
+        out.append({"i": i, "clip": clip, "tin": tin, "dur": dur, "at": round(at, 2), "verdict": verdict})
+        at += dur
+    return out
+
+
+def feedback(video, i, kind):
+    """👍 / 👎 on one shot of a montage -> taste.json."""
+    import taste
+    sh = shots_of(video)
+    if not (0 <= i < len(sh)): raise ValueError("нет такого кадра")
+    s = sh[i]
+    path = footage_files().get(s["clip"])
+    if not path: raise ValueError("клип не найден в footage")
+    taste.add("likes" if kind == "like" else "dislikes", montage_project(video), s["clip"], path,
+              s["tin"], s["tin"] + s["dur"], "button", 1.0)
+    return shots_of(video)
+
+
+def learn_from_voiced(video):
+    """A montage the owner voiced is one he accepted: its shots become weak likes."""
+    def step(job):
+        import taste
+        stem = os.path.splitext(os.path.basename(video))[0]
+        n = taste.from_plan(os.path.join(OUT, stem + "_plan.txt"), montage_project(video),
+                            lambda c: footage_files().get(c), log=job.say)
+        if n: job.say(f"запомнил {n} кадр(ов) этого монтажа как удачные")
+    return step
+
+
 def pin(project, clip, t, remove=False):
     """A moment the owner wants in the cut (★ in the preview): montage puts it in whatever Gemini picks."""
     cur = jload(CURRENT, {})
@@ -285,7 +330,7 @@ def backup(job):
         return p.returncode
     br = subprocess.run(["git", "-C", ROOT, "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True,
                         text=True).stdout.strip() or "main"
-    g("add", "--", "pipeline/library.json", "scripts")
+    g("add", "--", "pipeline/library.json", "pipeline/taste.json", "scripts")
     if subprocess.run(["git", "-C", ROOT, "diff", "--cached", "--quiet"]).returncode:
         g("commit", "-m", f"Backup: clip library and scripts, {time.strftime('%Y-%m-%d %H:%M')}")
         job.say("изменения записаны")
@@ -335,6 +380,9 @@ class H(BaseHTTPRequestHandler):
         if p.startswith("/footage/"):
             f = footage_files().get(os.path.basename(p[len("/footage/"):]))
             return self.media(f, root=FOOTAGE) if f else self.send(404, {"error": "no file"})
+        if p == "/api/shots":
+            m = re.search(r"video=([^&]*)", u.query or "")
+            return self.send(200, shots_of(unquote(m[1])) if m else [])
         if p == "/api/job":
             since = int((re.search(r"since=(\d+)", u.query or "") or [0, 0])[1])
             return self.send(200, JOB.view(since))
@@ -395,8 +443,15 @@ class H(BaseHTTPRequestHandler):
             tp = os.path.join(tdir, os.path.splitext(name)[0] + "_input.txt")
             open(tp, "w", encoding="utf-8").write(text + "\n")
             args = ["dub.py", src, tp] + (["--landscape"] if d.get("landscape") else [])
-            ok = JOB.start("dub", f"Озвучка: {name}", [args])
+            steps = [args] + ([learn_from_voiced(name)] if montage_project(name) else [])
+            ok = JOB.start("dub", f"Озвучка: {name}", steps)
             return self.send(200 if ok else 409, {"ok": ok, "error": None if ok else "уже идёт другая задача"})
+        if p == "/api/feedback":
+            try:
+                return self.send(200, {"shots": feedback(os.path.basename(str(d.get("video", ""))),
+                                                         int(d.get("i", -1)), str(d.get("kind", "")))})
+            except Exception as e:
+                return self.send(400, {"error": str(e)})
         if p == "/api/pin":
             proj = re.sub(r"[^A-Za-z0-9_\-]", "", str(d.get("project", "")))
             clip = os.path.basename(str(d.get("clip", "")))

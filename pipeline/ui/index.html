@@ -95,6 +95,16 @@ a{color:var(--accent2)}
 .chip{background:rgba(245,166,35,.15);color:var(--accent);border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer}
 .chip b{margin-left:6px;color:var(--muted)}
 .fc .im em{position:absolute;top:5px;right:5px;font-style:normal;font-size:11px;font-weight:700;background:var(--accent);color:#1a1200;padding:1px 6px;border-radius:6px}
+#ovbody.rate{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+#ovbody.rate video{max-height:78vh;max-width:46vw}
+.shots{display:flex;flex-direction:column;gap:6px;max-height:78vh;overflow:auto;min-width:320px;max-width:44vw}
+.shot{display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:10px;padding:7px 10px;font-size:13px;border:1px solid transparent}
+.shot.cur{border-color:var(--accent)}
+.shot .tt{color:var(--muted);min-width:78px;cursor:pointer}
+.shot .nm{flex:1;cursor:pointer;word-break:break-all}
+.shot button{border:1px solid var(--line);background:#12151b;border-radius:8px;padding:3px 8px;cursor:pointer;font-size:14px}
+.shot button.on.like{background:rgba(62,207,142,.25);border-color:var(--ok)}
+.shot button.on.dislike{background:rgba(255,93,93,.25);border-color:var(--bad)}
 .toast{position:fixed;top:70px;right:24px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:.2s;z-index:20}
 .toast.on{opacity:1}
 </style>
@@ -171,7 +181,7 @@ let projects = [], vids = [], selP = null, selV = null, jobN = 0, wasRunning = f
 const fmtDate = t => t ? new Date(t*1000).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}) : "";
 const fmtDur = d => d ? (d>=60 ? `${Math.floor(d/60)}:${String(Math.round(d%60)).padStart(2,"0")}` : `${d.toFixed(0)} с`) : "";
 function dateRange(a,b){ const x=fmtDate(a), y=fmtDate(b); return !a ? "" : x===y ? x : `${x} – ${y}`; }
-function closeOv(){ $("#ov").classList.remove("on"); $("#ovbody").innerHTML=""; $("#ovpins").innerHTML="";
+function closeOv(){ $("#ov").classList.remove("on"); $("#ovbody").innerHTML=""; $("#ovbody").className=""; $("#ovpins").innerHTML="";
   if(pinsChanged && selP){ pinsChanged=false; const p=projects.find(x=>x.name===selP); if(p) loadFiles(p); } }
 let pinsChanged = false;
 function drawPins(f){
@@ -199,12 +209,38 @@ function openFile(f){
   $("#ov").classList.add("on");
   if(f.kind==="clip" && selP) drawPins(f);
 }
+async function rateVideo(name){
+  const sh = await get("/api/shots?video=" + encodeURIComponent(name));
+  if(!sh.length){ toast("У этого ролика нет плана кадров"); return; }
+  const body = $("#ovbody"); body.className = "rate";
+  body.innerHTML = `<video src="${media(name)}" controls></video><div class="shots" id="shots"></div>`;
+  $("#ovt").innerHTML = `${esc(name)} — 👍 такие кадры брать чаще, 👎 этот момент больше не брать, похожие реже`;
+  $("#ovpins").innerHTML = "";
+  $("#ov").classList.add("on");
+  const v = body.querySelector("video");
+  const draw = list => {
+    $("#shots").innerHTML = list.map(s => `<div class="shot" data-i="${s.i}">
+      <span class="tt" data-at="${s.at}">${s.at.toFixed(1)}–${(s.at+s.dur).toFixed(1)} с</span>
+      <span class="nm" data-at="${s.at}">${esc(s.clip)} @${s.tin.toFixed(1)}</span>
+      <button class="like ${s.verdict==="like"?"on":""}" data-k="like" title="хороший кадр">👍</button>
+      <button class="dislike ${s.verdict==="dislike"?"on":""}" data-k="dislike" title="плохой кадр">👎</button></div>`).join("");
+    document.querySelectorAll("#shots [data-at]").forEach(e => e.onclick = () => { v.currentTime = +e.dataset.at + 0.05; v.play(); });
+    document.querySelectorAll("#shots button").forEach(b => b.onclick = async () => {
+      const i = +b.closest(".shot").dataset.i;
+      const r = await post("/api/feedback", {video:name, i, kind:b.dataset.k});
+      if(r.shots){ draw(r.shots); toast(b.dataset.k==="like" ? "Запомнил: хороший кадр" : "Запомнил: плохой кадр"); }
+    });
+  };
+  draw(sh);
+  v.ontimeupdate = () => { const t = v.currentTime;
+    document.querySelectorAll("#shots .shot").forEach((e,k) => e.classList.toggle("cur", t >= sh[k].at && t < sh[k].at + sh[k].dur)); };
+}
 function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2600); }
 async function get(u){ return (await fetch(u)).json(); }
 async function post(u, body){
   const r = await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});
   const d = await r.json().catch(()=>({}));
-  if(!r.ok) toast(d.error || "не получилось"); else if(u!=="/api/open" && u!=="/api/pin") pollJob(true);
+  if(!r.ok) toast(d.error || "не получилось"); else if(!["/api/open","/api/pin","/api/feedback"].includes(u)) pollJob(true);
   return d;
 }
 
@@ -317,8 +353,9 @@ function drawGrid(){
       <video src="${media(v.name)}#t=1" controls preload="metadata"></video>
       <div class="name">${esc(v.name)}</div>
       <div class="links">${v.voiced?'<span class="badge ok">с голосом</span>':v.montage?'<span class="badge">монтаж</span>':'<span class="badge acc">свой</span>'}
-        <a href="${media(v.name)}" download>скачать</a>${v.plan?`<a href="${media(v.plan)}" target="_blank">план</a>`:""}${v.sheet?`<a href="${media(v.sheet)}" target="_blank">кадры</a>`:""}</div></div>`).join("")
+        ${v.montage&&v.plan?`<a href="#" data-rate="${esc(v.name)}">оценить кадры</a>`:""}<a href="${media(v.name)}" download>скачать</a>${v.plan?`<a href="${media(v.plan)}" target="_blank">план</a>`:""}${v.sheet?`<a href="${media(v.sheet)}" target="_blank">кадры</a>`:""}</div></div>`).join("")
     || `<div class="empty">Пока пусто</div>`;
+  document.querySelectorAll("#vgrid [data-rate]").forEach(a => a.onclick = e => { e.preventDefault(); rateVideo(a.dataset.rate); });
 }
 
 /* ---------- the running job ---------- */
@@ -343,10 +380,11 @@ async function pollJob(force){
     res.style.display = "flex";
     res.innerHTML = `<video src="${media(j.result)}" controls muted title="нажми — откроется крупно"></video>
       <div class="row"><b>${esc(j.result)}</b></div>
-      <div class="row"><button class="btn" id="big">Смотреть крупно</button>${j.kind==="montage"?`<button class="btn primary" id="todub">Озвучить этот ролик</button>`:""}</div>`;
+      <div class="row"><button class="btn" id="big">Смотреть крупно</button>${j.kind==="montage"?`<button class="btn" id="rate">Оценить кадры</button><button class="btn primary" id="todub">Озвучить этот ролик</button>`:""}</div>`;
     const big = () => { res.querySelector("video").pause(); $("#ovbody").innerHTML = `<video src="${media(j.result)}" controls autoplay></video>`;
       $("#ovt").textContent = j.result; $("#ov").classList.add("on"); };
     $("#big").onclick = big; res.querySelector("video").onclick = e => { e.preventDefault(); big(); };
+    if($("#rate")) $("#rate").onclick = () => { res.querySelector("video").pause(); rateVideo(j.result); };
     if($("#todub")) $("#todub").onclick = () => { selV = j.result; document.querySelector('nav button[data-t="dub"]').click(); setTimeout(drawVForm, 300); };
   } else if(j.running && res.dataset.shown) { res.style.display = "none"; res.innerHTML = ""; res.dataset.shown = ""; }
   if(wasRunning && !j.running){ loadVideos(); loadProjects(); }
