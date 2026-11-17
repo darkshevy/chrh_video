@@ -113,7 +113,7 @@ def place(f, t, d, used, L=None):
 def capacity(names, photos):
     """Shots the footage holds without repeating itself: per clip one per 2.5 s of steady footage, at most
     montage.MAX_PER_CLIP (a short steady stretch still gives one); a photo one."""
-    return sum(min(montage.MAX_PER_CLIP, len(candidates(f))) for f in names) + len(photos)
+    return sum(min(cap(f), len(candidates(f))) for f in names) + len(photos)
 
 
 RULES = """You are the editor of short vertical promo videos for a car hauler (car carrier trailer) repair shop.
@@ -129,13 +129,16 @@ Rules, in order of importance:
    beats a calm view of a wall or of someone standing. "(handheld)" ids move with the hand and are stabilised;
    use them freely when they show the work. Avoid any id that you see is blurred, dark, or the phone being
    raised or lowered.
-2. The order of the work. Damage first, then removal / cutting / grinding, fitting, welding, paint, and the
-   finished result last. Never show a finished part before the work that made it.
-3. Start strong: the first shot is the clearest view of the damage (or of the job, if there is no damage).
-   End on the best-looking finished result.
+2. Tell a story in three parts, in this order, as far as the footage allows (a part with no footage is
+   skipped): BEGINNING — what came in: the damage, the old part, the bare frame (about 20% of the time);
+   PROCESS — the work: cutting, grinding, fitting, welding, paint (about 50%); RESULT — the finished job,
+   several shots from different angles and details (about 30%; a long clip of the finished work deserves
+   three to five of its best moments, not one). Never show a finished part before the work that made it.
+3. Start strong: the first shot is the clearest view of the beginning (the damage, or the job if there is
+   none). End on the best-looking shot of the result.
 4. Action and detail win (even handheld): sparks, the welding arc, a cut, grinding, a hand fitting a part, a sharp close-up of
    the damage or of a fresh weld. Skip empty or repetitive moments, a wall, the floor, people standing.
-5. Variety: at most three shots from one clip, never the same moment twice; when two shots come from one clip
+5. Variety: at most three shots from one clip (five from a RESULT clip), never the same moment twice; when two shots come from one clip
    they must show clearly different moments.
 6. Tell the whole job: every clip that has a usable stretch is a step of the work — use each of them at
    least once before using any clip a second time.
@@ -177,8 +180,36 @@ def ask_plan(parts, durs, note, ordered, extra=""):
             + extra +
             '\nReply with JSON only: {"shots": [{"slot": 0, "id": "c3.2", '
             '"why": "a few words", "key": false}], "title": "2-4 words, max 22 characters, capitals, the repair", '
-            '"sub": "max 30 characters, capitals, the gist", "note": "one sentence about the cut"}')
+            '"sub": "max 30 characters, capitals, the gist", "note": "one sentence about the cut", '
+            '"stages": {"<clip number>": "begin|process|result"} for every clip you watched}')
     return gemini.ask_json(parts + [{"text": task}])
+
+
+STAGES = {}          # clip file -> begin|process|result for this run (from Gemini, else from the clip numbers)
+RESULT_MAX = 5       # shots from a clip of the finished job: the payoff the owner wants to see at length
+RESULT_SHARE = 0.25  # at least this share of the video shows the result when there is footage of it
+
+
+def set_stages(res, names, ordered, log):
+    """Which clips are the beginning, the work and the result: Gemini's answer, else for numbered clips the
+    first is the beginning and the last the result."""
+    STAGES.clear()
+    by_num = {num(f): f for f in names}
+    for k, v in (res.get("stages") or {}).items():
+        f = by_num.get(int(re.sub(r"\D", "", str(k)) or -1))
+        if f and str(v).lower() in ("begin", "process", "result"): STAGES[f] = str(v).lower()
+    usable = [f for f in sorted(names, key=lambda n: (num(n), n)) if candidates(f)]
+    if ordered and usable:
+        STAGES.setdefault(usable[0], "begin")
+        if "result" not in STAGES.values(): STAGES[usable[-1]] = "result"
+    if STAGES:
+        log("   story: " + "  ".join(f"{st}: " + ",".join(str(num(f)) for f in sorted(STAGES, key=num)
+                                                       if STAGES[f] == st) for st in ("begin", "process", "result")
+                                     if st in STAGES.values()))
+
+
+def cap(f):
+    return RESULT_MAX if STAGES.get(f) == "result" else montage.MAX_PER_CLIP
 
 
 def resolve(r, lower, table):
@@ -214,7 +245,7 @@ def check(res, durs, names, photos, ordered):
                               push=bool(r.get("key")) and sum(1 for s in shots if s.get("push")) < 3,
                               seg={"stage": "photo", "shows": r.get("why", "")}))
             continue
-        if per[f] >= montage.MAX_PER_CLIP:
+        if per[f] >= cap(f):
             problems.append((i, f"a fourth shot from {f}")); continue
         got = place(f, t, d, used, L)
         if got is None:
@@ -229,6 +260,43 @@ def check(res, durs, names, photos, ordered):
     return shots, problems
 
 
+def balance(shots, names, ordered, log):
+    """The result gets its time: a 25-s clip of the finished deck got one 2-s shot. While the result shows
+    under RESULT_SHARE of the video, a doubled shot of the work is swapped for another moment of the result."""
+    res_clips = [f for f in names if STAGES.get(f) == "result"]
+    if not res_clips: return shots
+    shots = list(shots)
+    total = lambda: sum(s["dur"] for s in shots)
+    rtime = lambda: sum(s["dur"] for s in shots if s["file"] in res_clips)
+    n = 0
+    while rtime() < RESULT_SHARE * total():
+        per = collections.Counter(s["file"] for s in shots
+                                  if not s.get("photo") and STAGES.get(s["file"], "process") == "process")
+        donors = [f for f, c in per.most_common() if c >= 2]
+        if not donors: break
+        j = max(i for i, s in enumerate(shots) if s["file"] == donors[0])
+        d = shots[j]["dur"]
+        used = collections.defaultdict(list)
+        for i, s in enumerate(shots):
+            if i != j and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
+        got = None
+        for f in res_clips:
+            if sum(1 for s in shots if s["file"] == f) >= cap(f): continue
+            # later moments of the finished work first: the end of a result clip is usually the best look
+            for x, L in reversed(candidates(f)):
+                g = place(f, x, max(d, 2.5), used, L)
+                if g: got = (f, g); break
+            if got: break
+        if not got: break
+        f, (x, dd) = got
+        shots[j] = dict(file=f, tin=round(x, 2), dur=dd, why="more of the result (added by code)",
+                        seg={"stage": "result", "shows": ""})
+        n += 1
+    if n: log(f"   {n} more shot(s) of the result, in place of repeated work")
+    if ordered: shots.sort(key=lambda s: (num(s["file"]), s["file"], s["tin"]))
+    return shots
+
+
 def cover(shots, names, ordered, log):
     """Every clip with steady footage gets a shot: a cut of 4 clips out of 9 did not tell what the job was.
     An unused clip takes the slot of a clip that has the most shots (its later duplicate), at the unused
@@ -236,7 +304,7 @@ def cover(shots, names, ordered, log):
     shots = list(shots)
     for f in sorted(names, key=lambda n: (num(n), n)):
         if any(s["file"] == f for s in shots) or not good_ranges(f): continue
-        per = collections.Counter(s["file"] for s in shots if not s.get("photo"))
+        per = collections.Counter(s["file"] for s in shots if not s.get("photo") and STAGES.get(s["file"]) != "result")
         if not per or per.most_common(1)[0][1] < 2: break       # nothing doubled left to give up
         donor = per.most_common(1)[0][0]
         j = max(i for i, s in enumerate(shots) if s["file"] == donor)
@@ -257,7 +325,7 @@ def cover(shots, names, ordered, log):
 PLANS = os.path.join(os.path.dirname(HERE), "work", "gemini_plans.json")
 # bump when the way shots are chosen changes: a plan made by older code must not be reused (a 4-shot plan
 # from the 3-s candidates came back after the fix)
-PLAN_VERSION = 3     # 3: handheld shots allowed (only strong shake is out)
+PLAN_VERSION = 4     # 3: handheld shots allowed; 4: beginning-process-result story, result gets 25%+
 
 
 def plan_sig(prefix, names, photos, seconds, ordered, note):
@@ -328,6 +396,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
     parts, listing = clip_parts(names, photos, log)
 
     res = ask_plan(parts, durs, note, ordered, other)
+    set_stages(res, names, ordered, log)
     shots, problems = check(res, durs, names, photos, ordered)
     if problems:
         log(f"{len(problems)} shot(s) do not hold up; asking again for those…")
@@ -353,6 +422,7 @@ def run(prefix, names, photos, seconds, ordered, note, dry=False, log=print, fre
         extra = [2.5] * int(short // 2.5)
         shots, _ = fill(shots, [(len(durs) + k, "top-up") for k in range(len(extra))], durs + extra, names,
                         ordered, log)
+    shots = balance(shots, names, ordered, log)
     title = re.sub(r"\s+", " ", str(res.get("title") or prefix).upper()).strip()[:22]
     sub = re.sub(r"\s+", " ", str(res.get("sub") or "")).upper().strip()[:30]
     show(shots, title, sub, log)
@@ -402,7 +472,7 @@ def fill(shots, problems, durs, names, ordered, log):
     for i, why in problems:
         d, got = durs[i], None
         for f in sorted(names, key=lambda f: (per[f], -num(f) if ordered else 0, f)):
-            if per[f] >= montage.MAX_PER_CLIP: continue
+            if per[f] >= cap(f): continue
             for x0, L in candidates(f):
                 g = place(f, x0, d, used, L)
                 if g: got = (f, g[0], g[1]); break
@@ -440,7 +510,7 @@ def replace(shots, bad, res, names, photos, ordered):
         used = collections.defaultdict(list)
         for j, s in enumerate(out):
             if j != i and not s.get("photo"): used[s["file"]].append((s["tin"], s["tin"] + s["dur"] + 0.3))
-        if sum(1 for j, s in enumerate(out) if j != i and s["file"] == f) >= montage.MAX_PER_CLIP: continue
+        if sum(1 for j, s in enumerate(out) if j != i and s["file"] == f) >= cap(f): continue
         got = place(f, t, d, used, L)
         if got is None: continue
         x, d = got
